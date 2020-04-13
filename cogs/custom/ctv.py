@@ -1,7 +1,6 @@
 import discord
 from discord.ext import commands
 from core.bot import perms
-# from core.bot.funcs import *
 from core.color import trace
 from core.logger import log
 from core import json
@@ -24,6 +23,7 @@ class Custom(commands.Cog):
     @perms.is_admin()
     async def ctv(self, ctx):
         if not ctx.invoked_subcommand:
+            # Todo: Implement announcements
             # ctv_live = await is_online()
             # await assignment_checks(self, ctv_live)
             # for x in ctx.guild.members:
@@ -199,11 +199,12 @@ async def reset(self):
     try:
         for x in self.bot.guilds:
             gid = data.base['ctv_guilds'].find_one(guild=x.id)
-            for m in x.members:
-                for r in m.roles:
-                    if r.id == gid['give_role']:
-                        await m.remove_roles(r)
-                        break
+            if gid:
+                for m in x.members:
+                    for r in m.roles:
+                        if r.id == gid['give_role']:
+                            await m.remove_roles(r)
+                            break
     except Exception as err:
         import traceback
         import random
@@ -212,4 +213,3 @@ async def reset(self):
         log.exception(f'Code #{number}', exc_info=err)
         # log.error(f'Error occurred in ctv.reset. code #{number}')
         # log.exception(err)
-
