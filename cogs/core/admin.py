@@ -1,17 +1,17 @@
 import discord
 from discord.ext import commands
-from func.color import trace
-from func.funcs import *
-from func.tools import *
+from core.color import trace
+from core.bot.funcs import *
+from core.bot.tools import *
 
 
 class Core(commands.Cog, command_attrs=dict(hidden=True)):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.group(aliases=['int', 'admin', 'bot', 'system', 'info', 'debug', 'dbg'])
+    @commands.group(aliases=['int', 'internal', 'bot', 'system', 'info', 'debug', 'dbg'])
     @commands.is_owner()  # OWNER ONLY FOR ENTIRE GROUP
-    async def internal(self, ctx):
+    async def admin(self, ctx):
         if not ctx.invoked_subcommand:
             com = []
             for x in self.bot.walk_commands():
@@ -26,18 +26,18 @@ class Core(commands.Cog, command_attrs=dict(hidden=True)):
             for x in t:
                 log(x)
 
-    @internal.command(name='cog')
+    @admin.command(name='cog')
     async def get_cog(self, ctx, name):
         cog = tls.Cog.fetch(self, name)
         log(cog.qualified_name)  # print(cog)
 
-    @internal.command(aliases=['servers'])
+    @admin.command(aliases=['servers'])
     async def guilds(self, ctx):  # LIST ALL GUILDS
         log(f'Number of Guilds that this bot is in: {len(self.bot.guilds)}')
         for x in self.bot.guilds:
             log(f'{x.id}: {x.name}')
 
-    @internal.group(aliases=['members'])
+    @admin.group(aliases=['members'])
     async def users(self, ctx):  # LIST ALL USERS
         if not ctx.invoked_subcommand:
             log(f'Number of Users that this bot can see: {len(self.bot.users)}')
@@ -51,7 +51,7 @@ class Core(commands.Cog, command_attrs=dict(hidden=True)):
         for x in matches:
             log(f'{x.id}: {x.name}#{x.discriminator}')
 
-    @internal.command(aliases=['member'])
+    @admin.command(aliases=['member'])
     async def user(self, ctx, *, arg):  # LIST ALL USERS
         user = await commands.UserConverter().convert(ctx=ctx, argument=arg)
         log(f'Viewing user: {user.id}: {user}')
@@ -64,7 +64,7 @@ class Core(commands.Cog, command_attrs=dict(hidden=True)):
         for x in guilds:
             log(f'{x.id}: {x.name}')
 
-    @internal.command(aliases=['server'])
+    @admin.command(aliases=['server'])
     async def guild(self, ctx, guild_id):  # LIST GUILD INFO
         guild = await self.bot.fetch_guild(guild_id)
         log(f'Viewing guild: {guild.id}: {guild}')
@@ -90,7 +90,7 @@ class Core(commands.Cog, command_attrs=dict(hidden=True)):
         if isinstance(err, commands.CommandInvokeError):
             log(f'Could not find guild in cache. Error message to follow.')
 
-    @internal.command(aliases=['createinvite'])
+    @admin.command(aliases=['createinvite'])
     async def invite(self, ctx, guild_id):  # LIST ALL USERS
         guild = await self.bot.fetch_guild(guild_id)
         log(f'Getting invite for guild: {guild.id}: {guild}')
@@ -111,7 +111,7 @@ class Core(commands.Cog, command_attrs=dict(hidden=True)):
             elif '50013' in str(err):
                 log(f'Failed to create invite for guild. Error message to follow.')
 
-    @internal.command()
+    @admin.command()
     async def commands(self, ctx):
         com = []
         for x in self.bot.walk_commands():
@@ -124,7 +124,7 @@ class Core(commands.Cog, command_attrs=dict(hidden=True)):
         log(f'{len(com)} commands (including sub-commands)')
         log(f'{pos} possible command combinations (including aliases)')
 
-    # @internal.command(aliases=['createinvite'])
+    # @admin.command(aliases=['createinvite'])
     # async def invite(self, ctx, guild_id):
     #     from func.ext.utility import guilds
     #     x = self.bot.get_guild(guild_id)

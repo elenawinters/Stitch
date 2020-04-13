@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
-from func.tools import *
-from func.funcs import *
+from core.bot.tools import *
+from core.bot.funcs import *
 
 
 class Preview(commands.Cog, command_attrs=dict(hidden=True)):

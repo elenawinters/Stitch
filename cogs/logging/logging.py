@@ -1,11 +1,7 @@
 import discord
 from discord.ext import commands
-import sys, traceback
-
-from func.color import trace
-from func.funcs import log, error
-from func.funcs import extensions
-from func import enums
+from core.color import trace
+from core.logger import log
 
 
 class Logs(commands.Cog):
@@ -14,11 +10,11 @@ class Logs(commands.Cog):
 
     @commands.Cog.listener()
     async def on_server_join(self, server):
-        log(f'> Joined {server.name}', enums.LogLevel.default)
+        log.info(f'> Joined {server.name}')
 
     @commands.Cog.listener()
     async def on_server_remove(self, server):
-        error(f'> Removed from {server.name}', enums.LogLevel.default)
+        log.error(f'> Removed from {server.name}')
 
 
 def setup(bot):

@@ -39,31 +39,36 @@ class Core(commands.Cog):
                     embed.add_field(name=f'Voices: ', value=f'{vcs} client')
                 else:
                     embed.add_field(name=f'Voices: ', value=f'{vcs} clients')
+                embed.set_footer(text=f'Latency of {round(self.bot.latency * 1000)}ms', icon_url=self.bot.user.avatar_url)
                 await msg.edit(content='Here is the current status:', embed=embed)
 
     @commands.command()
     async def members(self, ctx):
         """Display the amount of members in the server"""
-        await ctx.send(f'I am currently defending the {ctx.guild.member_count} members that are in this guild.')
+        await tls.Command.execute(self, ctx, 'status')
+        # await ctx.send(f'I am currently defending the {ctx.guild.member_count} members that are in this guild.')
 
     @commands.command(aliases=['guilds'])
     async def servers(self, ctx):
         """Display how many servers the bot is in"""
-        await ctx.send(f'I am currently defending {len(self.bot.guilds)} guilds.')
+        await tls.Command.execute(self, ctx, 'status')
+        # await ctx.send(f'I am currently defending {len(self.bot.guilds)} guilds.')
 
     @commands.command(aliases=['pong'])
     async def ping(self, ctx):
         """Get a ping response from Discord"""
-        before = time.monotonic()
-        msg = await ctx.send('Pong!')
-        ping = round((time.monotonic() - before) * 1000)
-        await msg.edit(content=f'Pong! `{ping}ms`')
+        await tls.Command.execute(self, ctx, 'status')
+        # before = time.monotonic()
+        # msg = await ctx.send('Pong!')
+        # ping = round((time.monotonic() - before) * 1000)
+        # await msg.edit(content=f'Pong! `{ping}ms`')
 
     @commands.command(aliases=['lat', 'late', 'wump'], hidden=True)
     async def latency(self, ctx):
         """Get Discord's current latency"""
-        ping = round(self.bot.latency * 1000)
-        await ctx.send(content=f'Wump! `{ping}ms`')
+        await tls.Command.execute(self, ctx, 'status')
+        # ping = round(self.bot.latency * 1000)
+        # await ctx.send(content=f'Wump! `{ping}ms`')
 
     @commands.command()
     async def time(self, ctx):

@@ -22,6 +22,10 @@ class Experiments(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    # @commands.Cog.listener()
+    # async def on_ready(self):
+    #     raise Exception('Test error')
+
     @commands.group(name='test')
     @settings.enabled()
     @perms.subcommand()

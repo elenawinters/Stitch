@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
-from func import funcs
-from func import perms
+from core.bot import funcs
+from core.bot import perms
 
 
 class Moderation(commands.Cog):

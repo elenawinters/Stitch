@@ -1,12 +1,13 @@
 import discord
 from discord.ext import commands
-from func.color import trace
-from func.funcs import *
-from func.funcs import extensions
-from func import settings
-from func.tools import *
-from func import perms
-from func import enums
+from core.color import trace
+# from core.bot.funcs import *
+from core.bot.funcs import extensions
+from core.bot import settings
+from core.bot.tools import *
+from core.bot import perms
+from core.bot import enums
+from core.logger import log
 exceptions = ['restart', 'reload', 'help', 'enable', 'disable', 'cogs']
 
 
@@ -14,38 +15,38 @@ class Core(commands.Cog, command_attrs=dict(hidden=True)):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command()
-    @commands.is_owner()
-    async def broadcast(self, ctx, *, msg=''):
-        if len(msg) > 0:  # Fix/rework soon
-            counter = 0
-            for x in self.bot.guilds:
-                color = get_color(x.get_member(self.bot.user.id))
-                embed = tls.Embed(title=f'Message from {ctx.message.author.name}, owner of {self.bot.user.name}', description=f'{msg}', colour=color)
-                if True is True:  # FOR FUTURE SETTING
-                    # Specifically for setting a specific channel
-                    if x.system_channel is not None:
-                        try:
-                            await x.system_channel.send(embed=embed)
-                            counter += 1
-                        except discord.errors.Forbidden:
-                            log(f'Failed to send broadcast to {x.name}')
-                    else:
-                        try:
-                            good = False
-                            for y in x.text_channels:
-                                await y.send(embed=embed)
-                                counter += 1
-                                good = True
-                                break
-                            if not good:
-                                log(f'Failed to send broadcast to {x.name}')
-                        except discord.errors.Forbidden:
-                            log(f'Failed to send broadcast to {x.name}')
-
-            await ctx.send(f'Sent broadcast to {counter}/{len(self.bot.guilds)} servers.')
-        else:
-            await ctx.send(f'No message specified!')
+    # @commands.command()
+    # @commands.is_owner()
+    # async def broadcast(self, ctx, *, msg=''):
+    #     if len(msg) > 0:  # Fix/rework soon
+    #         counter = 0
+    #         for x in self.bot.guilds:
+    #             color = get_color(x.get_member(self.bot.user.id))
+    #             embed = tls.Embed(title=f'Message from {ctx.message.author.name}, owner of {self.bot.user.name}', description=f'{msg}', colour=color)
+    #             if True is True:  # FOR FUTURE SETTING
+    #                 # Specifically for setting a specific channel
+    #                 if x.system_channel is not None:
+    #                     try:
+    #                         await x.system_channel.send(embed=embed)
+    #                         counter += 1
+    #                     except discord.errors.Forbidden:
+    #                         log(f'Failed to send broadcast to {x.name}')
+    #                 else:
+    #                     try:
+    #                         good = False
+    #                         for y in x.text_channels:
+    #                             await y.send(embed=embed)
+    #                             counter += 1
+    #                             good = True
+    #                             break
+    #                         if not good:
+    #                             log(f'Failed to send broadcast to {x.name}')
+    #                     except discord.errors.Forbidden:
+    #                         log(f'Failed to send broadcast to {x.name}')
+    #
+    #         await ctx.send(f'Sent broadcast to {counter}/{len(self.bot.guilds)} servers.')
+    #     else:
+    #         await ctx.send(f'No message specified!')
 
     @commands.command(aliases=['refresh'])
     @commands.is_owner()  # I hate this command.
@@ -55,7 +56,7 @@ class Core(commands.Cog, command_attrs=dict(hidden=True)):
         unloaded = []
         import time
         before = time.monotonic()
-        log(f'{trace.red.s}> Reloading Extensions')
+        log.info(f'{trace.red.s}> Reloading Extensions')
         loaded = []
         for x in self.bot.extensions:
             loaded.append(x)
@@ -65,7 +66,7 @@ class Core(commands.Cog, command_attrs=dict(hidden=True)):
                 try:
                     self.bot.reload_extension(x)
                     if not arg == 'silent':
-                        log(f'{trace.cyan}> Reloaded {trace.yellow.s}{x}', enums.LogLevel.default)
+                        log.info(f'{trace.cyan}> Reloaded {trace.yellow.s}{x}', enums.LogLevel.default)
                     loaded.remove(x)
                 except Exception as e:
                     warnings.append(f'Failed to reload extension {x}.\n{e}')
@@ -85,22 +86,22 @@ class Core(commands.Cog, command_attrs=dict(hidden=True)):
                 warnings.append(f'Failed to unload extension {x}.\n{e}')
 
         if not cogs:
-            warn('No extensions were found.')
+            log.warn('No extensions were found.')
         else:
             for x in loading:
-                warn(f'> Loaded {x}', enums.LogLevel.info)
+                log.warn(f'> Loaded {x}', enums.LogLevel.info)
             for x in unloaded:
-                error(f'> Unloaded {x}', enums.LogLevel.info)
+                log.error(f'> Unloaded {x}', enums.LogLevel.info)
             for x in warnings:
                 y = x.split('\n')
-                warn(f'> {y[0]}', enums.LogLevel.calm)
-                error(f'> {y[1]}', enums.LogLevel.error)
+                log.warn(f'> {y[0]}', enums.LogLevel.calm)
+                log.error(f'> {y[1]}', enums.LogLevel.error)
             ping = round((time.monotonic() - before) * 1000)
-            log(f'{trace.cyan}> Reloaded {trace.yellow.s}{len(self.bot.extensions)} extensions {trace.cyan}in {trace.yellow.s}{ping}ms{trace.cyan}.')
+            log.info(f'{trace.cyan}> Reloaded {trace.yellow.s}{len(self.bot.extensions)} extensions {trace.cyan}in {trace.yellow.s}{ping}ms{trace.cyan}.')
             await ctx.send(f'Extensions reloaded. ({len(self.bot.extensions)}) (`{ping}ms`)')
-            from func import json
+            from core import json
             json.json()  # Reload memory
-            from func.login import version
+            from core.bot.login import version
             version.Discord.latest()  # Check for updates for Discord.py
             version.YouTubeDL.latest()  # Check for updates for YouTubeDL
             await tls.Activity.preset(self.bot)  # Update activity
@@ -114,7 +115,7 @@ class Core(commands.Cog, command_attrs=dict(hidden=True)):
             await ctx.send(f'{self.bot.user.name} is restarting.')
         else:
             await ctx.send(f'{self.bot.user.name} is restarting {message}.')
-        log(f'{trace.red.s}> Manual Restart: {trace.yellow.s}{self.bot.user.name}, {trace.cyan.s}{self.bot.user.id}, {trace.magenta.s}Restarting.')
+        log.info(f'{trace.red.s}> Manual Restart: {trace.yellow.s}{self.bot.user.name}, {trace.cyan.s}{self.bot.user.id}, {trace.magenta.s}Restarting.')
         await tls.Voice(ctx).disconnect()
         await self.bot.close()
 
@@ -125,7 +126,7 @@ class Core(commands.Cog, command_attrs=dict(hidden=True)):
             if x.name not in exceptions:
                 x.enabled = False
         await tls.Voice(ctx).disconnect()
-        log(f'{trace.red.s}> Lockdown: {trace.yellow.s}{self.bot.user.name}, {trace.cyan.s}{self.bot.user.id}, {trace.magenta.s}Halted.')
+        log.info(f'{trace.red.s}> Lockdown: {trace.yellow.s}{self.bot.user.name}, {trace.cyan.s}{self.bot.user.id}, {trace.magenta.s}Halted.')
         await self.bot.change_presence(status=discord.Status.do_not_disturb)
         await ctx.send(f'{self.bot.user.name} is now in lockdown.')
 
@@ -151,26 +152,6 @@ class Core(commands.Cog, command_attrs=dict(hidden=True)):
                     await ctx.send(f'Enabled **.{x.name}**')
                 break
 
-    @commands.command(aliases=['purge', 'claer'])
-    @perms.has_perms()
-    async def clear(self, ctx, arg='1'):
-        """Clears up to 250 messages
-        .clear [number of messages]"""
-        try:
-            await ctx.message.delete()
-        except Exception:
-            pass
-        if len(arg) > 0:
-            if is_number(arg):
-                if int(arg) <= 250:  # Hard limit.
-                    await ctx.message.channel.purge(limit=int(arg))
-                else:
-                    await ctx.send(f'Cannot clear more than 250 messages')
-            else:
-                await ctx.send(f'You need to specify a number!')
-        else:
-            await ctx.send(f'You need to specify how much you want to clear')
-            
 
 def setup(bot):
     bot.add_cog(Core(bot))

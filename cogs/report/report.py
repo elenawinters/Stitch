@@ -1,9 +1,9 @@
 import discord
 from discord.ext import commands
-from func.tools import split_string
-from func.tools import tls
+from core.bot.tools import split_string
+from core.bot.tools import tls
 from data.data import data
-from func.enums import *
+from core.bot.enums import *
 
 
 class Reporting(commands.Cog):
@@ -82,5 +82,5 @@ def setup(bot):
     bot.add_cog(Reporting(bot))
 
 
-class report_content: # Literally just here for the simulated error thingy.
+class report_content:  # Literally just here for the simulated error thingy.
     name = 'report_content'

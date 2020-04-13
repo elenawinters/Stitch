@@ -91,8 +91,11 @@ async def on_command(ctx):
 
 
 @client.event
-async def on_command_error(ctx, err):  # COMMAND ERROR HANDLER
-    if type(err) == commands.errors.CommandNotFound:  # UNKNOWN COMMAND
+async def on_command_error(ctx, exc):  # COMMAND ERROR HANDLER
+    if hasattr(ctx.command, 'on_error'):
+        return
+
+    if isinstance(exc, commands.CommandNotFound):
         delete_invalid_command = True
         if delete_invalid_command:
             com_name = list(ctx.message.content)
@@ -106,42 +109,51 @@ async def on_command_error(ctx, err):  # COMMAND ERROR HANDLER
                             pass
                         # Implement custom command support. This is per guild.
                         try:
-                            ccom = ast.literal_eval(data.base['cCom'].find_one(server=ctx.guild.id)['commands'])
+                            ccom = ast.literal_eval(data.base['ccom'].find_one(server=ctx.guild.id)['commands'])
                         except Exception:  # Whatever the exception, move on. People who use this base might not have cComs.
                             ccom = {}
                         cname = split_string(ctx.message.content, f'{client.command_prefix}').split(' ')[0]
                         if cname not in ccom:
-                            await ctx.send(f'Sorry {ctx.message.author.mention}, but the given command does not currently exist!')
+                            return await ctx.send(f'Sorry {ctx.message.author.mention}, but the given command does not currently exist!')
 
-    elif type(err) == commands.errors.MissingRequiredArgument:  # MISSING ARGUMENT
-        await respond(ctx, err, content=f'Sorry {ctx.message.author.mention}, but you\'re missing an important argument!')
-    elif type(err) == commands.errors.BadArgument:  # BAD ARGUMENT
-        await respond(ctx, err, content=f'Sorry {ctx.message.author.mention}, but an argument is incorrect!')
-    elif type(err) == commands.errors.DisabledCommand:  # DISABLED COMMAND
-        await ctx.send(f'Sorry {ctx.message.author.mention}, but the given command is currently disabled!')
-    elif type(err) == commands.errors.MissingPermissions:  # MISSING PERMISSIONS
-        await ctx.send(f'Sorry {ctx.message.author.mention}, you do not have permission to run that command!')
-    elif type(err) == commands.errors.NotOwner:  # MISSING PERMISSIONS
-        await ctx.send(f'Sorry {ctx.message.author.mention}, you do not have permission to run that command!')
-    elif type(err) == commands.errors.CheckFailure:  # MISSING PERMISSIONS?
+    elif isinstance(exc, commands.MissingRequiredArgument):
+        return await respond(ctx, err, content=f'Sorry {ctx.message.author.mention}, but you\'re missing an important argument!')
+
+    elif isinstance(exc, commands.BadArgument):
+        return await respond(ctx, err, content=f'Sorry {ctx.message.author.mention}, but an argument is incorrect!')
+
+    elif isinstance(exc, commands.DisabledCommand):
+        return await ctx.send(f'Sorry {ctx.message.author.mention}, but the given command is currently disabled!')
+
+    elif isinstance(exc, commands.MissingPermissions):
+        return await ctx.send(f'Sorry {ctx.message.author.mention}, you do not have permission to run that command!')
+
+    elif isinstance(exc, commands.NotOwner):
+        return await ctx.send(f'Sorry {ctx.message.author.mention}, you do not have permission to run that command!')
+
+    elif isinstance(exc, commands.CheckFailure):
         if ctx.guild is not None:
-            await ctx.send(f'Sorry {ctx.message.author.mention}, you do not have permission to run that command!')
-    else:  # UNHANDLED / GENERIC COMMAND ERROR HANDLER
-        log.error(f'> {trace.red}{ctx.cog.qualified_name.capitalize()}{trace.alert} encountered {trace.red}{type(err).__name__}'
-                  f'{trace.alert} while running {trace.red}{ctx.prefix}{ctx.command}{trace.alert} with error {trace.red}{err}')
+            return await ctx.send(f'Sorry {ctx.message.author.mention}, you do not have permission to run that command!')
+
+    else:
+        log.error(f'> {trace.red}{ctx.cog.qualified_name.capitalize()}{trace.alert} encountered {trace.red}{type(exc).__name__}'
+                  f'{trace.alert} while running {trace.red}{ctx.prefix}{ctx.command}{trace.alert} with error {trace.red}{exc}')
 
 
 @client.event
-async def on_error(event, *args, **kwargs):  # GENERAL ERROR HANDLER
-    err = err_traceback()
+async def on_error(event):  # GENERAL ERROR HANDLER
+    import traceback
+    import random
+    exc = sys.exc_info()
+    random.seed(traceback.format_exc())
+    number = random.randint(10000, 99999)
     log.error(f'> {trace.red}{event.capitalize()}{trace.alert} encountered {trace.red}'
-              f'{err[0].__name__}{trace.alert} with message {trace.red}{err[1]}')
-
-    log.critical(f'> {traceback.format_exc()}')
+              f'{exc[0].__name__}{trace.alert} with message {trace.red}{exc[1]}')
+    log.exception(f'Code #{number}', exc_info=exc)
 
 
 # Login
 try:
     login(client)
-except Exception:
-    log.exception()
+except Exception as err:
+    log.exception(err)

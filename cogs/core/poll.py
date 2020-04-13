@@ -1,8 +1,8 @@
 import discord
 from discord.ext import commands
-from func import settings
-from func.tools import *
-from func import perms
+from core.bot import settings
+from core.bot.tools import *
+from core.bot import perms
 color = discord.Colour.from_rgb(r=59, g=136, b=195)
 
 
@@ -20,8 +20,8 @@ class Core(commands.Cog):
             if len(msg) > 0:
                 embed = tls.Embed(title=f"Vote by **{ctx.author}**:", description=msg, colour=color)
                 vote = await ctx.send(embed=embed)
-                await vote.add_reaction(u"\U0001F53C") # UP ARROW
-                await vote.add_reaction(u"\U0001F53D") # DOWN ARROW
+                await vote.add_reaction(u"\U0001F53C")  # UP ARROW
+                await vote.add_reaction(u"\U0001F53D")  # DOWN ARROW
             else:
                 await ctx.send('You need to vote on something!')
         except Exception as e:
@@ -33,7 +33,7 @@ class Core(commands.Cog):
     async def poll(self, ctx, amount, *, msg=''):
         """Command to open poll
         `.poll [number of options] [text]`"""
-        base = ord(u"\U0001F1E6") # INDICATOR A
+        base = ord(u"\U0001F1E6")  # INDICATOR A
         try:
             if is_number(amount):
                 if 2 <= int(amount) <= 20:
@@ -63,8 +63,8 @@ class Core(commands.Cog):
             if len(msg) > 0:
                 embed = tls.Embed(title=f"Question by **{ctx.author}**:", description=msg, colour=color)
                 ask = await ctx.send(embed=embed)
-                await ask.add_reaction(u"\U0001F1FE") # Y SYMBOL
-                await ask.add_reaction(u"\U0001F1F3") # N SYMBOL
+                await ask.add_reaction(u"\U0001F1FE")  # Y SYMBOL
+                await ask.add_reaction(u"\U0001F1F3")  # N SYMBOL
             else:
                 await ctx.send('You need to ask something!')
         except Exception as e:

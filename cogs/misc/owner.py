@@ -1,11 +1,11 @@
 import discord
 import asyncio
 from discord.ext import commands
-from func.color import trace
-from func.funcs import *
-from func.enums import *
-from func.tools import *
-from func.defaults.setup import reset_logs
+from core.color import trace
+from core.bot.funcs import *
+from core.bot.enums import *
+from core.bot.tools import *
+from core.defaults.setup import reset_logs
 exceptions = ['restart', 'reload', 'help', 'enable', 'disable']
 
 

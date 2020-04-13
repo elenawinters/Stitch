@@ -1,9 +1,8 @@
 import discord
 from discord.ext import commands
-from func.funcs import log, error, warn
-from func.funcs import extensions
-from func.tools import *
-from func import perms
+from core.bot.funcs import extensions
+from core.bot.tools import *
+from core.bot import perms
 
 
 class Core(commands.Cog):

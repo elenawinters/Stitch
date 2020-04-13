@@ -5,8 +5,8 @@ from core.color import trace
 from core.logger import log
 from core.ext import assets
 import youtube_dl
-import functools
 import traceback
+import functools
 import requests
 import asyncio
 import random
@@ -17,84 +17,63 @@ class Music(commands.Cog):
         self.bot = bot
 
     @commands.command()
-    async def play(self, ctx, url=None):
+    async def play(self, ctx, arg=None):
         if await Player.can_connect(ctx, False):
             await Player.join(ctx.message.author)
         if Player.is_connected(ctx):
-            try:
-                if url is not None:
-                    async with ctx.typing():
-                        info, data = await Player.info(url, loop=self.bot.loop, ctx=ctx)
-                        # log.debug(info)
-                        if info is not None:
-                            if len(info) > 1:
-                                playlist = data['title']
-                            else:
-                                playlist = None
-                            embed = tls.Embed(ctx)
-                            for item in info:  # Append tracks to queue. Eventually it'll just be pfp and data.
-                                try:
-                                    item.update({'discord_mention': ctx.author.mention})
-                                    extractor = Player.Extractor.fetch(data)
-                                    queue[ctx.guild.id]['q'].append(item)
-                                    # log.debug(item)
-                                except KeyError as err:
-                                    log.error(err)
-                                    # break
-                            if playlist is None:
-                                item = await Player.process_picture(item, extractor[0])
-                                try:
-                                    # log.debug(queue[ctx.guild.id]['q'][-1]['extractor'])
-                                    embed.set_author(name=item['uploader'], url=item['uploader_url'], icon_url=queue[ctx.guild.id]['q'][-1]['pfp'])
-                                except KeyError as err:
-                                    embed.set_author(name=item['uploader'], icon_url=queue[ctx.guild.id]['q'][-1]['pfp'])
-                                embed.add_field(name=f"{item['title']}", value=f"has been added to the queue.", inline=False)
-                            else:
-                                embed.add_field(name=f"{len(info)} tracks added from", value=f" playlist **{playlist}**", inline=False)
-                            await ctx.send(embed=embed)
+            if arg is not None:
+                async with ctx.typing():
+                    info, data = await Player.info(arg, loop=self.bot.loop, ctx=ctx)
+                    if info is not None:
+                        if len(info) > 1:
+                            playlist = data['title']
+                        else:
+                            playlist = None
+                        embed = tls.Embed(ctx)
+                        for item in info:  # Append tracks to queue. Eventually it'll just be pfp and data.
+                            try:
+                                extractor = Player.Extractor.fetch(data)
+                                # print(extractor[0])
+                                if extractor[0] == 'youtube':
+                                    queue[ctx.guild.id]['q'].append({'url': item['webpage_url'], 'title': item['title'], 'author': item['uploader'], 'pfp': await Player.profile_picture(item['channel_id'], extractor[0]), 'data': item})
+                                else:
+                                    queue[ctx.guild.id]['q'].append({'url': item['webpage_url'], 'title': item['title'], 'author': item['uploader'], 'pfp': await Player.profile_picture(item['uploader_id'], extractor[0]), 'data': item})
+                            except KeyError as err:
+                                queue[ctx.guild.id]['q'].append({'url': item['webpage_url'], 'title': item['title'], 'author': item['uploader'], 'pfp': assets.Discord.error.value, 'data': item})
+                        if playlist is None:
+                            try:
+                                # log.debug(queue[ctx.guild.id]['q'][-1]['pfp'])
+                                embed.set_author(name=item['uploader'], url=item['uploader_url'].replace('http://', 'https://'), icon_url=queue[ctx.guild.id]['q'][-1]['pfp'])
+                            except KeyError:
+                                embed.set_author(name=item['uploader'], icon_url=queue[ctx.guild.id]['q'][-1]['pfp'])
+                            embed.add_field(name=f"{item['title']}", value=f"has been added to the queue.", inline=False)
+                        else:
+                            embed.add_field(name=f"{len(info)} tracks added from", value=f" playlist **{playlist}**", inline=False)
+                        await ctx.send(embed=embed)
 
-                else:  # If no URL specified, try to resume
-                    Player.resume(ctx)
+            else:  # If no URL specified, try to resume
+                Player.resume(ctx)
 
-                await Player.loop(self, ctx)
-
-            except Exception as err:
-                random.seed(traceback.format_exc())
-                number = random.randint(10000, 99999)
-                await ctx.send(f'Oops! Something went wrong! `(#{number})`')
-                log.exception(f'Code #{number}', exc_info=err)
+            await Player.loop(self, ctx)
 
     @commands.group(aliases=['q'])
     async def queue(self, ctx):
         if ctx.invoked_subcommand is None:
-            try:
-                if queue[ctx.guild.id]['playing']:  # If object exists in here, we show the queue
-                    embed = tls.Embed(ctx, description=f"Currently {(len(queue[ctx.guild.id]['q']) + 1)} songs in queue")
-                    curr = queue[ctx.guild.id]['playing'][0]
-                    try:
-                        embed.add_field(name=f"**>**[**1**] {curr['title']}", value=f"**Artist:** {curr['author']}", inline=False)
-                    except Exception:
-                        embed.add_field(name=f"**>**[**1**] {curr['title']}", value=f"**Added by:** {curr['discord_mention']}", inline=False)
-                    pos = 2
-                    for song in queue[ctx.guild.id]['q']:
-                        if pos <= 10:
-                            try:
-                                embed.add_field(name=f"[**{pos}**] {song['title']}", value=f"**Artist:** {song['author']}", inline=False)
-                            except Exception:
-                                embed.add_field(name=f"[**{pos}**] {song['title']}", value=f"**Added by:** {song['discord_mention']}", inline=False)
-                        pos += 1
-                    if pos > 10:
-                        dif = (len(queue[ctx.guild.id]['q']) + 1) - 10
-                        embed.set_footer(text=f'Plus {dif} other tracks.', icon_url=self.bot.user.avatar_url)
-                    await ctx.send(embed=embed)
-                else:
-                    await ctx.send('The queue is currently empty.')
-
-            except Exception as err:
-                random.seed(traceback.format_exc())
-                number = random.randint(10000, 99999)
-                await ctx.send(f'Oops! Something went wrong! `(#{number})`')
-                log.exception(f'Code #{number}', exc_info=err)
+            if len(queue[ctx.guild.id]['q']) >= 0:
+                embed = tls.Embed(ctx, description=f"Currently {(len(queue[ctx.guild.id]['q']) + 1)} songs in queue")
+                curr = queue[ctx.guild.id]['playing'][0]
+                embed.add_field(name=f"**>**[**1**] {curr['title']}", value=f"**Artist:** {curr['author']}", inline=False)
+                pos = 2
+                for song in queue[ctx.guild.id]['q']:
+                    if pos <= 10:
+                        embed.add_field(name=f"[**{pos}**] {song['title']}", value=f"**Artist:** {song['author']}", inline=False)
+                    pos += 1
+                if pos > 10:
+                    dif = (len(queue[ctx.guild.id]['q']) + 1) - 10
+                    embed.set_footer(text=f'Plus {dif} other tracks.')
+                await ctx.send(embed=embed)
+            else:
+                await ctx.send('The queue is currently empty.')
 
     @queue.command()
     async def backend(self, ctx):
@@ -108,8 +87,6 @@ class Music(commands.Cog):
     async def clear(self, ctx):
         if Player.is_connected(ctx):
             queue[ctx.guild.id]['q'].clear()
-        else:
-            await ctx.send('Not connected to voice')
 
     @queue.command()
     async def remove(self, ctx, loc: int):
@@ -119,7 +96,7 @@ class Music(commands.Cog):
                 del queue[ctx.guild.id]['q'][loc - 2]
                 await ctx.send(embed=embed)
             except IndexError:
-                await ctx.send(f'Nothing at index location {loc} exists!')
+                pass
 
     @queue.command(aliases=['shuff'])
     async def shuffle(self, ctx):
@@ -137,7 +114,7 @@ class Music(commands.Cog):
             curr = queue[ctx.guild.id]['playing'][0]
             import math
             try:
-                desc = curr['description']
+                desc = curr['data']['description']
                 # length = math.sqrt((len(desc))) + 200
                 # desc = desc[:int(length)]
                 # desc = desc[:248]
@@ -149,17 +126,14 @@ class Music(commands.Cog):
                 embed = tls.Embed(ctx, title=curr['title'], description=f'{desc}...')
             else:
                 embed = tls.Embed(ctx, title=curr['title'])
+            embed.set_image(url=curr['data']['thumbnail'])
             try:
-                embed.set_image(url=curr['thumbnail'])
+                embed.set_author(name=curr['author'], url=curr['data']['uploader_url'].replace('http://', 'https://'), icon_url=curr['pfp'])
             except KeyError:
-                pass
-            try:
-                embed.set_author(name=curr['uploader'], url=curr['uploader_url'], icon_url=curr['pfp'])
-            except KeyError:
-                embed.set_author(name=curr['uploader'], icon_url=curr['pfp'])
-            if curr['pfp'] != discord.Embed.Empty:
-                embed.set_thumbnail(url=curr['pfp'])
-            # log.debug(curr['pfp'])
+                embed.set_author(name=curr['author'], icon_url=curr['pfp'])
+            # For some reason YouTube stores it's channel URLs as HTTP instead of HTTPS. We fix that above.
+            # In reality, it doesn't really make a difference, but I want it to be HTTPS
+            embed.set_thumbnail(url=curr['pfp'])
             await ctx.send(embed=embed)
 
     @commands.command(aliases=['next'])
@@ -264,31 +238,18 @@ class Player:
             while Player.has_queue(ctx):
                 if not Player.is_playing(ctx) and not Player.is_paused(ctx):
                     try:
-                        try:
-                            url = queue[ctx.guild.id]['q'][0]['webpage_url']
-                        except Exception:
-                            url = queue[ctx.guild.id]['q'][0]['id']
+                        url = queue[ctx.guild.id]['q'][0]['url']
+                        # log.debug(url)
                         stream = await YTDLSource.create_source(url=url, loop=self.bot.loop)
+                        # log.debug(stream)
                         Player.play(ctx, stream)
                         new = queue[ctx.guild.id]['q'].pop(0)
-                        if 'ie_key' in new:  # if Playlist object
-                            if new['ie_key'].lower() == 'youtube':
-                                added_by = new['discord_mention']
-                                data_trunk, new = await Player.info(new['id'], loop=self.bot.loop, ctx=ctx)
-                                # new = new[0]  # Format into usable form
-                                new.update({'discord_mention': added_by})
-                        extractor = Player.Extractor.fetch(new)
-                        new = await Player.process_picture(new, extractor)
-                        # log.debug(new)
                         queue[ctx.guild.id]['playing'].insert(0, new)
                         queue[ctx.guild.id]['player'] = stream
                         embed = tls.Embed(ctx, title=new['title'], description='is now playing.')
-                        # log.debug(new['pfp'])
-                        try:
-                            embed.set_author(name=new['uploader'], url=new['uploader_url'], icon_url=new['pfp'])
-                        except KeyError as err:
-                            embed.set_author(name=new['uploader'], icon_url=new['pfp'])
-                        # embed.set_image(url=new['thumbnail'])
+                        # log.debug(new['data']['uploader_url'])
+                        embed.set_author(name=new['author'], url=new['data']['uploader_url'].replace('http://', 'https://'), icon_url=new['pfp'])
+                        # embed.set_image(url=new['data']['thumbnail'])
                         try:
                             await ctx.send(embed=embed)
                         except Exception as e:
@@ -328,10 +289,7 @@ class Player:
     @classmethod
     def is_connected(cls, ctx):  # Is the bot connected to voice?
         if ctx.me.voice is not None:
-            try:
-                return ctx.guild.voice_client.is_connected()
-            except AttributeError:
-                return False
+            return ctx.guild.voice_client.is_connected()
         else:
             return False
 
@@ -359,44 +317,26 @@ class Player:
         # if inurl.casefold() in MusicTests.__members__.keys():
         #     url = MusicTests[inurl.casefold()].value
         try:
-            data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=False, process=False))
-            # log.debug(data)
+            data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=False))
         except Exception as err:
             if ctx is not None:
                 await respond(ctx, err, url)
             data = {}
 
         if do_log:
-            log.debug(data)
+            print(data)
         if 'extractor_key' in data:
             if data['extractor_key'] == 'YoutubeSearch':
                 return None, None
             else:
                 if 'entries' in data:
-                    count = 0
-                    entries = []
-                    for x in data['entries']:  # Don't add to output
-                        if not x['title'] == '[Deleted video]' or x['title'] == '[Private video]':
-                            entries.append(x)
-                        if count >= 1000:
-                            break
-                        count += 1
-                    return entries, data
+                    return data['entries'], data
                 else:
-                    # log.debug(data)
                     return [data], data
         else:
             return None, None
 
-    @classmethod
-    async def process_picture(cls, _dict, platform):
-        if 'channel_id' in _dict:  # Get profile picture
-            pfp = await Player.profile_picture(_dict['channel_id'], platform)
-        else:
-            pfp = await Player.profile_picture(_dict['uploader_id'], platform)
-        _dict.update({'pfp': pfp})
-        return _dict
-
+    # For the following, you need a Google API key.
     @classmethod
     async def profile_picture(cls, _id, extractor='youtube'):
         from core.bot.tools import crypt
@@ -404,7 +344,6 @@ class Player:
         from core import json
         # print(_id)
         # print(extractor)
-        # log.debug(extractor)
         info = data.base['cache'].find_one(id=_id, platform=extractor)
         # print(info)
         try:
@@ -412,11 +351,10 @@ class Player:
                 if extractor == 'youtube':  # 2 points
                     base = f"https://www.googleapis.com/youtube/v3/channels?part=snippet&id={_id}&key={crypt(json.json.orm['secure']['extractors'][extractor])}"
                     info = requests.get(base).json()['items'][0]['snippet']['thumbnails']['high']['url']
-                    # log.debug(info)
                     data.base['cache'].upsert(dict(platform=extractor, id=_id, data=info), ['id'])
                 elif extractor == 'twitch':  # Kraken - Depreciated.
                     version = 'kraken'
-                    if version == 'kraken':  # Kraken implementation
+                    if version == 'kraken':  # Doesn't seem to work at the moment. Will return the error image.
                         import aiohttp
                         session = aiohttp.ClientSession()
                         url = "https://api.twitch.tv/kraken/users?login=" + _id
@@ -437,11 +375,8 @@ class Player:
                     return discord.Embed.Empty
             else:
                 info = info['data']
-                pass
         except Exception as err:
-            random.seed(sys.exc_info())
-            number = random.randint(10000, 99999)
-            log.exception(f'Code #{number}', exc_info=err)
+            log.error(f'> {traceback.format_exc()}')
             info = assets.Discord.error.value
         # log.debug(info)
         return info
@@ -460,9 +395,6 @@ class Player:
                         sort = keys[2].lower()
 
                 return extractor, sub, sort
-            elif 'ie_key' in data:
-                extractor = data['ie_key'].lower()
-                return extractor, None, None
             else:
                 return None, None, None
 
@@ -493,7 +425,7 @@ options = {
     'format': 'bestaudio/best',
     'noplaylist': True,
     'nocheckcertificate': True,
-    'ignoreerrors': True,
+    'ignoreerrors': False,
     'logtostderr': False,
     'quiet': True,
     'no_warnings': True
