@@ -131,11 +131,11 @@ class Music(commands.Cog):
     async def length(self, ctx):
         await ctx.send(f"Queue currently contains {len(queue[ctx.guild.id]['q'])} tracks")
 
-    @commands.command(aliases=['now_playing', 'nowplaying', 'now-playing', 'now', 'playing'])
-    async def np(self, ctx):
+    @commands.command(aliases=['now_playing', 'nowplaying', 'now-playing', 'now', 'np'])
+    async def playing(self, ctx):
         if Player.is_connected(ctx):
             curr = queue[ctx.guild.id]['playing'][0]
-            import math
+            # import math
             try:
                 desc = curr['description']
                 # length = math.sqrt((len(desc))) + 200
@@ -146,9 +146,9 @@ class Music(commands.Cog):
                 desc = None
             # TODO: make it filter out newlines
             if desc is not None:
-                embed = tls.Embed(ctx, title=curr['title'], description=f'{desc}...')
+                embed = tls.Embed(ctx, title=curr['title'], url=curr['webpage_url'], description=f'{desc}...')
             else:
-                embed = tls.Embed(ctx, title=curr['title'])
+                embed = tls.Embed(ctx, title=curr['title'], url=curr['webpage_url'])
             try:
                 embed.set_image(url=curr['thumbnail'])
             except KeyError:
@@ -161,6 +161,16 @@ class Music(commands.Cog):
                 embed.set_thumbnail(url=curr['pfp'])
             # log.debug(curr['pfp'])
             await ctx.send(embed=embed)
+
+    # @playing.command(aliases=['url'])
+    # async def video(self, ctx):
+    #     if Player.is_connected(ctx):
+    #         try:
+    #             curr = queue[ctx.guild.id]['playing'][0]
+    #             await ctx.send(curr['webpage_url'])
+    #         except Exception as err:
+    #             from core.bot.funcs import respond
+    #             await respond(ctx, err)
 
     @commands.command(aliases=['next'])
     async def skip(self, ctx):
@@ -282,7 +292,7 @@ class Player:
                         # log.debug(new)
                         queue[ctx.guild.id]['playing'].insert(0, new)
                         queue[ctx.guild.id]['player'] = stream
-                        embed = tls.Embed(ctx, title=new['title'], description='is now playing.')
+                        embed = tls.Embed(ctx, title=new['title'], url=new['webpage_url'], description='is now playing.')
                         # log.debug(new['pfp'])
                         try:
                             embed.set_author(name=new['uploader'], url=new['uploader_url'], icon_url=new['pfp'])
