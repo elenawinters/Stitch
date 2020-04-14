@@ -439,7 +439,7 @@ class Player:
                 info = info['data']
                 pass
         except Exception as err:
-            random.seed(sys.exc_info())
+            random.seed(traceback.format_exc())
             number = random.randint(10000, 99999)
             log.exception(f'Code #{number}', exc_info=err)
             info = assets.Discord.error.value
