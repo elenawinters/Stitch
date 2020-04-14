@@ -278,7 +278,7 @@ class Player:
                                 # new = new[0]  # Format into usable form
                                 new.update({'discord_mention': added_by})
                         extractor = Player.Extractor.fetch(new)
-                        new = await Player.process_picture(new, extractor)
+                        new = await Player.process_picture(new, extractor[0])
                         # log.debug(new)
                         queue[ctx.guild.id]['playing'].insert(0, new)
                         queue[ctx.guild.id]['player'] = stream
@@ -390,6 +390,7 @@ class Player:
 
     @classmethod
     async def process_picture(cls, _dict, platform):
+        # log.debug(platform)
         if 'channel_id' in _dict:  # Get profile picture
             pfp = await Player.profile_picture(_dict['channel_id'], platform)
         else:
@@ -437,7 +438,6 @@ class Player:
                     return discord.Embed.Empty
             else:
                 info = info['data']
-                pass
         except Exception as err:
             random.seed(traceback.format_exc())
             number = random.randint(10000, 99999)
