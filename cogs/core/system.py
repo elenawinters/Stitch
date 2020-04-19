@@ -66,7 +66,7 @@ class Core(commands.Cog, command_attrs=dict(hidden=True)):
                 try:
                     self.bot.reload_extension(x)
                     if not arg == 'silent':
-                        log.info(f'{trace.cyan}> Reloaded {trace.yellow.s}{x}', enums.LogLevel.default)
+                        log.info(f'{trace.cyan}> Reloaded {trace.yellow.s}{x}')
                     loaded.remove(x)
                 except Exception as e:
                     warnings.append(f'Failed to reload extension {x}.\n{e}')
@@ -89,13 +89,13 @@ class Core(commands.Cog, command_attrs=dict(hidden=True)):
             log.warn('No extensions were found.')
         else:
             for x in loading:
-                log.warn(f'> Loaded {x}', enums.LogLevel.info)
+                log.warn(f'> Loaded {x}')
             for x in unloaded:
-                log.error(f'> Unloaded {x}', enums.LogLevel.info)
+                log.error(f'> Unloaded {x}')
             for x in warnings:
                 y = x.split('\n')
-                log.warn(f'> {y[0]}', enums.LogLevel.calm)
-                log.error(f'> {y[1]}', enums.LogLevel.error)
+                log.warn(f'> {y[0]}')
+                log.error(f'> {y[1]}')
             ping = round((time.monotonic() - before) * 1000)
             log.info(f'{trace.cyan}> Reloaded {trace.yellow.s}{len(self.bot.extensions)} extensions {trace.cyan}in {trace.yellow.s}{ping}ms{trace.cyan}.')
             await ctx.send(f'Extensions reloaded. ({len(self.bot.extensions)}) (`{ping}ms`)')
