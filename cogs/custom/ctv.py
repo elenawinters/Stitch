@@ -13,6 +13,8 @@ header = {
         'Client-ID': crypt(json.json.orm['secure']['extractors']['twitch']),
         'Accept': 'application/vnd.twitchtv.v5+json'
 }
+do_loop = True
+looping = True
 
 
 class Custom(commands.Cog):
@@ -42,7 +44,18 @@ class Custom(commands.Cog):
     @ctv.command(name='reset')
     @commands.is_owner()
     async def do_reset(self, ctx):
-        await reset(self)
+        global do_loop
+        do_loop = False
+        count = 0
+        while looping:
+            count += 1
+            if count >= 10:
+                break
+            await asyncio.sleep(2)
+        if count <= 10:
+            do_loop = True
+            await live_loop(self)
+        log.error('CTV Loop Stopped')
 
     @commands.Cog.listener()
     async def on_member_update(self, before, member):
@@ -63,6 +76,7 @@ class Custom(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         await live_loop(self)
+        log.error('CTV Loop Stopped')
 
 
 def setup(bot):
@@ -112,8 +126,14 @@ async def get_stream(ctv_user):
 
 async def live_loop(self):
     await reset(self)
-    while True:
-        # print('Ping!')
+    log.debug('CTV Loop Started')
+    from cogs.core.system import lockdown
+    global looping
+    while not lockdown and do_loop:
+        from cogs.core.system import lockdown
+        if lockdown:
+            break
+        looping = True
         try:
             info = await is_online()
             if info:
@@ -135,6 +155,8 @@ async def live_loop(self):
         except Exception as err:
             log.error(err)
         await asyncio.sleep(10)
+
+    looping = False
 
 now = []
 past = []

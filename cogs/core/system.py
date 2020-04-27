@@ -9,6 +9,7 @@ from core.bot import perms
 from core.bot import enums
 from core.logger import log
 exceptions = ['restart', 'reload', 'help', 'enable', 'disable', 'cogs']
+lockdown = False
 
 
 class Core(commands.Cog, command_attrs=dict(hidden=True)):
@@ -98,6 +99,8 @@ class Core(commands.Cog, command_attrs=dict(hidden=True)):
                 log.error(f'> {y[1]}')
             ping = round((time.monotonic() - before) * 1000)
             log.info(f'{trace.cyan}> Reloaded {trace.yellow.s}{len(self.bot.extensions)} extensions {trace.cyan}in {trace.yellow.s}{ping}ms{trace.cyan}.')
+            global lockdown
+            lockdown = False
             await ctx.send(f'Extensions reloaded. ({len(self.bot.extensions)}) (`{ping}ms`)')
             from core import json
             json.json()  # Reload memory
@@ -126,6 +129,8 @@ class Core(commands.Cog, command_attrs=dict(hidden=True)):
             if x.name not in exceptions:
                 x.enabled = False
         await tls.Voice(ctx).disconnect()
+        global lockdown
+        lockdown = True
         log.info(f'{trace.red.s}> Lockdown: {trace.yellow.s}{self.bot.user.name}, {trace.cyan.s}{self.bot.user.id}, {trace.magenta.s}Halted.')
         await self.bot.change_presence(status=discord.Status.do_not_disturb)
         await ctx.send(f'{self.bot.user.name} is now in lockdown.')

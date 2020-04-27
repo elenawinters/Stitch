@@ -1,4 +1,5 @@
 import discord
+from core.bot.tools import is_number
 from discord.ext import commands
 from core.bot import funcs
 from core.bot import perms
