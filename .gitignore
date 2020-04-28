@@ -3,6 +3,14 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# IDEA Studio
+.idea/
+
+# Stitch Bot
+settings*.json
+*.txt
+
+
 # C extensions
 *.so
 

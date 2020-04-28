@@ -22,6 +22,7 @@ from core.bot.funcs import respond
 from core.bot.tools import *
 from core.logger import log
 from core.bot import enums
+from core.bot import time
 from core import json
 import traceback
 # import colorama
@@ -35,7 +36,7 @@ if custom_help:
     client.remove_command('help')
 
 if __name__ == '__main__':
-    log.info(f'>{trace.cyan} Starting at {time.readable.at()}.')
+    log.info(f'>{trace.cyan} Starting at {time.time.readable.at()}.')
     # Initialize database
     log.info(f'{trace.cyan}> Initializing {trace.black.s}dataset{trace.cyan} Database.')
     try:
@@ -153,6 +154,7 @@ async def on_error(event):  # GENERAL ERROR HANDLER
 
 
 # Login
+time.uptime = datetime.datetime.utcnow()
 try:
     login(client)
 except Exception as err:

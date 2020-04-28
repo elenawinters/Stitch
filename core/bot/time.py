@@ -1,8 +1,15 @@
 from core.color import trace
 import datetime
+uptime = datetime.datetime.utcnow()
 
 
 class Time:
+    def __init__(self):
+        self.uptime = uptime
+
+    def uptime(self):
+        return time.readable.From.timedelta.seconds(time.diff(self.uptime, datetime.datetime.utcnow()))
+
     @classmethod
     def diff(cls, before: datetime.datetime, after: datetime.datetime):
         return after - before

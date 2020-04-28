@@ -1,8 +1,9 @@
 import discord
 from discord.ext import commands
 from core.color import trace
-from core.bot.funcs import *
+# from core.bot.funcs import *
 from core.bot.tools import *
+from core.logger import log
 
 
 class Core(commands.Cog, command_attrs=dict(hidden=True)):
@@ -18,82 +19,82 @@ class Core(commands.Cog, command_attrs=dict(hidden=True)):
                 com.append(x)
             pos = len(com)
             com = remove_duplicates(com)
-            log(f'{len(com)} commands (including sub-commands)')
-            log(f'{pos} possible command combinations (including aliases)')
+            log.info(f'{len(com)} commands (including sub-commands)')
+            log.info(f'{pos} possible command combinations (including aliases)')
             t = tls.search(ctx.command.name, com)
             if len(t) > 0:
-                log(f'Sub-commands under this command ({len(t)}):')
+                log.info(f'Sub-commands under this command ({len(t)}):')
             for x in t:
-                log(x)
+                log.info(x)
 
     @admin.command(name='cog')
     async def get_cog(self, ctx, name):
         cog = tls.Cog.fetch(self, name)
-        log(cog.qualified_name)  # print(cog)
+        log.info(cog.qualified_name)  # print(cog)
 
     @admin.command(aliases=['servers'])
     async def guilds(self, ctx):  # LIST ALL GUILDS
-        log(f'Number of Guilds that this bot is in: {len(self.bot.guilds)}')
+        log.info(f'Number of Guilds that this bot is in: {len(self.bot.guilds)}')
         for x in self.bot.guilds:
-            log(f'{x.id}: {x.name}')
+            log.info(f'{x.id}: {x.name}')
 
     @admin.group(aliases=['members'])
     async def users(self, ctx):  # LIST ALL USERS
         if not ctx.invoked_subcommand:
-            log(f'Number of Users that this bot can see: {len(self.bot.users)}')
+            log.info(f'Number of Users that this bot can see: {len(self.bot.users)}')
             for x in self.bot.users:
-                log(f'{x.id}: {x}')
+                log.info(f'{x.id}: {x}')
 
     @users.command(aliases=['search', 'match'])
     async def find(self, ctx, *, user):
         matches = tls.search(user, self.bot.users)
-        log(f'Found {len(matches)} users that match "{user}"')
+        log.info(f'Found {len(matches)} users that match "{user}"')
         for x in matches:
-            log(f'{x.id}: {x.name}#{x.discriminator}')
+            log.info(f'{x.id}: {x.name}#{x.discriminator}')
 
     @admin.command(aliases=['member'])
     async def user(self, ctx, *, arg):  # LIST ALL USERS
         user = await commands.UserConverter().convert(ctx=ctx, argument=arg)
-        log(f'Viewing user: {user.id}: {user}')
-        log(f'Joined: {user.created_at}')
+        log.info(f'Viewing user: {user.id}: {user}')
+        log.info(f'Joined: {user.created_at}')
         guilds = []
         for x in self.bot.guilds:
             if user in x.members:
                 guilds.append(x)
-        log(f'Number of Guilds that {user.id} is in: {len(guilds)}')
+        log.info(f'Number of Guilds that {user.id} is in: {len(guilds)}')
         for x in guilds:
-            log(f'{x.id}: {x.name}')
+            log.info(f'{x.id}: {x.name}')
 
     @admin.command(aliases=['server'])
     async def guild(self, ctx, guild_id):  # LIST GUILD INFO
         guild = await self.bot.fetch_guild(guild_id)
-        log(f'Viewing guild: {guild.id}: {guild}')
+        log.info(f'Viewing guild: {guild.id}: {guild}')
         owner = await commands.UserConverter().convert(ctx=ctx, argument=str(guild.owner_id))
-        log(f'Owner: {guild.owner_id}: {owner}')
+        log.info(f'Owner: {guild.owner_id}: {owner}')
         # log(f'Members: {len(guild.members)} members')
         # log(f'Categories: {len(guild.categories)} categories')
         # log(f'Channels: {len(guild.channels)} channels')
-        log(f'Roles: {len(guild.roles)} roles')
-        log(f'Emojis: {len(guild.emojis)} emojis')
-        log(f'Verification Level: {guild.verification_level}')
-        log(f'Content Filter: {guild.explicit_content_filter}')
-        log(f'Notifications: {guild.default_notifications}')
-        log(f'Voice Region: {guild.region}')
+        log.info(f'Roles: {len(guild.roles)} roles')
+        log.info(f'Emojis: {len(guild.emojis)} emojis')
+        log.info(f'Verification Level: {guild.verification_level}')
+        log.info(f'Content Filter: {guild.explicit_content_filter}')
+        log.info(f'Notifications: {guild.default_notifications}')
+        log.info(f'Voice Region: {guild.region}')
         if len(guild.features) > 0:
-            log(f'Features: {len(guild.features)}')
+            log.info(f'Features: {len(guild.features)}')
             for x in guild.features:
-                log(f'Feature: {x}')
-        log(f'Created at: {guild.created_at}')
+                log.info(f'Feature: {x}')
+        log.info(f'Created at: {guild.created_at}')
 
     @guild.error
     async def guild_error(self, ctx, err):
         if isinstance(err, commands.CommandInvokeError):
-            log(f'Could not find guild in cache. Error message to follow.')
+            log.warn(f'Could not find guild in cache. Error message to follow.')
 
     @admin.command(aliases=['createinvite'])
     async def invite(self, ctx, guild_id):  # LIST ALL USERS
         guild = await self.bot.fetch_guild(guild_id)
-        log(f'Getting invite for guild: {guild.id}: {guild}')
+        log.info(f'Getting invite for guild: {guild.id}: {guild}')
         channels = await guild.fetch_channels()
         invite = None
         for x in channels:
@@ -101,15 +102,15 @@ class Core(commands.Cog, command_attrs=dict(hidden=True)):
                 if type(x).__name__ == 'TextChannel':
                     invite = await x.create_invite(reason='Requested by bot owner.', unique=False, temporary=False, max_age=3600, max_uses=1)
                     break
-        log(f'Invite for guild {guild.id}: {invite}')
+        log.info(f'Invite for guild {guild.id}: {invite}')
 
     @invite.error
     async def invite_error(self, ctx, err):
         if isinstance(err, commands.CommandInvokeError):
             if '50001' in str(err):
-                log(f'Could not find guild in cache. Error message to follow.')
+                log.warn(f'Could not find guild in cache. Error message to follow.')
             elif '50013' in str(err):
-                log(f'Failed to create invite for guild. Error message to follow.')
+                log.warn(f'Failed to create invite for guild. Error message to follow.')
 
     @admin.command()
     async def commands(self, ctx):
@@ -121,8 +122,8 @@ class Core(commands.Cog, command_attrs=dict(hidden=True)):
         for x in com:
             log(x)
             # log(type(x))
-        log(f'{len(com)} commands (including sub-commands)')
-        log(f'{pos} possible command combinations (including aliases)')
+        log.info(f'{len(com)} commands (including sub-commands)')
+        log.info(f'{pos} possible command combinations (including aliases)')
 
     # @admin.command(aliases=['createinvite'])
     # async def invite(self, ctx, guild_id):

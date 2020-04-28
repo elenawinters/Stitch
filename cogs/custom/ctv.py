@@ -8,7 +8,7 @@ from data.data import data
 import asyncio
 import aiohttp
 from core.bot.tools import crypt
-test = True
+test = False
 header = {
         'Client-ID': crypt(json.json.orm['secure']['extractors']['twitch']),
         'Accept': 'application/vnd.twitchtv.v5+json'
@@ -55,7 +55,6 @@ class Custom(commands.Cog):
         if count <= 10:
             do_loop = True
             await live_loop(self)
-        log.error('CTV Loop Stopped')
 
     @commands.Cog.listener()
     async def on_member_update(self, before, member):
@@ -69,14 +68,14 @@ class Custom(commands.Cog):
                 if not streaming:  # If you just went live, this runs
                     _id = await name_to_id(x.twitch_name)
                     data.base['ctv_users'].upsert(dict(userid=_id, discorduid=member.id), ['discorduid'])
-                    log.debug(f'{trace.alert}CTV | {member.name}: {x.twitch_name} / {_id}, {x.url}')
+                    if test:
+                        log.debug(f'{trace.alert}CTV | {member.name}: {x.twitch_name} / {_id}, {x.url}')
                     break
         pass
 
     @commands.Cog.listener()
     async def on_ready(self):
         await live_loop(self)
-        log.error('CTV Loop Stopped')
 
 
 def setup(bot):
@@ -126,7 +125,8 @@ async def get_stream(ctv_user):
 
 async def live_loop(self):
     await reset(self)
-    log.debug('CTV Loop Started')
+    if test:
+        log.debug('CTV Loop Started')
     from cogs.core.system import lockdown
     global looping
     while not lockdown and do_loop:
@@ -155,8 +155,9 @@ async def live_loop(self):
         except Exception as err:
             log.error(err)
         await asyncio.sleep(10)
-
     looping = False
+    if test:
+        log.error('CTV Loop Stopped')
 
 now = []
 past = []
