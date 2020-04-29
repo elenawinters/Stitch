@@ -142,7 +142,7 @@ async def on_command_error(ctx, exc):  # COMMAND ERROR HANDLER
 
 
 @client.event
-async def on_error(event):  # GENERAL ERROR HANDLER
+async def on_error(event, *args, **kwargs):  # GENERAL ERROR HANDLER
     import traceback
     import random
     exc = sys.exc_info()

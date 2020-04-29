@@ -120,7 +120,7 @@ class Core(commands.Cog, command_attrs=dict(hidden=True)):
         pos = len(com)
         com = remove_duplicates(com)
         for x in com:
-            log(x)
+            log.debug(x)
             # log(type(x))
         log.info(f'{len(com)} commands (including sub-commands)')
         log.info(f'{pos} possible command combinations (including aliases)')

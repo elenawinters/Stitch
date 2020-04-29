@@ -138,12 +138,18 @@ class tls:  # Short for Tools
         def parse(cls, ctx, string, bot=None):  # Parse JSON to Embed
             if bot is None:  # R-Filter needs to be reworked. Doesn't
                 # work in private chats, even when it really should.
-                replaced = rfilterm(ctx.author, string, ctx.bot, ctx.guild.id)
+                try:
+                    replaced = rfilterm(ctx.author, string, ctx.bot, ctx.guild.id)
+                except Exception:
+                    replaced = string
             else:
                 try:
                     replaced = rfilterm(ctx.author, string, bot, ctx.guild.id)
                 except Exception:
-                    replaced = rfilterm(ctx, string, bot, ctx.guild.id)
+                    try:
+                        replaced = rfilterm(ctx, string, bot, ctx.guild.id)
+                    except Exception:
+                        replaced = string
 
             # JSON -> Dict
             try:
@@ -170,7 +176,10 @@ class tls:  # Short for Tools
                     literal['timestamp'] = time.Parse.iso(literal['timestamp'])
             if 'color' in literal:
                 if literal['color'] < 0:
-                    literal['color'] = get_color(bot, ctx.author).value
+                    try:
+                        literal['color'] = get_color(bot, ctx.author).value
+                    except Exception:
+                        literal['color'] = 0
 
             embed = discord.Embed.from_dict(literal)
             return embed, message

@@ -32,13 +32,15 @@ class Experiments(commands.Cog):
     async def test(self, ctx):
         # Actively test things
         if not ctx.invoked_subcommand:
-            t = f"{trace.alert}This {trace.cyan}is a {trace.yellow.s}TEST{trace.alert} string!"
-            log.info('test')
-            log.debug(f'{t}: debug')
-            log.info(f'{t}: info')
-            log.warn(f'{t}: warn')
-            log.error(f'{t}: error')
-            log.critical(f'{t}: critical')
+            for x in self.bot.extensions:
+                print(x)
+            # t = f"{trace.alert}This {trace.cyan}is a {trace.yellow.s}TEST{trace.alert} string!"
+            # log.info('test')
+            # log.debug(f'{t}: debug')
+            # log.info(f'{t}: info')
+            # log.warn(f'{t}: warn')
+            # log.error(f'{t}: error')
+            # log.critical(f'{t}: critical')
             # import logging
             # print(logging.LogRecord.message)
             # print(type(trace.tracers))
