@@ -241,12 +241,32 @@ class Player:
             ctx.voice_client.play(stream)
 
         @classmethod
-        def file(cls, sound, member):
+        async def file(cls, sound, member):
             import os
             abspath = os.path.abspath('.')
-            path = f'{abspath}\\{sound.value}'
-            audio = discord.FFmpegPCMAudio(source=path)
-            member.guild.voice_client.play(audio)
+            try:
+                path = f'{abspath}\\{sound.value}'
+            except AttributeError:
+                path = f'{abspath}\\{sound}'
+            if not Player.is_playing(member):
+                audio = discord.FFmpegPCMAudio(source=path)
+                member.guild.voice_client.play(audio)
+            else:
+                import subprocess as sp
+                comm = ['ffprobe', '-i', path, '-show_entries', 'format=duration',
+                        '-of', 'default=noprint_wrappers=1:nokey=1', '-loglevel', 'warning']
+                pipe = sp.Popen(comm, stdout=sp.PIPE)
+                duration = str(pipe.stdout.read())
+                duration = duration.replace('\\r', '')
+                duration = duration.replace('\\n', '')
+                duration = duration.replace('\'', '')
+                duration = duration.replace('b', '')
+                duration = float(duration) - 0.1
+                source = member.guild.voice_client.source
+                member.guild.voice_client.source = discord.FFmpegPCMAudio(source=path)
+                await asyncio.sleep(duration)
+                member.guild.voice_client.source = source
+                # log.debug(duration)
 
     play = Play
 
@@ -336,8 +356,8 @@ class Player:
         return mem
 
     @classmethod
-    def is_connected(cls, ctx):  # Is the bot connected to voice?
-        if ctx.me.voice is not None:
+    def is_connected(cls, ctx):  # Is the bot connected to v7ice?
+        if Player.voice(ctx) is not None:
             try:
                 return ctx.guild.voice_client.is_connected()
             except AttributeError:
@@ -347,17 +367,24 @@ class Player:
 
     @classmethod
     def is_playing(cls, ctx):
-        if ctx.me.voice is not None:
+        if Player.voice(ctx) is not None:
             return ctx.guild.voice_client.is_playing()
         else:
             return False
 
     @classmethod
     def is_paused(cls, ctx):
-        if ctx.me.voice is not None:
+        if Player.voice(ctx) is not None:
             return ctx.guild.voice_client.is_paused()
         else:
             return False
+
+    @classmethod
+    def voice(cls, obj):
+        try:
+            return obj.me.voice
+        except AttributeError:
+            return obj.voice
 
     @classmethod
     async def info(cls, inurl, **kwargs):  # VIDEO INFO

@@ -153,13 +153,16 @@ class tls:  # Short for Tools
 
             # JSON -> Dict
             try:
-                import ast
-                literal = ast.literal_eval(replaced)
-            except Exception:  # If json function fails,
-                # it'll output the error for it instead
-                # of the ast.literal_eval error.
-                import json
-                literal = json.loads(replaced)
+                try:
+                    import ast
+                    literal = ast.literal_eval(replaced)
+                except Exception:  # If json function fails,
+                    # it'll output the error for it instead
+                    # of the ast.literal_eval error.
+                    import json
+                    literal = json.loads(replaced)
+            except Exception:
+                literal = dict(string)
 
             message = None
             if 'embed' in literal:

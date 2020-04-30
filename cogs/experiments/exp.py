@@ -32,8 +32,13 @@ class Experiments(commands.Cog):
     async def test(self, ctx):
         # Actively test things
         if not ctx.invoked_subcommand:
-            for x in self.bot.extensions:
-                print(x)
+            # bot.guild.voice_client.play(audio)
+
+            # DANGEROUS CODE
+            # DO NOT RUN
+            # audio = discord.FFmpegPCMAudio(source=path)
+            # discord.player.AudioPlayer(source=audio, client=bot.guild.voice_client).run()
+
             # t = f"{trace.alert}This {trace.cyan}is a {trace.yellow.s}TEST{trace.alert} string!"
             # log.info('test')
             # log.debug(f'{t}: debug')

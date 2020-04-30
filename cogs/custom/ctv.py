@@ -49,10 +49,10 @@ class Custom(commands.Cog):
         count = 0
         while looping:
             count += 1
-            if count >= 10:
+            if count >= 6:
                 break
-            await asyncio.sleep(2)
-        if count <= 10:
+            await asyncio.sleep(10)
+        if count <= 6:
             do_loop = True
             await live_loop(self)
 
