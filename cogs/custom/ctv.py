@@ -5,8 +5,10 @@ from core.color import trace
 from core.logger import log
 from core import json
 from data.data import data
+from core.bot.tools import tls
 import asyncio
 import aiohttp
+import ast
 from core.bot.tools import crypt
 test = False
 header = {
@@ -54,6 +56,10 @@ class Custom(commands.Cog):
             await asyncio.sleep(10)
         if count <= 6:
             do_loop = True
+            global now
+            now = []
+            global past
+            past = []
             await live_loop(self)
 
     @commands.Cog.listener()
@@ -75,11 +81,27 @@ class Custom(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
+        await find_online_users(self)
         await live_loop(self)
 
 
 def setup(bot):
     bot.add_cog(Custom(bot))
+
+
+async def find_online_users(self):
+    live = []
+    for guild in self.bot.guilds:
+        for member in guild.members:
+            for x in member.activities:
+                if x.type == discord.ActivityType.streaming:
+                    new = {'user': member.id, 'twitch': x.twitch_name}
+                    if new not in live:
+                        live.append(new)
+
+    for x in live:
+        _id = await name_to_id(x['twitch'])
+        data.base['ctv_users'].upsert(dict(userid=_id, discorduid=x['user']), ['discorduid'])
 
 
 async def name_to_id(_name):
@@ -168,22 +190,12 @@ async def on_live(self, ctv_channel):
     guilds = get_guilds(self, did['discorduid'])
     for x in guilds:
         gid = data.base['ctv_guilds'].find_one(guild=x.id)
-        roles = []
-        for r in x.roles:
-            roles.append(r)
-
-        has_role = []
-        give_role = []
-
-        for r in roles:
-            if r.id == gid['give_role']:
-                give_role.append(r)
-            if r.id == gid['has_role']:
-                has_role.append(r)
+        give_roles = [tls.Snowflake(r) for r in ast.literal_eval(gid['give_roles'])]
+        has_roles = [tls.Snowflake(r) for r in ast.literal_eval(gid['has_roles'])]
 
         member = x.get_member(did['discorduid'])
-        if has_role:
-            await member.add_roles(give_role[0])
+        if [y for y in member.roles for x in has_roles if y.id == x.id]:
+            await member.add_roles(*give_roles)
 
 
 async def on_offline(self, ctv_channel):
@@ -191,22 +203,12 @@ async def on_offline(self, ctv_channel):
     guilds = get_guilds(self, did['discorduid'])
     for x in guilds:
         gid = data.base['ctv_guilds'].find_one(guild=x.id)
-        roles = []
-        for r in x.roles:
-            roles.append(r)
-
-        has_role = []
-        give_role = []
-
-        for r in roles:
-            if r.id == gid['give_role']:
-                give_role.append(r)
-            if r.id == gid['has_role']:
-                has_role.append(r)
+        give_roles = [tls.Snowflake(r) for r in ast.literal_eval(gid['give_roles'])]
+        has_roles = [tls.Snowflake(r) for r in ast.literal_eval(gid['has_roles'])]
 
         member = x.get_member(did['discorduid'])
-        if has_role:
-            await member.remove_roles(give_role[0])
+        if [y for y in member.roles for x in has_roles if y.id == x.id]:
+            await member.remove_roles(*give_roles)
 
 
 def get_guilds(self, did):
@@ -224,10 +226,10 @@ async def reset(self):
             gid = data.base['ctv_guilds'].find_one(guild=x.id)
             if gid:
                 for m in x.members:
-                    for r in m.roles:
-                        if r.id == gid['give_role']:
-                            await m.remove_roles(r)
-                            break
+                    roles = [tls.Snowflake(r) for r in ast.literal_eval(gid['give_roles'])]
+                    if [y for y in m.roles for x in roles if y.id == x.id]:
+                        await m.remove_roles(*roles)
+
     except Exception as err:
         import traceback
         import random

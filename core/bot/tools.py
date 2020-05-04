@@ -17,6 +17,10 @@ class tls:  # Short for Tools
                 matches.append(x)
         return matches
 
+    class Snowflake:
+        def __init__(self, snowflake):
+            self.id = snowflake
+
     class Voice:
         def __init__(self, ctx):
             self.ctx = ctx
