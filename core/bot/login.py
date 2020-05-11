@@ -24,10 +24,11 @@ class LoginManager:
         log.info(f'{trace.cyan}> Running on {trace.white}Discord{trace.green.s}Py '
                  f'{trace.cyan}v{trace.cyan.s}{discord.__version__}{trace.cyan}.')
         tokens = json.json.orm['tokens']
+        threads = []
         for x in tokens:
             client = commands.Bot(command_prefix=self.prefix)
-            LoginMultiple(client, crypt(x))
-        return
+            threads.append(LoginMultiple(client, crypt(x)))
+        return threads
 
 
 class LoginMultiple(Thread):

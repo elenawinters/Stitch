@@ -59,10 +59,12 @@ if __name__ == '__main__':
 
     try:
         from core.bot.login import *
-        LoginManager(prefix='.').login()
+        threads = LoginManager(prefix='.').login()
         import time
         while True:
             time.sleep(2)
+            if not threads[0].is_alive():
+                break
             if core.flags.restart:
                 break
     except KeyboardInterrupt:
