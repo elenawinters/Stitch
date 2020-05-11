@@ -22,7 +22,7 @@ class Core(commands.Cog):
         else:
             activity = discord.Activity(type=_type, name=_game, flags=None)
             jack = json.json.orm['activity']
-            jack[self.bot.user.id] = activity.to_dict()
+            jack[str(self.bot.user.id)] = activity.to_dict()
             json.json.orm['activity'] = jack
             # json.json.orm['activity'][self.bot.user.id] = activity.to_dict()
         await self.bot.change_presence(activity=activity)
