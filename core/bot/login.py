@@ -7,12 +7,30 @@ from core.bot import enums
 from core import json
 import traceback
 import requests
+import loader
+import sys
 import os
 from threading import Thread
 import asyncio
+loop = None
 
 
-class Login(Thread):
+class LoginManager:
+    def __init__(self, prefix):
+        self.prefix = prefix
+
+    def login(self):
+        log.info(f'{trace.cyan}> Attempting Login.')
+        log.info(f'{trace.cyan}> Running on {trace.white}Discord{trace.green.s}Py '
+                 f'{trace.cyan}v{trace.cyan.s}{discord.__version__}{trace.cyan}.')
+        tokens = json.json.orm['tokens']
+        for x in tokens:
+            client = commands.Bot(command_prefix=self.prefix)
+            LoginMultiple(client, crypt(x))
+        return
+
+
+class LoginMultiple(Thread):
     def __init__(self, client, token=None):
         Thread.__init__(self)
         self.client = client
@@ -21,9 +39,19 @@ class Login(Thread):
         self.start()
 
     def run(self):
-        loop = self.client.loop
-        loop.create_task(_login(self.client, self.token))
-        loop.run_forever()
+        global loop
+        try:
+            if loop:
+                loader.Load(self.client).run(silent=True)
+                loop.create_task(_login(self.client, self.token))
+            else:
+                loop = self.client.loop
+                loader.Load(self.client).run()
+                loop.create_task(_login(self.client, self.token))
+                loop.run_forever()
+        except Exception as exc:
+            log.exception(exc)
+
         return
 
 

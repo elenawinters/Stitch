@@ -18,7 +18,6 @@ from discord.ext import commands
 from core.color import trace
 from data.data import data
 from core.bot.funcs import respond
-from core.bot.login import Login
 from core.bot.tools import *
 from core.logger import log
 from core.bot import enums
@@ -36,24 +35,7 @@ import sys
 # colorama.init()
 # setup.startup()
 client = commands.Bot(command_prefix='.')
-# client2 = commands.Bot(command_prefix='.')
-custom_help = True
-if custom_help:
-    client.remove_command('help')
-
-
-@client.event
-async def on_ready():
-    log.info(f'{trace.cyan}> Logged in: {trace.yellow.s}{client.user.name}, {trace.cyan.s}{client.user.id}, {trace.magenta.s}Initiated.')
-
-
-@client.event
-async def on_command(ctx):
-    try:
-        await ctx.message.delete()
-    except Exception:
-        pass
-
+client2 = commands.Bot(command_prefix='.')
 
 if __name__ == '__main__':
     log.info(f'>{trace.cyan} Starting at {time.time.readable.at()}.')
@@ -69,19 +51,15 @@ if __name__ == '__main__':
 
     # Initialize extensions
     # Append cCogs
-    append_cog('errors.py')  # Load error handlers
     append_cog('debug.py')  # Load debug things
-
-    import loader
-    loader.Load(client).run()
-    # loader.Load(client2).run()
+    append_cog('main.py')  # Load essentials
 
     # Login
     time.uptime = datetime.datetime.utcnow()
 
     try:
         from core.bot.login import *
-        Login(client)
+        LoginManager(prefix='.').login()
         import time
         while True:
             time.sleep(2)

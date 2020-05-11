@@ -2,7 +2,7 @@ from data.data import get_data_file
 from core.json import default
 settings_file = default
 settings = {
-    'token': None,
+    'tokens': [],
     'secure': {
         'extractors': {
             'youtube': None,
@@ -10,8 +10,10 @@ settings = {
         }
     },
     'activity': {
-        'name': 'games',
-        'type': 0
+        'default': {
+            'name': 'games',
+            'type': 0
+        }
     },
     'settings': {
         'logging': {

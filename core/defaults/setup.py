@@ -19,8 +19,8 @@ def do_setup():
     if not json.external.exists():
         json.external.write(defaults.settings)
         json.json()
-        token = input(f"[{time.Now.unix()}] What is the bot's login token? ")
-        json.json.orm['token'] = tools.crypt(token)
+        token = input(f"[{time.Now.unix()}] What is the main bot's login token? ")
+        json.json.orm['tokens'] = [tools.crypt(token)]
 
 
 def reset_logs(force=False):

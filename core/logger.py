@@ -46,14 +46,14 @@ settings = json.json.orm['settings']['logging']
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)  # Void
 
-stream_formatter = logging.Formatter('%(time)s %(color)s%(message)s%(end)s')
+stream_formatter = logging.Formatter('%(time)s [%(threadName)s] %(color)s%(message)s%(end)s')
 stream = logging.StreamHandler(sys.stdout)
 stream.setFormatter(stream_formatter)
 stream.addFilter(StreamRecords())
 stream.setLevel(tls.Enums(LogLevel).find(settings['console']['level']).value)
 log.addHandler(stream)
 
-file_formatter = logging.Formatter('[%(levelno)s] [%(name)s] [%(module)s] [%(asctime)s] %(clean_msg)s')
+file_formatter = logging.Formatter('[%(levelno)s] [%(name)s] [%(threadName)s] [%(module)s] [%(asctime)s] %(clean_msg)s')
 file = logging.FileHandler(settings['file']['file'], mode='a+')
 file.setFormatter(file_formatter)
 file.addFilter(FileRecords())

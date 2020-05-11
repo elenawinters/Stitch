@@ -60,7 +60,7 @@ class tls:  # Short for Tools
         @classmethod
         async def preset(cls, bot):
             from core import json
-            activity = tls.Activity.from_dict(json.json.orm['activity'])
+            activity = tls.Activity.from_dict(json.json.orm['activity'].get(bot.user.id, json.json.orm['activity']['default']))
             await bot.change_presence(activity=activity)
 
     class Command:

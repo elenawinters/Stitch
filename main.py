@@ -15,6 +15,17 @@ class Stitch(commands.Cog):
         self.bot = bot
 
     @commands.Cog.listener()
+    async def on_command(self, ctx):
+        try:
+            await ctx.message.delete()
+        except Exception:
+            pass
+
+    @commands.Cog.listener()
+    async def on_ready(self):
+        log.info(f'{trace.cyan}> Logged in: {trace.yellow.s}{self.bot.user.name}, {trace.cyan.s}{self.bot.user.id}, {trace.magenta.s}Initiated.')
+
+    @commands.Cog.listener()
     async def on_command_error(self, ctx, exc):  # COMMAND ERROR HANDLER
         if hasattr(ctx.command, 'on_error'):
             return
