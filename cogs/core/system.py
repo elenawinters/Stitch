@@ -8,6 +8,7 @@ from core.bot.tools import *
 from core.bot import perms
 from core.bot import enums
 from core.logger import log
+import core.flags
 exceptions = ['restart', 'reload', 'help', 'enable', 'disable', 'cogs']
 lockdown = False
 
@@ -121,6 +122,7 @@ class Core(commands.Cog, command_attrs=dict(hidden=True)):
         log.info(f'{trace.red.s}> Manual Restart: {trace.yellow.s}{self.bot.user.name}, {trace.cyan.s}{self.bot.user.id}, {trace.magenta.s}Restarting.')
         await tls.Voice(ctx).disconnect()
         await self.bot.close()
+        core.flags.restart = True
 
     @commands.command(aliases=['lockdown', 'lock', 'halt'])
     @commands.is_owner()

@@ -8,32 +8,56 @@ from core import json
 import traceback
 import requests
 import os
+from threading import Thread
+import asyncio
 
 
-def login(client):
-    try:
-        log.info(f'{trace.cyan}> Attempting Login.')
-        log.info(f'{trace.cyan}> Running on {trace.white}Discord{trace.green.s}Py '
-                 f'{trace.cyan}v{trace.cyan.s}{discord.__version__}{trace.cyan}.')
-        version.Discord.latest()
-        version.YouTubeDL.latest()
-        token = json.json.reader('token')
-        if token == enums.ReturnType.fail or token == enums.ReturnType.none:
-            raise discord.errors.LoginFailure('No token')
-        else:
-            client.run(crypt(token))
-    except discord.errors.LoginFailure as e:
-        if json.external.exists(json.default):
-            try:
-                os.remove(json.default)
-            except OSError:
-                pass
-        log.critical(f'{type(e)} has occurred. Please check your login token')
-        log.critical('SESSION HAS BEEN TERMINATED')
-        log.critical(f'{e}')
-    except Exception as err:  # This should never occur.
-        log.error(f'> {short_traceback()}')
-        log.error(f'> {traceback.format_exc()}')
+class Login(Thread):
+    def __init__(self, client, token=None):
+        Thread.__init__(self)
+        self.client = client
+        self.token = token
+        self.daemon = True
+        self.start()
+
+    def run(self):
+        loop = self.client.loop
+        loop.create_task(_login(self.client, self.token))
+        loop.run_forever()
+        return
+
+
+async def _login(client, token=None):
+    if not token:
+        try:
+            log.info(f'{trace.cyan}> Attempting Login.')
+            log.info(f'{trace.cyan}> Running on {trace.white}Discord{trace.green.s}Py '
+                     f'{trace.cyan}v{trace.cyan.s}{discord.__version__}{trace.cyan}.')
+            version.Discord.latest()
+            version.YouTubeDL.latest()
+            token = json.json.reader('token')
+            if token == enums.ReturnType.fail or token == enums.ReturnType.none:
+                raise discord.errors.LoginFailure('No token')
+            else:
+                await client.start(crypt(token))
+                # client.run(crypt(token))
+                return
+        except discord.errors.LoginFailure as e:
+            if json.external.exists(json.default):
+                try:
+                    os.remove(json.default)
+                except OSError:
+                    pass
+            log.critical(f'{type(e)} has occurred. Please check your login token')
+            log.critical('SESSION HAS BEEN TERMINATED')
+            log.critical(f'{e}')
+        except Exception as err:  # This should never occur.
+            log.error(f'> {short_traceback()}')
+            log.error(f'> {traceback.format_exc()}')
+    else:
+        await client.start(token)
+        # client.run(token)
+        return
 
 
 class version:

@@ -10,13 +10,14 @@ import asyncio
 import aiohttp
 import ast
 from core.bot.tools import crypt
-test = False
+test = True
 header = {
         'Client-ID': crypt(json.json.orm['secure']['extractors']['twitch']),
         'Accept': 'application/vnd.twitchtv.v5+json'
 }
 do_loop = True
 looping = True
+last_live = 0
 
 
 class Custom(commands.Cog):
@@ -64,6 +65,7 @@ class Custom(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_update(self, before, member):
+        global last_live
         for x in member.activities:
             if x.type == discord.ActivityType.streaming:
                 streaming = False
@@ -72,11 +74,13 @@ class Custom(commands.Cog):
                         streaming = True
                         break
                 if not streaming:  # If you just went live, this runs
-                    _id = await name_to_id(x.twitch_name)
-                    data.base['ctv_users'].upsert(dict(userid=_id, discorduid=member.id), ['discorduid'])
-                    if test:
-                        log.debug(f'{trace.alert}CTV | {member.name}: {x.twitch_name} / {_id}, {x.url}')
-                    break
+                    if member.id != last_live:
+                        last_live = member.id
+                        _id = await name_to_id(x.twitch_name)
+                        data.base['ctv_users'].upsert(dict(userid=_id, discorduid=member.id), ['discorduid'])
+                        if test:
+                            log.debug(f'{trace.alert}CTV | {member.name}: {x.twitch_name} / {_id}, {x.url}')
+                        break
         pass
 
     @commands.Cog.listener()
@@ -105,10 +109,14 @@ async def find_online_users(self):
 
 
 async def name_to_id(_name):
-    session = aiohttp.ClientSession()
+    connector = aiohttp.TCPConnector(limit=60)
+    session = aiohttp.ClientSession(connector=connector)
     url = "https://api.twitch.tv/kraken/users?login=" + _name
-    async with session.get(url, headers=header) as r:
-        _data = await r.json(encoding='utf-8')
+    try:
+        async with session.get(url, headers=header) as r:
+            _data = await r.json(encoding='utf-8')
+    except Exception:
+        pass
     await session.close()
     if r.status == 200:
         if _data['users']:
@@ -121,11 +129,14 @@ async def is_online():
     for x in data.base['ctv_users']:
         _id.append(x['userid'])
     _id = ','.join([str(elem) for elem in _id])
-    # print(_id)
-    session = aiohttp.ClientSession()
+    connector = aiohttp.TCPConnector(limit=60)
+    session = aiohttp.ClientSession(connector=connector)
     url = "https://api.twitch.tv/kraken/streams/?channel=" + _id
-    async with session.get(url, headers=header) as r:
-        _data = await r.json(encoding='utf-8')
+    try:
+        async with session.get(url, headers=header) as r:
+            _data = await r.json(encoding='utf-8')
+    except Exception:
+        pass
     await session.close()
     if r.status == 200:
         if _data["streams"]:
@@ -134,10 +145,14 @@ async def is_online():
 
 
 async def get_stream(ctv_user):
-    session = aiohttp.ClientSession()
+    connector = aiohttp.TCPConnector(limit=60)
+    session = aiohttp.ClientSession(connector=connector)
     url = "https://api.twitch.tv/kraken/stream/" + ctv_user
-    async with session.get(url, headers=header) as r:
-        _data = await r.json(encoding='utf-8')
+    try:
+        async with session.get(url, headers=header) as r:
+            _data = await r.json(encoding='utf-8')
+    except Exception:
+        pass
     await session.close()
     if r.status == 200:
         if _data["stream"]:
@@ -147,8 +162,9 @@ async def get_stream(ctv_user):
 
 async def live_loop(self):
     await reset(self)
-    if test:
-        log.debug('CTV Loop Started')
+    log.debug('CTV Loop Started')
+    # if test:
+    #     log.debug('CTV Loop Started')
     from cogs.core.system import lockdown
     global looping
     while not lockdown and do_loop:
@@ -178,8 +194,9 @@ async def live_loop(self):
             log.error(err)
         await asyncio.sleep(10)
     looping = False
-    if test:
-        log.error('CTV Loop Stopped')
+    log.error('CTV Loop Stopped')
+    # if test:
+    #     log.error('CTV Loop Stopped')
 
 now = []
 past = []
@@ -187,37 +204,45 @@ past = []
 
 async def on_live(self, ctv_channel):
     did = data.base['ctv_users'].find_one(userid=ctv_channel)
-    guilds = get_guilds(self, did['discorduid'])
-    for x in guilds:
-        gid = data.base['ctv_guilds'].find_one(guild=x.id)
-        give_roles = [tls.Snowflake(r) for r in ast.literal_eval(gid['give_roles'])]
-        has_roles = [tls.Snowflake(r) for r in ast.literal_eval(gid['has_roles'])]
+    if did:
+        guilds = get_guilds(self, did['discorduid'])
+        # log.debug(f'CTV Online: {guilds}')
+        for x in guilds:
+            gid = data.base['ctv_guilds'].find_one(guild=x.id)
+            if gid:
+                give_roles = [tls.Snowflake(r) for r in ast.literal_eval(gid['give_roles'])]
+                has_roles = [tls.Snowflake(r) for r in ast.literal_eval(gid['has_roles'])]
 
-        member = x.get_member(did['discorduid'])
-        if [y for y in member.roles for x in has_roles if y.id == x.id]:
-            await member.add_roles(*give_roles)
+                member = x.get_member(did['discorduid'])
+                if [y for y in member.roles for x in has_roles if y.id == x.id]:
+                    await member.add_roles(*give_roles)
 
 
 async def on_offline(self, ctv_channel):
     did = data.base['ctv_users'].find_one(userid=ctv_channel)
-    guilds = get_guilds(self, did['discorduid'])
-    for x in guilds:
-        gid = data.base['ctv_guilds'].find_one(guild=x.id)
-        give_roles = [tls.Snowflake(r) for r in ast.literal_eval(gid['give_roles'])]
-        has_roles = [tls.Snowflake(r) for r in ast.literal_eval(gid['has_roles'])]
+    if did:
+        guilds = get_guilds(self, did['discorduid'])
+        # log.debug(f'CTV Offline: {guilds}')
+        for x in guilds:
+            gid = data.base['ctv_guilds'].find_one(guild=x.id)
+            if gid:
+                give_roles = [tls.Snowflake(r) for r in ast.literal_eval(gid['give_roles'])]
+                has_roles = [tls.Snowflake(r) for r in ast.literal_eval(gid['has_roles'])]
 
-        member = x.get_member(did['discorduid'])
-        if [y for y in member.roles for x in has_roles if y.id == x.id]:
-            await member.remove_roles(*give_roles)
+                member = x.get_member(did['discorduid'])
+                if [y for y in member.roles for x in has_roles if y.id == x.id]:
+                    await member.remove_roles(*give_roles)
 
 
 def get_guilds(self, did):
-    guilds = []
-    for x in self.bot.guilds:
-        for y in x.members:
-            if y.id == did:
-                guilds.append(x)
-    return guilds
+    return [x for x in self.bot.guilds for y in x.members if y.id == did]
+    # guilds = []
+    #
+    # for x in self.bot.guilds:
+    #     for y in x.members:
+    #         if y.id == did:
+    #             guilds.append(x)
+    # return guilds
 
 
 async def reset(self):
