@@ -10,6 +10,7 @@ import asyncio
 import aiohttp
 import ast
 from core.bot.tools import crypt
+import session
 test = True
 header = {
         'Client-ID': crypt(json.json.orm['secure']['extractors']['twitch']),
@@ -76,8 +77,14 @@ class Custom(commands.Cog):
                 if not streaming:  # If you just went live, this runs
                     if member.id != last_live:
                         last_live = member.id
-                        _id = await name_to_id(x.twitch_name)
-                        data.base['ctv_users'].upsert(dict(userid=_id, discorduid=member.id), ['discorduid'])
+                        _id = data.base['ctv_users'].find_one(discorduid=member.id)
+                        try:
+                            _id = _id['userid']
+                        except Exception:
+                            pass
+                        if not _id:
+                            _id = await name_to_id(x.twitch_name)
+                            data.base['ctv_users'].upsert(dict(userid=_id, discorduid=member.id), ['discorduid'])
                         if test:
                             log.debug(f'{trace.alert}CTV | {member.name}: {x.twitch_name} / {_id}, {x.url}')
                         break
@@ -104,23 +111,27 @@ async def find_online_users(self):
                         live.append(new)
 
     for x in live:
-        _id = await name_to_id(x['twitch'])
-        data.base['ctv_users'].upsert(dict(userid=_id, discorduid=x['user']), ['discorduid'])
+        _id = data.base['ctv_users'].find_one(discorduid=x['user'])
+        if not _id:
+            _id = await name_to_id(x['twitch'])
+            data.base['ctv_users'].upsert(dict(userid=_id, discorduid=x['user']), ['discorduid'])
+        # _id = await name_to_id(x['twitch'])
+        # data.base['ctv_users'].upsert(dict(userid=_id, discorduid=x['user']), ['discorduid'])
 
 
 async def name_to_id(_name):
-    connector = aiohttp.TCPConnector(limit=60)
-    session = aiohttp.ClientSession(connector=connector)
     url = "https://api.twitch.tv/kraken/users?login=" + _name
     try:
-        async with session.get(url, headers=header) as r:
+        async with session.session.get(url, headers=header) as r:
             _data = await r.json(encoding='utf-8')
     except Exception:
         pass
-    await session.close()
-    if r.status == 200:
-        if _data['users']:
-            return _data['users'][0]['_id']
+    try:
+        if r.status == 200:
+            if _data['users']:
+                return _data['users'][0]['_id']
+    except Exception:
+        pass
     return False
 
 
@@ -129,34 +140,34 @@ async def is_online():
     for x in data.base['ctv_users']:
         _id.append(x['userid'])
     _id = ','.join([str(elem) for elem in _id])
-    connector = aiohttp.TCPConnector(limit=60)
-    session = aiohttp.ClientSession(connector=connector)
     url = "https://api.twitch.tv/kraken/streams/?channel=" + _id
     try:
-        async with session.get(url, headers=header) as r:
+        async with session.session.get(url, headers=header) as r:
             _data = await r.json(encoding='utf-8')
     except Exception:
         pass
-    await session.close()
-    if r.status == 200:
-        if _data["streams"]:
-            return _data
+    try:
+        if r.status == 200:
+            if _data["streams"]:
+                return _data
+    except Exception:
+        pass
     return None
 
 
 async def get_stream(ctv_user):
-    connector = aiohttp.TCPConnector(limit=60)
-    session = aiohttp.ClientSession(connector=connector)
     url = "https://api.twitch.tv/kraken/stream/" + ctv_user
     try:
-        async with session.get(url, headers=header) as r:
+        async with session.session.get(url, headers=header) as r:
             _data = await r.json(encoding='utf-8')
     except Exception:
         pass
-    await session.close()
-    if r.status == 200:
-        if _data["stream"]:
-            return _data
+    try:
+        if r.status == 200:
+            if _data["stream"]:
+                return _data
+    except Exception:
+        pass
     return False
 
 

@@ -9,6 +9,7 @@ import functools
 import traceback
 import requests
 import asyncio
+import session
 import random
 
 
@@ -455,16 +456,13 @@ class Player:
                 elif extractor == 'twitch':  # Kraken - Depreciated.
                     version = 'kraken'
                     if version == 'kraken':  # Kraken implementation
-                        import aiohttp
-                        session = aiohttp.ClientSession()
                         url = "https://api.twitch.tv/kraken/users?login=" + _id
                         header = {
                             'Client-ID': crypt(json.json.orm['secure']['extractors']['twitch']),
                             'Accept': 'application/vnd.twitchtv.v5+json'
                         }
-                        async with session.get(url, headers=header) as r:
+                        async with session.session.get(url, headers=header) as r:
                             _data = await r.json(encoding='utf-8')
-                        await session.close()
                         if r.status == 200:
                             if _data['users']:
                                 info = _data['users'][0]['logo']

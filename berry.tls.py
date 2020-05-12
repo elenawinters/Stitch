@@ -1,6 +1,6 @@
 #
 #   Developed by Elena Winters (ElenaBerry#2561), aka Tracer
-#   Contributions by: Raine Bannister
+#   Contributions by: Raine Bannister and RingoMar
 #
 #   This bot is used and hosted by me (Elena), for others to use.
 #
@@ -30,6 +30,7 @@ import traceback
 # import colorama
 import asyncio
 import discord
+import session
 import ast
 import sys
 # colorama.init()
@@ -51,6 +52,7 @@ if __name__ == '__main__':
 
     # Initialize extensions
     # Append cCogs
+    append_cog('session.py')  # Load session
     append_cog('debug.py')  # Load debug things
     append_cog('main.py')  # Load essentials
 
@@ -63,13 +65,16 @@ if __name__ == '__main__':
         import time
         while True:
             time.sleep(2)
-            if not threads[0].is_alive():
-                break
             if core.flags.restart:
+                break
+            if not threads[0].is_alive():
                 break
     except KeyboardInterrupt:
         sys.exit('Closed')
     except Exception as err:
         log.exception(err)
+
+loop = asyncio.new_event_loop()
+loop.run_until_complete(session.cleanup())
 
 log.info(f'> Uptime: {Time.uptime(Time())}')

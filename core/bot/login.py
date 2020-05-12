@@ -1,3 +1,4 @@
+# Threading assistance provided by RingoMar
 import discord
 from core.color import *
 # from .funcs import *
@@ -51,6 +52,7 @@ class LoginMultiple(Thread):
                 loop.create_task(_login(self.client, self.token))
                 loop.run_forever()
         except Exception as exc:
+            log.critical('THREAD IS EXITING:')
             log.exception(exc)
 
         return

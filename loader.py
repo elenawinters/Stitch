@@ -5,7 +5,7 @@ custom_help = True
 
 
 class Load:
-    def __init__(self, client):
+    def __init__(self, client=None):
         self.client = client
 
     def run(self, silent=False):

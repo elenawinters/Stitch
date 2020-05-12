@@ -1,5 +1,6 @@
 discord.py>=1.1.1
 dataset>=1.1.2
+aiohttp
 requests
 colorama
 PyNaCl
