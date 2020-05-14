@@ -17,7 +17,7 @@ header = {
         'Accept': 'application/vnd.twitchtv.v5+json'
 }
 do_loop = True
-looping = True
+looping = False
 last_live = 0
 
 
@@ -92,8 +92,9 @@ class Custom(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        await find_online_users(self)
-        await live_loop(self)
+        if not looping:
+            await find_online_users(self)
+            await live_loop(self)
 
 
 def setup(bot):
