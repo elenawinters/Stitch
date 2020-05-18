@@ -239,22 +239,14 @@ async def on_offline(self, ctv_channel):
             gid = data.base['ctv_guilds'].find_one(guild=x.id)
             if gid:
                 give_roles = [tls.Snowflake(r) for r in ast.literal_eval(gid['give_roles'])]
-                has_roles = [tls.Snowflake(r) for r in ast.literal_eval(gid['has_roles'])]
 
                 member = x.get_member(did['discorduid'])
-                if [y for y in member.roles for x in has_roles if y.id == x.id]:
+                if [y for y in member.roles for x in give_roles if y.id == x.id]:
                     await member.remove_roles(*give_roles)
 
 
 def get_guilds(self, did):
     return [x for x in self.bot.guilds for y in x.members if y.id == did]
-    # guilds = []
-    #
-    # for x in self.bot.guilds:
-    #     for y in x.members:
-    #         if y.id == did:
-    #             guilds.append(x)
-    # return guilds
 
 
 async def reset(self):

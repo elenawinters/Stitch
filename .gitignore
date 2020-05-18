@@ -9,6 +9,7 @@ __pycache__/
 # Stitch Bot
 settings*.json
 *.txt
+*.mp3
 
 
 # C extensions

@@ -1,3 +1,7 @@
 import os
+from core.logger import log
 while True:
-    os.system('python berry.tls.py')
+	try:
+		os.system('python berry.tls.py')
+	except Exception as exc:
+		log.exception(exc)

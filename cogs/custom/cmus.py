@@ -352,9 +352,7 @@ class Player:
 
     @classmethod
     def self(cls, self, member):  # Returns member object of bot.
-        guild = member.guild
-        mem = guild.get_member(self.bot.user.id)
-        return mem
+        return member.guild.get_member(self.bot.user.id)
 
     @classmethod
     def is_connected(cls, ctx):  # Is the bot connected to v7ice?
