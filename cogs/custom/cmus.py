@@ -249,25 +249,28 @@ class Player:
                 path = f'{abspath}\\{sound.value}'
             except AttributeError:
                 path = f'{abspath}\\{sound}'
+
+            import subprocess as sp
+            comm = ['ffprobe', '-i', path, '-show_entries', 'format=duration',
+                    '-of', 'default=noprint_wrappers=1:nokey=1', '-loglevel', 'warning']
+            pipe = sp.Popen(comm, stdout=sp.PIPE)
+            duration = str(pipe.stdout.read())
+            duration = duration.replace('\\r', '')
+            duration = duration.replace('\\n', '')
+            duration = duration.replace('\'', '')
+            duration = duration.replace('b', '')
+            duration = float(duration) - 0.1
+
             if not Player.is_playing(member):
                 audio = discord.FFmpegPCMAudio(source=path)
                 member.guild.voice_client.play(audio)
             else:
-                import subprocess as sp
-                comm = ['ffprobe', '-i', path, '-show_entries', 'format=duration',
-                        '-of', 'default=noprint_wrappers=1:nokey=1', '-loglevel', 'warning']
-                pipe = sp.Popen(comm, stdout=sp.PIPE)
-                duration = str(pipe.stdout.read())
-                duration = duration.replace('\\r', '')
-                duration = duration.replace('\\n', '')
-                duration = duration.replace('\'', '')
-                duration = duration.replace('b', '')
-                duration = float(duration) - 0.1
                 source = member.guild.voice_client.source
                 member.guild.voice_client.source = discord.FFmpegPCMAudio(source=path)
                 await asyncio.sleep(duration)
                 member.guild.voice_client.source = source
-                # log.debug(duration)
+
+            return duration
 
     play = Play
 
