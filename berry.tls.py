@@ -8,38 +8,19 @@
 #   Display: Purpose
 #
 
-# This is required. Settings file will be wiped if this is not here
-# from core.defaults import setup
-# setup.startup()  # Run startup
-
-from core.bot.funcs import extensions
-from discord.ext import commands
-# from core.defaults import setup
 from core.color import trace
 from data.data import data
-from core.bot.funcs import respond
 from core.bot.tools import *
 from core.logger import log
-from core.bot import enums
-from threading import Thread
 from core.bot.time import Time
-from core.bot import time
-from core import json
-import core.flags
 import traceback
-# import colorama
 import asyncio
-import discord
 import session
-import ast
 import sys
-# colorama.init()
-# setup.startup()
-client = commands.Bot(command_prefix='.')
-client2 = commands.Bot(command_prefix='.')
+
 
 if __name__ == '__main__':
-    log.info(f'>{trace.cyan} Starting at {time.time.readable.at()}.')
+    log.info(f'>{trace.cyan} Starting at {Time.readable.at()}.')
     # Initialize database
     log.info(f'{trace.cyan}> Initializing {trace.black.s}dataset{trace.cyan} Database.')
     try:
@@ -57,24 +38,15 @@ if __name__ == '__main__':
     append_cog('main.py')  # Load essentials
 
     # Login
+    from core.bot import time
     time.uptime = datetime.datetime.utcnow()
 
-    try:
-        from core.bot.login import *
-        threads = LoginManager(prefix='.').login()
-        import time
-        while True:
-            time.sleep(2)
-            if core.flags.restart:
-                break
-            if not threads[0].is_alive():
-                break
-    except KeyboardInterrupt:
-        sys.exit('Closed')
-    except Exception as err:
-        log.exception(err)
+    from core.bot import login
+    threads = login.LoginManager(prefix='.').login()
+    [t.start() for t in threads]
+    while all(x.is_alive() for x in threads):
+        login.time.sleep(2)
+    log.info('Bot is shutting down')
+    log.info(f'> Uptime: {Time.uptime(Time())}')
+    sys.exit()
 
-loop = asyncio.new_event_loop()
-loop.run_until_complete(session.cleanup())
-
-log.info(f'> Uptime: {Time.uptime(Time())}')

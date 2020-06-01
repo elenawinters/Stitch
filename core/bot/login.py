@@ -6,14 +6,15 @@ from .tools import *
 from core.logger import log
 from core.bot import enums
 from core import json
+import threading
 import traceback
 import requests
 import loader
 import sys
 import os
-from threading import Thread
+import time
 import asyncio
-loop = None
+import core.flags
 
 
 class LoginManager:
@@ -25,37 +26,20 @@ class LoginManager:
         log.info(f'{trace.cyan}> Running on {trace.white}Discord{trace.green.s}Py '
                  f'{trace.cyan}v{trace.cyan.s}{discord.__version__}{trace.cyan}.')
         tokens = json.json.orm['tokens']
-        threads = []
-        for x in tokens:
-            client = commands.Bot(command_prefix=self.prefix)
-            threads.append(LoginMultiple(client, crypt(x)))
+        threads = [threading.Thread(target=login_threads, args=(self.prefix, crypt(x),), daemon=True) for x in tokens]
+        # threads = [threading.Thread(target=login_threads, args=(self.prefix, crypt(x),)) for x in tokens]
         return threads
 
 
-class LoginMultiple(Thread):
-    def __init__(self, client, token=None):
-        Thread.__init__(self)
-        self.client = client
-        self.token = token
-        self.daemon = True
-        self.start()
+def login_threads(prefix, token=None):
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
 
-    def run(self):
-        global loop
-        try:
-            if loop:
-                loader.Load(self.client).run(silent=True)
-                loop.create_task(_login(self.client, self.token))
-            else:
-                loop = self.client.loop
-                loader.Load(self.client).run()
-                loop.create_task(_login(self.client, self.token))
-                loop.run_forever()
-        except Exception as exc:
-            log.critical('THREAD IS EXITING:')
-            log.exception(exc)
+    client = commands.Bot(command_prefix=prefix)
+    loader.Load(client).run()
 
-        return
+    loop.run_until_complete(_login(client, token))
+    loop.close()
 
 
 async def _login(client, token=None):
