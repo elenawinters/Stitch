@@ -19,6 +19,7 @@ header = {
 do_loop = True
 looping = False
 last_live = 0
+test_debug = False
 
 
 class Custom(commands.Cog):
@@ -26,7 +27,7 @@ class Custom(commands.Cog):
         self.bot = bot
 
     @commands.group()
-    @perms.is_admin()
+    @commands.is_owner()
     async def ctv(self, ctx):
         if not ctx.invoked_subcommand:
             # Todo: Implement announcements
@@ -39,6 +40,22 @@ class Custom(commands.Cog):
             #             data.base['ctv_users'].upsert(dict(userid=_id, discorduid=x.id), ['discorduid'])
             #             print(f'Debug | {x.name}: {z.twitch_name} / {_id}, {z.url}')
             pass
+
+    @ctv.command()
+    @commands.is_owner()
+    async def test_debug(self, ctx):
+        global test_debug
+        test_debug = not test_debug
+
+    @ctv.command()
+    @commands.is_owner()
+    async def looping(self, ctx):
+        log.debug(looping)
+
+    @ctv.command()
+    @commands.is_owner()
+    async def force_start(self, ctx):
+        await live_loop(self)
 
     @ctv.command()
     @commands.is_owner()
@@ -66,29 +83,30 @@ class Custom(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_update(self, before, member):
-        global last_live
-        for x in member.activities:
-            if x.type == discord.ActivityType.streaming:
-                streaming = False
-                for z in before.activities:
-                    if z.type == discord.ActivityType.streaming:
-                        streaming = True
-                        break
-                if not streaming:  # If you just went live, this runs
-                    if member.id != last_live:
-                        last_live = member.id
-                        _id = data.base['ctv_users'].find_one(discorduid=member.id)
-                        try:
-                            _id = _id['userid']
-                        except Exception:
-                            pass
-                        if not _id:
-                            _id = await name_to_id(x.twitch_name)
-                            data.base['ctv_users'].upsert(dict(userid=_id, discorduid=member.id), ['discorduid'])
-                        if test:
-                            log.debug(f'{trace.alert}CTV | {member.name}: {x.twitch_name} / {_id}, {x.url}')
-                        break
-        pass
+        if not member.bot:
+            global last_live
+            for x in member.activities:
+                if x.type == discord.ActivityType.streaming:
+                    streaming = False
+                    for z in before.activities:
+                        if z.type == discord.ActivityType.streaming:
+                            streaming = True
+                            break
+                    if not streaming:  # If you just went live, this runs
+                        if member.id != last_live:
+                            last_live = member.id
+                            _id = data.base['ctv_users'].find_one(discorduid=member.id)
+                            try:
+                                _id = _id['userid']
+                            except Exception:
+                                pass
+                            if not _id:
+                                _id = await name_to_id(x.twitch_name)
+                                if _id is not False:
+                                    data.base['ctv_users'].upsert(dict(userid=_id, discorduid=member.id), ['discorduid'])
+                            if test:
+                                log.debug(f'{trace.alert}CTV | {member.name}: {x.twitch_name} / {_id}, {x.url}')
+                            break
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -105,34 +123,41 @@ async def find_online_users(self):
     live = []
     for guild in self.bot.guilds:
         for member in guild.members:
-            for x in member.activities:
-                if x.type == discord.ActivityType.streaming:
-                    new = {'user': member.id, 'twitch': x.twitch_name}
-                    if new not in live:
-                        live.append(new)
+            if not member.bot:
+                for x in member.activities:
+                    if x.type == discord.ActivityType.streaming:
+                        new = {'user': member.id, 'twitch': x.twitch_name}
+                        if new not in live:
+                            live.append(new)
 
     for x in live:
-        _id = data.base['ctv_users'].find_one(discorduid=x['user'])
-        if not _id:
-            _id = await name_to_id(x['twitch'])
-            data.base['ctv_users'].upsert(dict(userid=_id, discorduid=x['user']), ['discorduid'])
+        try:
+            _id = data.base['ctv_users'].find_one(discorduid=x['user'])
+            if not _id:
+                _id = await name_to_id(x['twitch'])
+                if _id is not False:
+                    data.base['ctv_users'].upsert(dict(userid=_id, discorduid=x['user']), ['discorduid'])
+        except Exception as exc:
+            log.exception(exc)
         # _id = await name_to_id(x['twitch'])
         # data.base['ctv_users'].upsert(dict(userid=_id, discorduid=x['user']), ['discorduid'])
 
 
 async def name_to_id(_name):
-    url = "https://api.twitch.tv/kraken/users?login=" + _name
-    try:
-        async with session.session.get(url, headers=header) as r:
-            _data = await r.json(encoding='utf-8')
-    except Exception:
-        pass
-    try:
-        if r.status == 200:
-            if _data['users']:
-                return _data['users'][0]['_id']
-    except Exception:
-        pass
+    if _name is not None:
+        url = "https://api.twitch.tv/kraken/users?login=" + _name
+        try:
+            async with session.session.get(url, headers=header) as r:
+                _data = await r.json(encoding='utf-8')
+        except Exception as exc:
+            if test_debug:
+                log.exception(exc)
+        try:
+            if r.status == 200:
+                if _data['users']:
+                    return _data['users'][0]['_id']
+        except Exception:
+            pass
     return False
 
 
@@ -145,8 +170,9 @@ async def is_online():
     try:
         async with session.session.get(url, headers=header) as r:
             _data = await r.json(encoding='utf-8')
-    except Exception:
-        pass
+    except Exception as exc:
+        if test_debug:
+            log.exception(exc)
     try:
         if r.status == 200:
             if _data["streams"]:
@@ -161,8 +187,9 @@ async def get_stream(ctv_user):
     try:
         async with session.session.get(url, headers=header) as r:
             _data = await r.json(encoding='utf-8')
-    except Exception:
-        pass
+    except Exception as exc:
+        if test_debug:
+            log.exception(exc)
     try:
         if r.status == 200:
             if _data["stream"]:
@@ -180,6 +207,8 @@ async def live_loop(self):
     from cogs.core.system import lockdown
     global looping
     while not lockdown and do_loop:
+        if test_debug:
+            log.debug(f'{self.bot.user.name} is looping')
         from cogs.core.system import lockdown
         if lockdown:
             break

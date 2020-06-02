@@ -43,7 +43,10 @@ if __name__ == '__main__':
 
     from core.bot import login
     threads = login.LoginManager(prefix='.').login()
-    [t.start() for t in threads]
+    for t in threads:
+        login.time.sleep(1)
+        t.start()
+    # [t.start() for t in threads]
     while all(x.is_alive() for x in threads):
         login.time.sleep(2)
     log.info('Bot is shutting down')
