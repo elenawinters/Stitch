@@ -10,7 +10,7 @@ import asyncio
 import aiohttp
 import ast
 from core.bot.tools import crypt
-import session
+import requests
 test = True
 header = {
         'Client-ID': crypt(json.json.orm['secure']['extractors']['twitch']),
@@ -144,59 +144,23 @@ async def find_online_users(self):
 
 
 async def name_to_id(_name):
-    if _name is not None:
-        url = "https://api.twitch.tv/kraken/users?login=" + _name
-        try:
-            async with session.session.get(url, headers=header) as r:
-                _data = await r.json(encoding='utf-8')
-        except Exception as exc:
-            if test_debug:
-                log.exception(exc)
-        try:
-            if r.status == 200:
-                if _data['users']:
-                    return _data['users'][0]['_id']
-        except Exception:
-            pass
-    return False
+    host = json.json.orm['api']
+    try:
+        r = requests.get(url=f"http://{host['host']}:{host['port']}/ctv/id/{_name}")
+        return r.json()
+    except Exception as exc:
+        log.exception(exc)
+        return False
 
 
 async def is_online():
-    _id = []
-    for x in data.base['ctv_users']:
-        _id.append(x['userid'])
-    _id = ','.join([str(elem) for elem in _id])
-    url = "https://api.twitch.tv/kraken/streams/?channel=" + _id
+    host = json.json.orm['api']
     try:
-        async with session.session.get(url, headers=header) as r:
-            _data = await r.json(encoding='utf-8')
+        r = requests.get(url=f"http://{host['host']}:{host['port']}/ctv/online")
+        return r.json()
     except Exception as exc:
-        if test_debug:
-            log.exception(exc)
-    try:
-        if r.status == 200:
-            if _data["streams"]:
-                return _data
-    except Exception:
-        pass
-    return None
-
-
-async def get_stream(ctv_user):
-    url = "https://api.twitch.tv/kraken/stream/" + ctv_user
-    try:
-        async with session.session.get(url, headers=header) as r:
-            _data = await r.json(encoding='utf-8')
-    except Exception as exc:
-        if test_debug:
-            log.exception(exc)
-    try:
-        if r.status == 200:
-            if _data["stream"]:
-                return _data
-    except Exception:
-        pass
-    return False
+        log.exception(exc)
+        return None
 
 
 async def live_loop(self):
@@ -232,7 +196,7 @@ async def live_loop(self):
                         if x not in now:
                             await on_offline(self, x)
         except Exception as err:
-            log.error(err)
+            log.exception(err)
         await asyncio.sleep(10)
     looping = False
     log.error('CTV Loop Stopped')

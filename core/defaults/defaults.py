@@ -3,6 +3,10 @@ from core.json import default
 settings_file = default
 settings = {
     'tokens': [],
+    'api': {
+        'host': 'localhost',
+        'port': 5000,
+    },
     'secure': {
         'extractors': {
             'youtube': None,

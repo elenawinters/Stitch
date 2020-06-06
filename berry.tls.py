@@ -31,9 +31,13 @@ if __name__ == '__main__':
         log.error(f'> {short_traceback()}')
         log.critical(f'> {traceback.format_exc()}')
 
+    # Start API
+    import api
+    api.Main()
+
     # Initialize extensions
     # Append cCogs
-    append_cog('session.py')  # Load session
+    # append_cog('session.py')  # Load session
     append_cog('debug.py')  # Load debug things
     append_cog('main.py')  # Load essentials
 
@@ -43,8 +47,11 @@ if __name__ == '__main__':
 
     from core.bot import login
     threads = login.LoginManager(prefix='.').login()
+    t_count = 0
     for t in threads:
-        login.time.sleep(1)
+        # login.time.sleep(2)
+        t_count += 1
+        t.name = f'Thread-{t_count}'
         t.start()
     # [t.start() for t in threads]
     while all(x.is_alive() for x in threads):

@@ -5,6 +5,7 @@ from core.logger import log
 from core.color import trace
 from core.bot.tools import *
 from core.bot import enums
+test = False
 
 
 class Debug(commands.Cog):
@@ -20,11 +21,13 @@ class Debug(commands.Cog):
 
     @commands.Cog.listener()
     async def on_disconnect(self):
-        log.debug(f'{trace.cyan}> Connection with {trace.white}Discord{trace.cyan} lost.')
+        if test:
+            log.debug(f'{trace.cyan}> Connection with {trace.white}Discord{trace.cyan} lost.')
 
     @commands.Cog.listener()
     async def on_resumed(self):
-        log.debug(f'{trace.cyan}> Connection with {trace.white}Discord{trace.cyan} resumed.')
+        if test:
+            log.debug(f'{trace.cyan}> Connection with {trace.white}Discord{trace.cyan} resumed.')
 
 
 def setup(bot):

@@ -9,7 +9,6 @@ import functools
 import traceback
 import requests
 import asyncio
-import session
 import random
 
 
@@ -70,7 +69,7 @@ class Music(commands.Cog):
         if ctx.invoked_subcommand is None:
             try:
                 if queue[ctx.guild.id]['playing']:  # If object exists in here, we show the queue
-                    embed = tls.Embed(ctx, description=f"Currently {(len(queue[ctx.guild.id]['q']) + 1)} songs in queue")
+                    embed = tls.Embed(ctx, description=f"Currently {(len(queue[ctx.guild.id]['q']) + 1)} items in queue")
                     curr = queue[ctx.guild.id]['playing'][0]
                     try:
                         embed.add_field(name=f"**>**[**1**] {curr['title']}", value=f"**Artist:** {curr['author']}", inline=False)
@@ -177,7 +176,7 @@ class Music(commands.Cog):
     async def skip(self, ctx):
         if Player.is_connected(ctx):
             Player.skip(ctx)
-            await ctx.send('Skipping the current song')
+            await ctx.send('Skipping the current item')
 
     @commands.command(aliases=['stop'])
     async def pause(self, ctx):
@@ -430,10 +429,13 @@ class Player:
     @classmethod
     async def process_picture(cls, _dict, platform):
         # log.debug(platform)
-        if 'channel_id' in _dict:  # Get profile picture
-            pfp = await Player.profile_picture(_dict['channel_id'], platform)
-        else:
-            pfp = await Player.profile_picture(_dict['uploader_id'], platform)
+        try:
+            if 'channel_id' in _dict:  # Get profile picture
+                pfp = await Player.profile_picture(_dict['channel_id'], platform)
+            else:
+                pfp = await Player.profile_picture(_dict['uploader_id'], platform)
+        except Exception:
+            pfp = assets.Discord.error.value
         _dict.update({'pfp': pfp})
         return _dict
 
@@ -462,11 +464,10 @@ class Player:
                             'Client-ID': crypt(json.json.orm['secure']['extractors']['twitch']),
                             'Accept': 'application/vnd.twitchtv.v5+json'
                         }
-                        async with session.session.get(url, headers=header) as r:
-                            _data = await r.json(encoding='utf-8')
-                        if r.status == 200:
-                            if _data['users']:
-                                info = _data['users'][0]['logo']
+                        r = requests.get(url=url, headers=header)
+                        _data = r.json()
+                        if _data['users']:
+                            info = _data['users'][0]['logo']
                         data.base['cache'].upsert(dict(platform=extractor, id=_id, data=info), ['id'])
                     elif version == 'helix':  # No implementation
                         return discord.Embed.Empty
