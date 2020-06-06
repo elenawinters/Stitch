@@ -10,7 +10,7 @@ import asyncio
 import aiohttp
 import ast
 from core.bot.tools import crypt
-import requests
+import httpx as requests
 test = True
 header = {
         'Client-ID': crypt(json.json.orm['secure']['extractors']['twitch']),
@@ -146,7 +146,8 @@ async def find_online_users(self):
 async def name_to_id(_name):
     host = json.json.orm['api']
     try:
-        r = requests.get(url=f"http://{host['host']}:{host['port']}/ctv/id/{_name}")
+        async with requests.AsyncClient() as client:
+            r = await client.get(url=f"http://{host['host']}:{host['port']}/ctv/id/{_name}", timeout=5)
         return r.json()
     except Exception as exc:
         log.exception(exc)
@@ -156,7 +157,8 @@ async def name_to_id(_name):
 async def is_online():
     host = json.json.orm['api']
     try:
-        r = requests.get(url=f"http://{host['host']}:{host['port']}/ctv/online")
+        async with requests.AsyncClient() as client:
+            r = await client.get(url=f"http://{host['host']}:{host['port']}/ctv/online", timeout=5)
         return r.json()
     except Exception as exc:
         log.exception(exc)

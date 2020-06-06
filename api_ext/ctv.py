@@ -6,7 +6,8 @@ from core.bot import time
 from flask import jsonify
 from core import json
 import datetime
-import requests
+import httpx as requests
+
 
 header = {
         'Client-ID': crypt(json.json.orm['secure']['extractors']['twitch']),
@@ -33,7 +34,7 @@ def ctv_id_name(name):
 def name_to_id(name):
     url = "https://api.twitch.tv/kraken/users?login=" + name
     try:
-        r = requests.get(url=url, headers=header)
+        r = requests.get(url=url, headers=header, timeout=5)
         r_json = r.json()
         if r_json['users']:
             return r_json['users'][0]['_id']
@@ -60,7 +61,7 @@ def is_online():
     url = "https://api.twitch.tv/kraken/streams/?channel=" + _id
 
     try:
-        r = requests.get(url=url, headers=header)
+        r = requests.get(url=url, headers=header, timeout=5)
         r_json = r.json()
         if r_json['streams']:
             return r_json

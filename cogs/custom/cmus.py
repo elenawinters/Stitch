@@ -7,7 +7,7 @@ from core.ext import assets
 import youtube_dl
 import functools
 import traceback
-import requests
+import httpx as requests
 import asyncio
 import random
 
@@ -453,7 +453,7 @@ class Player:
             if info is None:
                 if extractor == 'youtube':  # 2 points
                     base = f"https://www.googleapis.com/youtube/v3/channels?part=snippet&id={_id}&key={crypt(json.json.orm['secure']['extractors'][extractor])}"
-                    info = requests.get(base).json()['items'][0]['snippet']['thumbnails']['high']['url']
+                    info = requests.get(base, timeout=5).json()['items'][0]['snippet']['thumbnails']['high']['url']
                     # log.debug(info)
                     data.base['cache'].upsert(dict(platform=extractor, id=_id, data=info), ['id'])
                 elif extractor == 'twitch':  # Kraken - Depreciated.
@@ -464,7 +464,8 @@ class Player:
                             'Client-ID': crypt(json.json.orm['secure']['extractors']['twitch']),
                             'Accept': 'application/vnd.twitchtv.v5+json'
                         }
-                        r = requests.get(url=url, headers=header)
+                        async with requests.AsyncClient() as client:
+                            r = await client.get(url=url, headers=header, timeout=5)
                         _data = r.json()
                         if _data['users']:
                             info = _data['users'][0]['logo']
