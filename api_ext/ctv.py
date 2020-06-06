@@ -34,13 +34,15 @@ def ctv_id_name(name):
 def name_to_id(name):
     url = "https://api.twitch.tv/kraken/users?login=" + name
     try:
-        r = requests.get(url=url, headers=header, timeout=5)
+        r = requests.get(url=url, headers=header)
         r_json = r.json()
         if r_json['users']:
             return r_json['users'][0]['_id']
+    except requests._exceptions.ReadTimeout:
+        log.debug('Request Timeout')
     except Exception as exc:
         log.exception(exc)
-        return None
+    return None
 
 
 @app.route("/ctv/online")
@@ -61,11 +63,12 @@ def is_online():
     url = "https://api.twitch.tv/kraken/streams/?channel=" + _id
 
     try:
-        r = requests.get(url=url, headers=header, timeout=5)
+        r = requests.get(url=url, headers=header)
         r_json = r.json()
         if r_json['streams']:
             return r_json
+    except requests._exceptions.ReadTimeout:
+        log.debug('Request Timeout')
     except Exception as exc:
         log.exception(exc)
-        return None
-
+    return None

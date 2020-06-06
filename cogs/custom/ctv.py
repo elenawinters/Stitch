@@ -147,22 +147,26 @@ async def name_to_id(_name):
     host = json.json.orm['api']
     try:
         async with requests.AsyncClient() as client:
-            r = await client.get(url=f"http://{host['host']}:{host['port']}/ctv/id/{_name}", timeout=5)
+            r = await client.get(url=f"http://{host['host']}:{host['port']}/ctv/id/{_name}")
         return r.json()
+    except requests._exceptions.ReadTimeout:
+        log.debug('Request Timeout')
     except Exception as exc:
         log.exception(exc)
-        return False
+    return False
 
 
 async def is_online():
     host = json.json.orm['api']
     try:
         async with requests.AsyncClient() as client:
-            r = await client.get(url=f"http://{host['host']}:{host['port']}/ctv/online", timeout=5)
+            r = await client.get(url=f"http://{host['host']}:{host['port']}/ctv/online")
         return r.json()
+    except requests._exceptions.ReadTimeout:
+        log.debug('Request Timeout')
     except Exception as exc:
         log.exception(exc)
-        return None
+    return None
 
 
 async def live_loop(self):
