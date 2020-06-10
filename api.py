@@ -13,6 +13,11 @@ flask_log.setLevel(logging.ERROR)
 
 loop = asyncio.get_event_loop()
 app = Flask(__name__)
+app.config.update(
+    JSONIFY_PRETTYPRINT_REGULAR=True,
+    ENV='production'
+)
+
 
 api_folder = 'api_ext'
 modules = glob.glob(join(f'{dirname(__file__)}\\{api_folder}', "*.py"))

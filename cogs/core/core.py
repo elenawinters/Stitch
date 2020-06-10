@@ -43,7 +43,7 @@ class Core(commands.Cog):
                 embed.add_field(name=f'Cogs: ', value=str(len(self.bot.cogs)))
                 embed.add_field(name=f'Extensions: ', value=str(len(self.bot.extensions)))
                 embed.add_field(name=f'Listeners: ', value=str(len(listeners)))
-                if vcs is 1:
+                if vcs == 1:
                     embed.add_field(name=f'Voices: ', value=f'{vcs} client')
                 else:
                     embed.add_field(name=f'Voices: ', value=f'{vcs} clients')

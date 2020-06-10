@@ -38,8 +38,10 @@ def name_to_id(name):
         r_json = r.json()
         if r_json['users']:
             return r_json['users'][0]['_id']
+    except requests._exceptions.ConnectTimeout:
+        log.debug('Connect Timeout')
     except requests._exceptions.ReadTimeout:
-        log.debug('Request Timeout')
+        log.debug('Read Timeout')
     except Exception as exc:
         log.exception(exc)
     return None
@@ -67,8 +69,10 @@ def is_online():
         r_json = r.json()
         if r_json['streams']:
             return r_json
+    except requests._exceptions.ConnectTimeout:
+        log.debug('Connect Timeout')
     except requests._exceptions.ReadTimeout:
-        log.debug('Request Timeout')
+        log.debug('Read Timeout')
     except Exception as exc:
         log.exception(exc)
     return None

@@ -41,7 +41,7 @@ class Core(commands.Cog):
         embed.add_field(name='Created At:', value=f'`{user.created_at}`', inline=True)
         embed.add_field(name=f'Account Age:', value=f'```{age}```', inline=False)
         embed.add_field(name=f'Known Nicknames:', value=f'```{display}```', inline=False)
-        if len(servers) is 1:
+        if len(servers) == 1:
             embed.set_footer(icon_url=user.avatar_url, text=f'In {len(servers)} guild (that can be seen)')
         else:
             embed.set_footer(icon_url=user.avatar_url, text=f'In {len(servers)} guilds (that can be seen)')
