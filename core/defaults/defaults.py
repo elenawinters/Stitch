@@ -2,7 +2,13 @@ from data.data import get_data_file
 from core.json import default
 settings_file = default
 settings = {
-    'tokens': [],
+    'tokens': {
+        'discord': [],
+        'twitch': {
+            'owner': '',
+            'pw': []
+        }
+    },
     'api': {
         'host': 'localhost',
         'port': 5000,
@@ -36,12 +42,3 @@ settings = {
         }
     }
 }
-
-
-
-
-
-
-
-
-

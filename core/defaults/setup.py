@@ -29,13 +29,3 @@ def reset_logs(force=False):
         if json.external.exists(logs['file']):
             open(logs['file'], 'w').close()
             log(f'{trace.black}{trace.white.b.s}> Cleared the log file. {trace.time}{time.readable.on(trace.black)}{trace.black}.')
-
-
-
-
-
-
-
-
-
-

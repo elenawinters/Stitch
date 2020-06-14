@@ -28,23 +28,3 @@ class Data:
 
 
 data = Data
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

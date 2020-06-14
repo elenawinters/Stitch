@@ -13,8 +13,8 @@ from core.bot.tools import crypt
 import httpx as requests
 test = True
 header = {
-        'Client-ID': crypt(json.json.orm['secure']['extractors']['twitch']),
-        'Accept': 'application/vnd.twitchtv.v5+json'
+    'Client-ID': crypt(json.json.orm['secure']['extractors']['twitch']),
+    'Accept': 'application/vnd.twitchtv.v5+json'
 }
 do_loop = True
 looping = False
@@ -149,8 +149,10 @@ async def name_to_id(_name):
         async with requests.AsyncClient() as client:
             r = await client.get(url=f"http://{host['host']}:{host['port']}/ctv/id/{_name}")
         return r.json()
+    except requests._exceptions.ConnectTimeout:
+        log.debug('Connect Timeout')
     except requests._exceptions.ReadTimeout:
-        log.debug('Request Timeout')
+        log.debug('Read Timeout')
     except Exception as exc:
         log.exception(exc)
     return False
@@ -162,8 +164,10 @@ async def is_online():
         async with requests.AsyncClient() as client:
             r = await client.get(url=f"http://{host['host']}:{host['port']}/ctv/online")
         return r.json()
+    except requests._exceptions.ConnectTimeout:
+        log.debug('Connect Timeout')
     except requests._exceptions.ReadTimeout:
-        log.debug('Request Timeout')
+        log.debug('Read Timeout')
     except Exception as exc:
         log.exception(exc)
     return None

@@ -8,7 +8,7 @@ from core.bot import enums
 from core import json
 import threading
 import traceback
-import requests
+import httpx as requests
 import loader
 import sys
 import os
@@ -25,7 +25,9 @@ class LoginManager:
         log.info(f'{trace.cyan}> Attempting Login.')
         log.info(f'{trace.cyan}> Running on {trace.white}Discord{trace.green.s}Py '
                  f'{trace.cyan}v{trace.cyan.s}{discord.__version__}{trace.cyan}.')
-        tokens = json.json.orm['tokens']
+        version.Discord.latest()
+        version.YouTubeDL.latest()
+        tokens = json.json.orm['tokens']['discord']
         threads = [threading.Thread(target=login_threads, args=(self.prefix, crypt(x),), daemon=True) for x in tokens]
         # threads = [threading.Thread(target=login_threads, args=(self.prefix, crypt(x),)) for x in tokens]
         return threads
@@ -50,7 +52,7 @@ async def _login(client, token=None):
                      f'{trace.cyan}v{trace.cyan.s}{discord.__version__}{trace.cyan}.')
             version.Discord.latest()
             version.YouTubeDL.latest()
-            token = json.json.reader('token')
+            # token = json.json.reader('token')
             if token == enums.ReturnType.fail or token == enums.ReturnType.none:
                 raise discord.errors.LoginFailure('No token')
             else:
@@ -97,7 +99,7 @@ class version:
                     log.warning(f'{trace.alert}> {trace.white}Discord{trace.green.s}Py {trace.cyan}v{trace.cyan.s}'
                                 f'{info}{trace.green.s} is {trace.yellow.s}available{trace.cyan}.')
                     log.warning(f'{trace.alert}> {trace.yellow.s}Please update to {trace.cyan}v{trace.cyan.s}{info}{trace.cyan}.')
-            except:
+            except Exception:
                 pass
 
     class YouTubeDL:
@@ -126,7 +128,7 @@ class version:
                     log.warning(f'{trace.alert}> {trace.yellow.s}Please update {trace.white.b}{trace.black}'
                                 f'You{trace.red.b.s}{trace.white.s}Tube{trace.reset}-{trace.red.s}DL '
                                 f'{trace.yellow.s}to {trace.cyan}v{trace.cyan.s}{info}{trace.cyan}.')
-            except:
+            except Exception:
                 pass
 
     @classmethod
@@ -134,7 +136,3 @@ class version:
         if late == curr:
             return False
         return True
-
-
-
-

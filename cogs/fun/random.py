@@ -3,7 +3,7 @@ from discord.ext import commands
 from core.ext.enums import general
 from core.ext.enums import names
 from core.bot.tools import tls
-import requests
+import httpx as requests
 import random
 
 
@@ -67,8 +67,8 @@ class Fun(commands.Cog):
         lr = names.NameURLs.last
         f = requests.get(fr.value).json()['data']  # First
         m = requests.get(mr.value).json()['RandL']['items']  # Middle
-        l = requests.get(lr.value).json()['data']  # Last
-        lt = l
+        la = requests.get(lr.value).json()['data']  # Last
+        lt = la
         if seed is not None:
             random.seed(seed)
         f = random.choice(f)
@@ -81,7 +81,7 @@ class Fun(commands.Cog):
         m = random.choice(m)
         if seed is not None:
             random.seed(seed)
-        l = random.choice(l)
+        la = random.choice(la)
         if seed is not None:
             random.seed(seed)
         lx = random.randint(1, 6)
@@ -93,10 +93,10 @@ class Fun(commands.Cog):
                 random.seed(seed)
             r = random.randint(1, 2)
             if r == 1:
-                l = f'{l}-{lx}'
+                la = f'{la}-{lx}'
             else:
-                l = f'{lx}-{l}'
-        embed = tls.Embed(description=f'{f} {m} {l}', timestamp=True)
+                la = f'{lx}-{la}'
+        embed = tls.Embed(description=f'{f} {m} {la}', timestamp=True)
         if seed is None:
             seed = 'Random'
         embed.set_footer(text=f'{sex.value} | {seed}')
@@ -110,5 +110,3 @@ class Fun(commands.Cog):
 
 def setup(bot):
     bot.add_cog(Fun(bot))
-
-

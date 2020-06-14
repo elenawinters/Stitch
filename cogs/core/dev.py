@@ -10,9 +10,9 @@ class Core(commands.Cog, command_attrs=dict(hidden=True)):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.group(aliases=['int', 'internal', 'bot', 'system', 'info', 'debug', 'dbg'])
+    @commands.group(aliases=['int', 'internal', 'bot', 'system', 'info', 'debug', 'dbg', 'admin'])
     @commands.is_owner()  # OWNER ONLY FOR ENTIRE GROUP
-    async def admin(self, ctx):
+    async def dev(self, ctx):
         if not ctx.invoked_subcommand:
             com = []
             for x in self.bot.walk_commands():
@@ -27,18 +27,18 @@ class Core(commands.Cog, command_attrs=dict(hidden=True)):
             for x in t:
                 log.info(x)
 
-    @admin.command(name='cog')
+    @dev.command(name='cog')
     async def get_cog(self, ctx, name):
         cog = tls.Cog.fetch(self, name)
         log.info(cog.qualified_name)  # print(cog)
 
-    @admin.command(aliases=['servers'])
+    @dev.command(aliases=['servers'])
     async def guilds(self, ctx):  # LIST ALL GUILDS
         log.info(f'Number of Guilds that this bot is in: {len(self.bot.guilds)}')
         for x in self.bot.guilds:
             log.info(f'{x.id}: {x.name}')
 
-    @admin.group(aliases=['members'])
+    @dev.group(aliases=['members'])
     async def users(self, ctx):  # LIST ALL USERS
         if not ctx.invoked_subcommand:
             log.info(f'Number of Users that this bot can see: {len(self.bot.users)}')
@@ -52,7 +52,7 @@ class Core(commands.Cog, command_attrs=dict(hidden=True)):
         for x in matches:
             log.info(f'{x.id}: {x.name}#{x.discriminator}')
 
-    @admin.command(aliases=['member'])
+    @dev.command(aliases=['member'])
     async def user(self, ctx, *, arg):  # LIST ALL USERS
         user = await commands.UserConverter().convert(ctx=ctx, argument=arg)
         log.info(f'Viewing user: {user.id}: {user}')
@@ -65,7 +65,7 @@ class Core(commands.Cog, command_attrs=dict(hidden=True)):
         for x in guilds:
             log.info(f'{x.id}: {x.name}')
 
-    @admin.command(aliases=['server'])
+    @dev.command(aliases=['server'])
     async def guild(self, ctx, guild_id):  # LIST GUILD INFO
         guild = await self.bot.fetch_guild(guild_id)
         log.info(f'Viewing guild: {guild.id}: {guild}')
@@ -91,7 +91,7 @@ class Core(commands.Cog, command_attrs=dict(hidden=True)):
         if isinstance(err, commands.CommandInvokeError):
             log.warn(f'Could not find guild in cache. Error message to follow.')
 
-    @admin.command(aliases=['createinvite'])
+    @dev.command(aliases=['createinvite'])
     async def invite(self, ctx, guild_id):  # LIST ALL USERS
         guild = await self.bot.fetch_guild(guild_id)
         log.info(f'Getting invite for guild: {guild.id}: {guild}')
@@ -112,7 +112,7 @@ class Core(commands.Cog, command_attrs=dict(hidden=True)):
             elif '50013' in str(err):
                 log.warn(f'Failed to create invite for guild. Error message to follow.')
 
-    @admin.command()
+    @dev.command()
     async def commands(self, ctx):
         com = []
         for x in self.bot.walk_commands():

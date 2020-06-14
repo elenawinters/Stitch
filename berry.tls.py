@@ -51,7 +51,7 @@ if __name__ == '__main__':
     for t in threads:
         # login.time.sleep(2)
         t_count += 1
-        t.name = f'Thread-{t_count}'
+        t.name = f'Discord-{t_count}'
         t.start()
     # [t.start() for t in threads]
     while all(x.is_alive() for x in threads):
@@ -59,4 +59,3 @@ if __name__ == '__main__':
     log.info('Bot is shutting down')
     log.info(f'> Uptime: {Time.uptime(Time())}')
     sys.exit()
-

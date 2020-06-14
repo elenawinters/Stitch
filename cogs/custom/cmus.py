@@ -361,7 +361,7 @@ class Player:
         if Player.voice(ctx) is not None:
             try:
                 return ctx.guild.voice_client.is_connected()
-            except AttributeError:
+            except AttributeError as err:
                 return False
         else:
             return False

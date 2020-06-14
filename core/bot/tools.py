@@ -36,7 +36,7 @@ class tls:  # Short for Tools
             for x in tls.Voice.clients(self):
                 try:
                     await x.disconnect(force=True)
-                except:
+                except Exception:
                     pass
 
     class Activity:
@@ -132,7 +132,7 @@ class tls:  # Short for Tools
             else:
                 try:
                     show_time = datetime.datetime.strptime(timestamp, '%Y-%m-%d %H:%M:%S.%f')
-                except:
+                except Exception:
                     show_time = timestamp
                 embed = discord.Embed(title=title, type=_type, url=url, description=description, colour=color, timestamp=show_time)
 
@@ -269,7 +269,7 @@ def rfilterm(member, string: str, bot=None, guid=None, channel=None):
 
 
 def split_string(string, remove, offset=0):
-    return string[len(f'{remove}')+offset:]
+    return string[len(f'{remove}') + offset:]
 
 
 def remove_duplicates(x: list):
@@ -374,27 +374,3 @@ def items(r, s):
             if k == s:
                 ret.append(v)
     return ret
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

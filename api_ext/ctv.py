@@ -10,11 +10,11 @@ import httpx as requests
 
 
 header = {
-        'Client-ID': crypt(json.json.orm['secure']['extractors']['twitch']),
-        'Accept': 'application/vnd.twitchtv.v5+json'
+    'Client-ID': crypt(json.json.orm['secure']['extractors']['twitch']),
+    'Accept': 'application/vnd.twitchtv.v5+json'
 }
 rate = datetime.datetime.utcnow()
-is_online_data = []
+is_online_data = None
 last_name_data = ''
 last_name_id = 0
 
@@ -62,7 +62,7 @@ def is_online():
     for x in data.base['ctv_users']:
         _id.append(x['userid'])
     _id = ','.join([str(elem) for elem in _id])
-    url = "https://api.twitch.tv/kraken/streams/?channel=" + _id
+    url = "https://api.twitch.tv/kraken/streams/?limit=100&channel=" + _id
 
     try:
         r = requests.get(url=url, headers=header)
