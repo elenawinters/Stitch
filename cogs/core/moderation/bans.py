@@ -85,7 +85,7 @@ async def ban_attempt(self, guild, snowflake):
 
             await guild.ban(tls.Snowflake(snowflake), delete_message_days=0, reason=ban[str(snowflake)]['reason'])
 
-            if bDebug:
+            if bDebug:  # reee cant make it 1 line
                 log.debug(f'Ban success on {snowflake}')
 
             return
@@ -112,10 +112,15 @@ async def ban_attempt(self, guild, snowflake):
 
 
 async def ban_sweep(self):
+    ban = await ban_list()
     for guild in self.bot.guilds:
-        for member in guild.members:
-            await ban_attempt(self, guild, member.id)
-        # log.debug(x)
+        for snowflake in ban:
+            if guild.get_member(snowflake):
+                await ban_attempt(self, guild, snowflake)
+
+    # for guild in self.bot.guilds:
+    #     for member in guild.members:
+    #         await ban_attempt(self, guild, member.id)
 
 
 bl_rate = datetime.datetime.utcnow()
@@ -123,7 +128,7 @@ bl_first = True
 bl_list = {}
 
 
-async def ban_list():  # Not used yet. Refer to notes at API_EXT/bans.py
+async def ban_list():  # Use this to prevent sql errors
     host = core.json.json.orm['api']
     try:
         global bl_list
@@ -131,7 +136,7 @@ async def ban_list():  # Not used yet. Refer to notes at API_EXT/bans.py
         global bl_first
         if time.time.diff(bl_rate, datetime.datetime.utcnow()).seconds >= 10 or bl_first:
             r = await core.web.Client(f"http://{host['host']}:{host['port']}/bans/list").async_get()
-            bl_list = r.json()
+            bl_list = r.json()  # Can't make this a one liner cuz it tries to call await on the .json
             bl_rate = datetime.datetime.utcnow()
             bl_first = False
         return bl_list
