@@ -65,6 +65,7 @@ class Custom(commands.Cog):
     @ctv.command(name='reset')
     @commands.is_owner()
     async def do_reset(self, ctx):
+        # BROKEN (I think)
         global do_loop
         do_loop = False
         count = 0
@@ -144,17 +145,18 @@ async def find_online_users(self):
 
 
 async def name_to_id(_name):
-    host = json.json.orm['api']
-    try:
-        async with requests.AsyncClient() as client:
-            r = await client.get(url=f"http://{host['host']}:{host['port']}/ctv/id/{_name}")
-        return r.json()
-    except requests._exceptions.ConnectTimeout:
-        log.debug('Connect Timeout')
-    except requests._exceptions.ReadTimeout:
-        log.debug('Read Timeout')
-    except Exception as exc:
-        log.exception(exc)
+    if _name is not None:
+        host = json.json.orm['api']
+        try:
+            async with requests.AsyncClient() as client:
+                r = await client.get(url=f"http://{host['host']}:{host['port']}/ctv/id/{_name}")
+            return r.json()
+        except requests._exceptions.ConnectTimeout:
+            log.debug('Connect Timeout')
+        except requests._exceptions.ReadTimeout:
+            log.debug('Read Timeout')
+        except Exception as exc:
+            log.exception(exc)
     return False
 
 

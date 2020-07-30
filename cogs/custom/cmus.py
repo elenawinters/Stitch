@@ -8,6 +8,7 @@ import youtube_dl
 import functools
 import traceback
 import httpx as requests
+import core.checks
 import asyncio
 import random
 
@@ -17,6 +18,7 @@ class Music(commands.Cog):
         self.bot = bot
 
     @commands.command()
+    @core.checks.is_banned()
     async def play(self, ctx, url=None):
         if await Player.can_connect(ctx, False):
             await Player.join(ctx.message.author)
@@ -65,6 +67,7 @@ class Music(commands.Cog):
                 log.exception(f'Code #{number}', exc_info=err)
 
     @commands.group(aliases=['q'])
+    @core.checks.is_banned()
     async def queue(self, ctx):
         if ctx.invoked_subcommand is None:
             try:
@@ -97,6 +100,7 @@ class Music(commands.Cog):
                 log.exception(f'Code #{number}', exc_info=err)
 
     @queue.command()
+    @commands.is_owner()
     async def backend(self, ctx):
         try:
             log.debug(queue[ctx.guild.id]['playing'][0])
@@ -132,6 +136,7 @@ class Music(commands.Cog):
         await ctx.send(f"Queue currently contains {len(queue[ctx.guild.id]['q'])} tracks")
 
     @commands.command(aliases=['now_playing', 'nowplaying', 'now-playing', 'now', 'np'])
+    @core.checks.is_banned()
     async def playing(self, ctx):
         if Player.is_connected(ctx):
             curr = queue[ctx.guild.id]['playing'][0]
@@ -173,35 +178,41 @@ class Music(commands.Cog):
     #             await respond(ctx, err)
 
     @commands.command(aliases=['next'])
+    @core.checks.is_banned()
     async def skip(self, ctx):
         if Player.is_connected(ctx):
             Player.skip(ctx)
             await ctx.send('Skipping the current item')
 
     @commands.command(aliases=['stop'])
+    @core.checks.is_banned()
     async def pause(self, ctx):
         if Player.is_connected(ctx):
             await ctx.send('Pausing the player')
             Player.pause(ctx)
 
     @commands.command()
+    @core.checks.is_banned()
     async def resume(self, ctx):
         if Player.is_connected(ctx):
             await ctx.send('Resuming the player')
             Player.resume(ctx)
 
     @commands.command(aliases=['rejoin'])
+    @core.checks.is_banned()
     async def reconnect(self, ctx):
         if await Player.can_connect(ctx):
             await Player.join(ctx.message.author)
             await Player.loop(self, ctx)
 
     @commands.command(aliases=['connect'])
+    @core.checks.is_banned()
     async def join(self, ctx):
         if await Player.can_connect(ctx):
             await Player.join(ctx.message.author)
 
     @commands.command(aliases=['disconnect'])
+    @core.checks.is_banned()
     async def leave(self, ctx):
         await Player.disconnect(ctx.me)
 

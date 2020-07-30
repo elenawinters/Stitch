@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 from core.bot.tools import *
 from core.bot.funcs import *
+import core.checks
 
 
 class Preview(commands.Cog, command_attrs=dict(hidden=True)):
@@ -9,6 +10,7 @@ class Preview(commands.Cog, command_attrs=dict(hidden=True)):
         self.bot = bot
 
     @commands.command()
+    @core.checks.is_banned()
     async def embed(self, ctx, *, data=None):
         try:
             if data is None:
@@ -21,6 +23,7 @@ class Preview(commands.Cog, command_attrs=dict(hidden=True)):
             await respond(ctx, err)
 
     @commands.command(aliases=['emote', 'emotes', 'emoji', 'emojis', 'emoticon', 'emoticons', 'decode'])
+    @core.checks.is_banned()
     async def code(self, ctx, *, emote=None):
         try:
             if emote is not None:
@@ -33,6 +36,7 @@ class Preview(commands.Cog, command_attrs=dict(hidden=True)):
             await respond(ctx, err)
 
     @commands.command(aliases=['colour'])
+    @core.checks.is_banned()
     async def color(self, ctx, *, emote=None):
         try:
             if emote is not None:

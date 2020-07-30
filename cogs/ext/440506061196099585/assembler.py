@@ -1,4 +1,5 @@
 from discord.ext import commands
+import core.checks
 
 
 class Ext(commands.Cog):
@@ -6,6 +7,7 @@ class Ext(commands.Cog):
         self.bot = bot
 
     @commands.command()
+    @core.checks.is_banned()
     async def assemble(self, ctx):
         test = ''
         async with ctx.typing():
@@ -24,4 +26,3 @@ class Ext(commands.Cog):
 
 def setup(bot):
     bot.add_cog(Ext(bot))
-

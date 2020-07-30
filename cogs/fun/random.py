@@ -4,6 +4,7 @@ from core.ext.enums import general
 from core.ext.enums import names
 from core.bot.tools import tls
 import httpx as requests
+import core.checks
 import random
 
 
@@ -12,6 +13,7 @@ class Fun(commands.Cog):
         self.bot = bot
 
     @commands.command(name='number', aliases=['random', 'rand', 'num', 'randomnumber', 'rando'])
+    @core.checks.is_banned()
     async def number_generator(self, ctx, number='1-100', *, seed=None):
         """Pseudorandom number generator.
         `.number [range] [seed]`
@@ -45,6 +47,7 @@ class Fun(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command(name='name', aliases=['handmeaname', 'hman', 'names'])
+    @core.checks.is_banned()
     async def name_generator(self, ctx, sex=None, *, seed=None):
         """Name generator.
         `.name [sex] [seed]`

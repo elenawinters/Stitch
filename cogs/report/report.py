@@ -4,6 +4,7 @@ from core.bot.tools import split_string
 from core.bot.tools import tls
 from data.data import data
 from core.bot.enums import *
+import core.checks
 
 
 class Reporting(commands.Cog):
@@ -11,6 +12,7 @@ class Reporting(commands.Cog):
         self.bot = bot
 
     @commands.group(aliases=['reports', 'review', 'r'])
+    @core.checks.is_banned()  # REEE I HAVE TO FIX THIS
     async def report(self, ctx):
         """Report something to the bot developer.
         .report [text]
@@ -19,13 +21,13 @@ class Reporting(commands.Cog):
             args = ctx.message.content.split(' ')
             if len(args) > 1:
                 try:
-                    report_data = dict(serverid=ctx.guild.id,
+                    report_data = dict(id=ctx.message.id,
+                                       serverid=ctx.guild.id,
                                        servername=ctx.guild.name,
                                        features=str(ctx.guild.features),
                                        userid=ctx.author.id,
                                        discordtag=str(ctx.author),
                                        nickname=ctx.author.nick,
-                                       messageid=ctx.message.id,
                                        report_text=split_string(ctx.message.content, f'{args[0]} '),
                                        timestamp=ctx.message.created_at)
                     rid = data.base['reports'].insert(report_data)
@@ -57,19 +59,9 @@ class Reporting(commands.Cog):
 
                 await ctx.send(embed=embed)
 
-    @report.command(aliases=['m'])
+    @report.command(aliases=['m', 'flag', 'f'])
     @commands.is_owner()
     async def mark(self, ctx, arg: int = 0):
-        if arg >= 0:
-            entry = data.base['reports'].find_one(id=arg)
-            if entry is not None:
-                new = not bool(entry['reviewed'])
-                data.base['reports'].update(dict(id=arg, reviewed=new), ['id'])
-                await ctx.send(f'Updated report #{arg}')
-
-    @report.command(aliases=['f'])
-    @commands.is_owner()
-    async def flag(self, ctx, arg: int = 0):
         if arg >= 0:
             entry = data.base['reports'].find_one(id=arg)
             if entry is not None:

@@ -3,6 +3,7 @@ from discord.ext import commands
 from core.bot.funcs import extensions
 from core.bot.tools import *
 from core.bot import perms
+import core.checks
 
 
 class Core(commands.Cog):
@@ -10,6 +11,7 @@ class Core(commands.Cog):
         self.bot = bot
 
     @commands.command(aliases=['userinfo'])
+    @core.checks.is_banned()
     async def whois(self, ctx, *, user):
         try:
             user = await commands.MemberConverter().convert(ctx=ctx, argument=user)
@@ -56,6 +58,7 @@ class Core(commands.Cog):
     #     # pass
 
     @commands.command(hidden=True)
+    @core.checks.is_banned()
     async def help(self, ctx):
         """Displays the old help menu."""
         com = ctx.message.content.split(' ')
@@ -122,18 +125,18 @@ class Core(commands.Cog):
         for x in self.bot.commands:
             cogs[x.cog_name].append(x.name)
         listeners = []
-        for y in self.bot.cogs: # listeners
+        for y in self.bot.cogs:  # listeners
             cog = self.bot.get_cog(y)
             for name, func in cog.get_listeners():
                 listeners.append(name)
         embed = tls.Embed(ctx, description=f'Here are the currently loaded cogs: ({len(self.bot.commands)} commands, {len(self.bot.cogs)}/{len(self.bot.extensions)} cogs, {len(listeners)} listeners)')
-        for k,v in sorted(cogs.items()):
+        for k, v in sorted(cogs.items()):
             for x in sorted(v):
                 embed.add_field(name=f'cogs.{k}', value=x, inline=True)
 
         await ctx.send(embed=embed)
 
-    @commands.command(name='command', aliases=['comm', 'commands', 'com'],  hidden=True)
+    @commands.command(name='command', aliases=['comm', 'commands', 'com'], hidden=True)
     @commands.is_owner()
     async def comm(self, ctx, name=None):
         if name is not None:
@@ -162,6 +165,7 @@ class Core(commands.Cog):
             await tls.Command.execute(self, ctx, 'status')
 
     @commands.command(aliases=['aliases', 'al'], hidden=True)
+    @core.checks.is_banned()
     async def alias(self, ctx, name=None):
         if name is not None:
             x = tls.Command.fetch(self, name)
@@ -178,23 +182,3 @@ class Core(commands.Cog):
 
 def setup(bot):
     bot.add_cog(Core(bot))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    

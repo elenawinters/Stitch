@@ -11,7 +11,7 @@ class Stitch(commands.Cog):
         self.bot = bot
 
     @commands.Cog.listener()
-    async def on_ready(self):
+    async def on_connect(self):
         await cleanup()
         global session
         connector = aiohttp.TCPConnector(limit=60)

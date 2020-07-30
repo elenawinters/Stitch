@@ -3,6 +3,7 @@ from core.bot.tools import is_number
 from discord.ext import commands
 from core.bot import funcs
 from core.bot import perms
+import core.checks
 
 
 class Moderation(commands.Cog):
@@ -11,6 +12,7 @@ class Moderation(commands.Cog):
 
     @commands.command(aliases=['purge', 'claer'])
     @perms.has_perms()
+    @core.checks.is_banned()
     async def clear(self, ctx, arg='1'):
         """Clears up to 250 messages
         .clear [number of messages]"""

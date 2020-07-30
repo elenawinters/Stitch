@@ -52,5 +52,3 @@ class Guild:
                                 pass
                 except Exception:
                     pass
-
-

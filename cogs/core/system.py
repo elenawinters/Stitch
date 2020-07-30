@@ -8,6 +8,7 @@ from core.bot.tools import *
 from core.bot import perms
 from core.bot import enums
 from core.logger import log
+import core.checks
 exceptions = ['restart', 'reload', 'help', 'enable', 'disable', 'cogs']
 lockdown = False
 

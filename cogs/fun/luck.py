@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 from core.ext import assets
 from core.bot.tools import tls
+import core.checks
 import random
 
 
@@ -10,6 +11,7 @@ class Fun(commands.Cog):
         self.bot = bot
 
     @commands.command(name='roll', aliases=['rolls', 'dice', 'rolldice', 'diceroll', 'rol'])
+    @core.checks.is_banned()
     async def roll_dice(self, ctx, dice='1d6', extra=None):
         """Roll a dice!
         `.roll [type]`
@@ -45,6 +47,7 @@ class Fun(commands.Cog):
             await tls.Command.execute(self, ctx, 'coin')
 
     @commands.command(name='coin', aliases=['flip', 'flipcoin', 'coinflip'])
+    @core.checks.is_banned()
     async def flip_coin(self, ctx):
         flip = random.randint(1, 2)
         embed = tls.Embed(ctx, description=f'You flipped a coin!', timestamp=True)
@@ -59,5 +62,3 @@ class Fun(commands.Cog):
 
 def setup(bot):
     bot.add_cog(Fun(bot))
-
-

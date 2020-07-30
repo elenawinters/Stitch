@@ -4,6 +4,7 @@ from data.data import data
 from core.bot.funcs import *
 from core.bot.tools import *
 from core.bot import perms
+import core.checks
 import ast
 
 
@@ -13,6 +14,7 @@ class Ext(commands.Cog):
 
     @commands.group(aliases=['ccom'])
     @perms.is_admin()
+    @core.checks.is_banned()
     async def ccoms(self, ctx):
         pass
 

@@ -4,6 +4,7 @@ from .enums import *
 import colorsys
 import datetime
 import discord
+import httpx
 import sys
 import os
 
@@ -26,6 +27,7 @@ class tls:  # Short for Tools
             self.ctx = ctx
 
         def clients(self):
+            # r = [x.voice_client for x in self.bot.guilds if x.voice_client is not None]
             r = []
             for x in self.ctx.bot.guilds:
                 if x.voice_client is not None:
@@ -347,11 +349,13 @@ def append_cog(file, package=''):
     return None
 
 
-def voice_clients(ctx):
-    clients = []
-    for x in ctx.bot.guilds:
-        if x.voice_client is not None:
-            clients.append(x.voice_client)
+def voice_clients(obj):
+    # clients = []
+    # for x in obj.bot.guilds:
+    #     if x.voice_client is not None:
+    #         clients.append(x.voice_client)
+
+    clients = [x.voice_client for x in self.bot.guilds if x.voice_client is not None]
 
     return clients
 

@@ -54,5 +54,3 @@ class Game:
         2: 'Listening to',
         3: 'Watching'
     }
-
-

@@ -23,7 +23,10 @@ def has_perms():
 
 def is_admin():
     async def predicate(ctx):
-        return ctx.message.channel.permissions_for(ctx.message.author).administrator
+        if await ctx.bot.is_owner(ctx.message.author):
+            return True
+        else:
+            return ctx.message.channel.permissions_for(ctx.message.author).administrator
     return commands.check(predicate)
 
 
