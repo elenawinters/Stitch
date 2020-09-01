@@ -1,6 +1,7 @@
 from discord.ext import commands
-from core.bot.time import time
-from .enums import *
+# from core.bot.time import time
+# from .enums import *
+from core import utils
 import traceback
 import colorsys
 import datetime
@@ -12,15 +13,8 @@ import re
 import os
 
 
-class tls:  # Short for Tools
-    @classmethod
-    def search(cls, find, data):
-        matches = []
-        for x in data:
-            if find.lower() in f'{str(x).lower()}':
-                matches.append(x)
-        return matches
-
+# Todo: Convert all to use self. fuck classmethods
+class Tools(utils.Utils):  # Short for Tools
     class Snowflake:  # just impersonate a snowflake obj
         def __init__(self, snowflake):
             self.id = snowflake
@@ -259,144 +253,3 @@ class tls:  # Short for Tools
             # if no default entry, an error will be thrown.
 
     Avatars = DiscordAvatars
-
-
-#  Replacement filter - member
-def rfilterm(member, string: str, bot=None, guid=None, channel=None):
-    string = string.replace('method.get.color', str(get_color(bot, member).value))
-    string = string.replace('method.color', str(get_color(bot, member).value))
-    string = string.replace('method.timestamp', str(datetime.datetime.utcnow()))
-    string = string.replace('method.datetime', str(datetime.datetime.utcnow()))
-    string = string.replace('member.avatar_url', str(member.avatar_url))
-    string = string.replace('member.avatar', str(member.avatar_url))
-    string = string.replace('member.name', member.name)
-    string = string.replace('member.tag', str(member))
-    string = string.replace('member.guild.name', str(member.guild.name))
-    string = string.replace('guild.name', str(member.guild.name))
-    if bot is not None:
-        string = string.replace('bot.name', str(bot.user.name))
-        string = string.replace('bot.avatar_url', str(bot.user.avatar_url))
-        string = string.replace('bot.avatar', str(bot.user.avatar_url))
-    if guid is not None:
-        if bot is not None:
-            guild = bot.get_guild(guid)
-            if guild.icon is None:
-                string = string.replace('guild.icon', DiscordAvatars.default)
-            else:
-                string = string.replace('guild.icon', str(guild.icon_url))
-    else:
-        if member.guild.icon is None:
-            string = string.replace('guild.icon', DiscordAvatars.default)
-        else:
-            string = string.replace('guild.icon', str(member.guild.icon_url))
-    return string
-
-
-def split_string(string, remove, offset=0):
-    return string[len(f'{remove}') + offset:]
-
-
-def remove_duplicates(x: list):
-    return list(dict.fromkeys(x))
-
-
-def short_traceback():
-    err = []
-    for x in sys.exc_info():
-        err.append(x)
-    return f"{err[0].__name__}: {err[1]}"
-
-
-def err_traceback():
-    err = []
-    for x in sys.exc_info():
-        err.append(x)
-    return err
-
-
-def is_number(s):
-    try:
-        float(s)
-        return True
-    except ValueError:
-        return False
-
-
-def get_color(ctx=None, other=None):
-    if ctx is None:
-        return discord.Colour.blurple()
-    else:
-        try:
-            member = ctx.message.guild.get_member(ctx.bot.user.id)
-        except AttributeError:
-            try:
-                member = other.guild.get_member(ctx.user.id)
-            except AttributeError:
-                member = ctx
-        try:
-            color = member.top_role.color
-        except AttributeError:
-            return discord.Colour.blurple()
-        if color.value == discord.Colour.default().value:
-            return discord.Colour.blurple()
-        else:
-            return color
-
-
-def get_files(path):
-    output = []
-    for root, dirs, files in os.walk(path):
-        for name in files:
-            if name.endswith(".py"):
-                output.append(f'{root}\\{name}')
-
-    return output
-
-
-def append_cog(file, package=''):
-    from core.bot import funcs
-    import os  # Huge mess but it works.
-    path = os.path.abspath('.')
-    for root, dirs, files in os.walk(path):
-        for name in files:
-            if file == name:
-                if name.endswith(".py"):
-                    output = split_string(f'{root}\\{name}', path, offset=1).replace('\\', '.')
-                    if package == '':
-                        funcs.c_cogs.append(f'{output}')
-                        return f'{output}'
-                    else:
-                        funcs.c_cogs.append(f'{package}.{output}')
-                        return f'{package}.{output}'
-    return None
-
-
-def voice_clients(obj):
-    # clients = []
-    # for x in obj.bot.guilds:
-    #     if x.voice_client is not None:
-    #         clients.append(x.voice_client)
-
-    clients = [x.voice_client for x in self.bot.guilds if x.voice_client is not None]
-
-    return clients
-
-
-def crypt(s):
-    x = []
-    for i in range(len(s)):
-        j = ord(s[i])
-        if 33 <= j <= 126:
-            x.append(chr(33 + ((j + 14) % 94)))
-        else:
-            x.append(s[i])
-    return ''.join(x)
-
-
-def items(r, s):
-    ret = []
-    for x in r:
-        for k, v in x.items():
-            if k == s:
-                ret.append(v)
-    return ret

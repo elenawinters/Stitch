@@ -14,7 +14,7 @@ class Trace:
     warn = Fore.LIGHTYELLOW_EX
     id = Fore.LIGHTCYAN_EX
     time = Fore.LIGHTGREEN_EX
-    
+
     class Styles:
         reset = Style.RESET_ALL
         normal = Style.NORMAL
@@ -42,7 +42,7 @@ class Trace:
         def __str__(self):
             return Fore.BLACK
     black = Black()
-            
+
     class Red:
         class B:
             s = Back.LIGHTRED_EX
@@ -55,7 +55,7 @@ class Trace:
         def __str__(self):
             return Fore.RED
     red = Red()
-            
+
     class Green:
         class B:
             s = Back.LIGHTGREEN_EX
@@ -68,7 +68,7 @@ class Trace:
         def __str__(self):
             return Fore.GREEN
     green = Green()
-            
+
     class Yellow:
         class B:
             s = Back.LIGHTYELLOW_EX
@@ -81,7 +81,7 @@ class Trace:
         def __str__(self):
             return Fore.YELLOW
     yellow = Yellow()
-            
+
     class Blue:
         class B:
             s = Back.LIGHTBLUE_EX
@@ -94,7 +94,7 @@ class Trace:
         def __str__(self):
             return Fore.BLUE
     blue = Blue()
-            
+
     class Magenta:
         class B:
             s = Back.LIGHTMAGENTA_EX
@@ -107,7 +107,7 @@ class Trace:
         def __str__(self):
             return Fore.MAGENTA
     magenta = Magenta()
-            
+
     class Cyan:
         class B:
             s = Back.LIGHTCYAN_EX
@@ -120,7 +120,7 @@ class Trace:
         def __str__(self):
             return Fore.CYAN
     cyan = Cyan()
-            
+
     class White:
         class B:
             s = Back.LIGHTWHITE_EX

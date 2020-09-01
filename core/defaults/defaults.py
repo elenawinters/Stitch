@@ -1,29 +1,28 @@
-from data.data import get_data_file
+# from data.data import get_data_file
 from core.json import default
 settings_file = default
 settings = {
-    'tokens': {
-        'discord': [],
-        'twitch': {
-            'owner': '',
-            'pw': []
+    'discord': {
+        'prefix': '.',
+        'tokens': [],
+        'activity': {
+            'default': {
+                'name': 'games',
+                'type': 0
+            }
         }
+    },
+    'twitch': {
+        'prefix': '!',
+        'tokens': []
     },
     'api': {
         'host': '127.0.0.1',
         'port': 5000,
     },
-    'secure': {
-        'extractors': {
-            'youtube': None,
-            'twitch': None
-        }
-    },
-    'activity': {
-        'default': {
-            'name': 'games',
-            'type': 0
-        }
+    'external': {
+        'youtube': None,
+        'twitch': None
     },
     'settings': {
         'logging': {
@@ -32,13 +31,13 @@ settings = {
             },
             'file': {
                 'level': 'default',
-                'override': False,
-                'file': 'log.txt'
+                'name': 'log.txt',
+                'mode': 'a+'
             }
         },
         'database': {
-            'path': None,
-            'file': 'data.sqlite'
+            'engine': 'sqlite',
+            'address': '/'
         }
     }
 }

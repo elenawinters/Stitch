@@ -1,7 +1,8 @@
 discord.py>=1.1.1
 dataset>=1.1.2
+youtube-dl
 colorama
 PyNaCl
-Flask
+flask
 httpx
 twitchio

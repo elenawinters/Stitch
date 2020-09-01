@@ -1,8 +1,4 @@
-# Do not use TLS log functions
-# in this class. Everything
-# will reset and break.
-# Central to Login sequence
-protected = ['token', 'secure']
+import collections
 default = 'settings.json'
 test = False
 mem = {}
@@ -46,7 +42,16 @@ class JSON:
 
     write = update
 
-    class ORMFile(object):
+    @classmethod
+    def merge(cls, dct, merge_dct):  # https://gist.github.com/angstwad/bf22d1822c38a92ec0a9
+        for k, v in merge_dct.items():
+            if (k in dct and isinstance(dct[k], dict) and isinstance(merge_dct[k], collections.Mapping)):
+                cls.merge(dct[k], merge_dct[k])
+            else:
+                dct[k] = merge_dct[k]
+        return dct
+
+    class ORMFile(object):  # Why does this fucking work?
         def __init__(self, f=default):
             return f
 
@@ -74,6 +79,9 @@ class JSON:
             return self.__dict__[key]
 
         def __setitem__(self, key, value):
+            JSON.ORM.update(self, key, value)
+
+        def update(self, key, value):
             if test:
                 print('JSON ORM Write')
 
@@ -82,10 +90,8 @@ class JSON:
             else:
                 self.__dict__ = external.loads(f=self.f())
 
-            # t = self.__dict__[key]
-            # t.update()
-            # self.__dict__.update()
-            self.__dict__[key] = value
+            # self.__dict__[key] = value
+            JSON.merge(self.__dict__, {key: value})
             external.write(self.__dict__, f=self.f())
             if self.f() == default:
                 json()  # Reload memory

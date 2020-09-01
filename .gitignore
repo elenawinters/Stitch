@@ -6,8 +6,11 @@ __pycache__/
 # IDEA Studio
 .idea/
 
+# VS Code
+.vscode/
+
 # Stitch Bot
-settings*.json
+*.json
 *.txt
 *.mp3
 

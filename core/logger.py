@@ -22,15 +22,22 @@ class LogLevel(enum.Enum):
 class StreamRecords(logging.Filter):
     def filter(self, record):
         # Special cases for all of the different log levels after this
-        record.time = f'{trace.time}[{time.Now.unix()}]{trace.reset}'
+        # This is a huge mess and I hate everything about it
+        record.time = f'{trace.reset}[{trace.time}{time.Now.unix()}{trace.reset}]'
         record.end = f'{trace.reset}{trace.alert}'
+        record.reset = f'{trace.reset}'
+
+        record.thrcol = ''
+        record.color = ''
 
         if record.levelno >= 40:  # If error/critical
+            record.thrcol = trace.red.s
             record.color = trace.alert
         elif record.levelno >= 30:  # If warning
+            record.thrcol = trace.red
             record.color = trace.warn
-        else:  # Regular/none
-            record.color = ''
+        elif record.levelno <= 10:
+            record.thrcol = trace.blue
 
         return True
 
@@ -43,10 +50,10 @@ class FileRecords(logging.Filter):
 
 setup.startup()
 settings = json.json.orm['settings']['logging']
-log = logging.getLogger(__name__)
+log = logging.getLogger('stitches')
 log.setLevel(logging.DEBUG)  # Void
 
-stream_formatter = logging.Formatter('%(time)s [%(threadName)s] %(color)s%(message)s%(end)s')
+stream_formatter = logging.Formatter('%(time)s [%(thrcol)s%(threadName)s%(reset)s] %(color)s%(message)s%(end)s')
 stream = logging.StreamHandler(sys.stdout)
 stream.setFormatter(stream_formatter)
 stream.addFilter(StreamRecords())
@@ -54,11 +61,11 @@ stream.setLevel(tls.Enums(LogLevel).find(settings['console']['level']).value)
 log.addHandler(stream)
 
 file_formatter = logging.Formatter('[%(levelno)s] [%(name)s] [%(threadName)s] [%(module)s] [%(asctime)s] %(clean_msg)s')
-file = logging.FileHandler(settings['file']['file'], mode='a+')
-file.setFormatter(file_formatter)
-file.addFilter(FileRecords())
-file.setLevel(tls.Enums(LogLevel).find(settings['file']['level']).value)
-log.addHandler(file)
+files = logging.FileHandler(settings['file']['name'], mode=settings['file']['mode'])
+files.setFormatter(file_formatter)
+files.addFilter(FileRecords())
+files.setLevel(tls.Enums(LogLevel).find(settings['file']['level']).value)
+log.addHandler(files)
 
 
 def clean(text):  # Make writable to file

@@ -14,7 +14,6 @@ import sys
 import os
 import time
 import asyncio
-import core.flags
 
 
 class LoginManager:

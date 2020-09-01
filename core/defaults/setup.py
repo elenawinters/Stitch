@@ -24,8 +24,9 @@ def do_setup():
 
 
 def reset_logs(force=False):
-    logs = json.json.orm['settings']['logging']['file']
-    if logs['override'] or force:
-        if json.external.exists(logs['file']):
-            open(logs['file'], 'w').close()
-            log(f'{trace.black}{trace.white.b.s}> Cleared the log file. {trace.time}{time.readable.on(trace.black)}{trace.black}.')
+    pass
+    # logs = json.json.orm['settings']['logging']['file']
+    # if logs['override'] or force:
+    #     if json.external.exists(logs['file']):
+    #         open(logs['file'], 'w').close()
+    #         log(f'{trace.black}{trace.white.b.s}> Cleared the log file. {trace.time}{time.readable.on(trace.black)}{trace.black}.')

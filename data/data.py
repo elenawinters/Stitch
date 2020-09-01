@@ -1,30 +1,38 @@
 from core import json
+import collections
 import dataset
+import sys
+import os
+
+'''
+    dataset uses SQLAlchemy as a base.
+    As such, our engine arguments need to conform to SQLAlchemy
+    https://docs.sqlalchemy.org/en/13/core/engines.html#database-urls
+
+    Default engine is SQLite
+
+'''
 
 
-def get_data_file():
-    import os
-    abspath = os.path.abspath('.')
-    if os.path.dirname(abspath) == 'data':
-        path = abspath
-    else:
-        path = f'{abspath}\\data'
-    return path
-
-
-class Data:
+class data:
     def __new__(cls):
         jdb = json.json.orm['settings']['database']
-        if jdb['path'] is None:
-            path = f"{get_data_file()}\\{jdb['file']}"
-        else:
-            path = f"{jdb['path']}\\{jdb['file']}"
-        db = dataset.connect(f'sqlite:///{path}', engine_kwargs={'pool_recycle': 3600})
+        if jdb['address'] == '/':  # Assuming SQLite, get default location
+            jdb['address'] = '/' + str(os.path.abspath('data\\data.sqlite'))
+            json.json.orm['settings'] = {'database': jdb}  # Merge updates
+
+        db = dataset.connect(f"{jdb['engine']}://{jdb['address']}", engine_kwargs={'pool_recycle': 3600})
+        cls.engine = jdb['engine']
         cls.base = db
+
+    @classmethod
+    def engine(cls):
+        return cls.engine
 
     @classmethod
     def base(cls):
         return cls.base
 
 
-data = Data
+class create:  # Create database/tables if not existant
+    pass
