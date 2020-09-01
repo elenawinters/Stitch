@@ -19,7 +19,7 @@ import ast
 
 if __name__ == '__main__':
     log.info(f'>{trace.cyan} Starting at {Time.readable.at()}.')
-    # Initialize database
+    # Initialize database (this needs to be improved)
     log.info(f'{trace.cyan}> Initializing {trace.black.s}dataset{trace.cyan} Database.')
     try:
         data()
@@ -32,46 +32,13 @@ if __name__ == '__main__':
         sys.exit(0)
 
     from core import manager
-    manager.Initialize()
+    threads = manager.Initialize().threads
 
-    # import application.main
-    # application.main.Main()
-    # e = re.split('<|=|>', t)
-    # log.debug(e)
-    # reqs = reqs.replace("b'", '')
-    # reqs = reqs.replace("\\r\\n'", '')
-    # log.debug(reqs)
-    # reqs = ast.literal_eval(reqs)
-    # log.debug(type(reqs))
-    # log.debug(reqs)
-    # log.debug('here')
-    # # Start API
+    log.debug(f'Current threads: {threads}')
+
+    # for x in threads:
+    #     log.debug(x.name)
+
     import time
-    while True:
+    while all(x.is_alive() for x in threads):
         time.sleep(2)
-
-    # # Initialize extensions
-    # # Append cCogs
-    # # Honestly, fuck cCogs.
-    # # append_cog('session.py')  # Load session
-    # # append_cog('debug.py')  # Load debug things
-    # # append_cog('main.py')  # Load essentials
-
-    # # Login
-    # from core.bot import time
-    # time.uptime = datetime.datetime.utcnow()
-
-    # from core.bot import login
-    # threads = login.LoginManager(prefix='.').login()
-    # t_count = 0
-    # for t in threads:
-    #     # login.time.sleep(2)
-    #     t_count += 1
-    #     t.name = f'Discord-{t_count}'
-    #     t.start()
-    # # [t.start() for t in threads]
-    # while all(x.is_alive() for x in threads):
-    #     login.time.sleep(2)
-    # log.info('Shutting Down')
-    # log.info(f'> Uptime: {Time.uptime(Time())}')
-    # sys.exit()

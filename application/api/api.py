@@ -50,17 +50,3 @@ for x in imports:
         importlib.import_module(x, abspath)
     except Exception as exc:
         logger.log.error(exc)
-
-
-class Main(Thread):
-    def __init__(self):
-        Thread.__init__(self)
-        self.daemon = True
-        self.name = 'API'
-        self.start()
-
-    def run(self):
-        try:
-            app.run(host=core.json.json.orm['api']['host'], port=core.json.json.orm['api']['port'])
-        except Exception as exc:
-            logger.log.exception(exc)

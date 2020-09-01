@@ -1,20 +1,18 @@
-from threading import Thread
 from core.color import trace
 from core.logger import log
 import subprocess
+import threading
 import time
 import sys
 import ast
 import re
 
 
-class Initialize(Thread):
+class Initialize():
     def __init__(self):
-        Thread.__init__(self)
-        self.daemon = True
-        self.name = 'Updates'
-        # self.name = f'{trace.alert}Updates{trace.reset}'
-        self.start()
+        threads = [threading.Thread(target=self.run, daemon=True, name='Updates')]
+        [thread.start() for thread in threads]
+        self.threads = []  # This thread will die eventually so we don't want to return that it may be alive
 
     def run(self):
         log.warn(f'{trace.warn}Checking for updates. This may take a minute.')

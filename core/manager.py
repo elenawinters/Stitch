@@ -6,6 +6,7 @@ import os
 
 class Initialize():
     def __init__(self):
+        self.threads = []
         self.load()
 
     def path(self):
@@ -19,7 +20,7 @@ class Initialize():
     def load(self):
         for x in self.scan():
             try:
-                importlib.import_module(x, self.path()).Initialize()
+                self.threads += importlib.import_module(x, self.path()).Initialize().threads
                 log.debug(f'Loaded {x[:-9]}')
             except Exception as exc:
                 log.error(exc)
