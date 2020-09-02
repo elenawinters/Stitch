@@ -19,25 +19,6 @@ class Tools(utils.Utils):  # Short for Tools
         def __init__(self, snowflake):
             self.id = snowflake
 
-    class Traceback:
-        def __init__(self, exc):
-            self.exc = exc
-
-        def formatted(self, etype, value, tb):
-            lines = traceback.format_list(traceback.extract_tb(tb))
-
-            def shorten(match):
-                return 'File "{}"'.format(os.path.basename(match.group(1)))
-            lines = [re.sub(r'File "([^"]+)"', shorten, line, 1) for line in lines]
-            return 'Traceback (most recent call last):\n' + ''.join(lines) + f'{etype.__name__}: {value}'
-            # Taken from https://stackoverflow.com/a/37059072
-
-        def code(self):
-            # random.seed(tls.Traceback(self.exc).formatted(*sys.exc_info()))
-            random.seed(tls.Traceback(self.exc).formatted(*sys.exc_info()))
-            number = random.randint(10000, 99999)
-            return {'msg': f'Code #{number}', 'exc_info': self.exc}
-
     class Voice:
         def __init__(self, ctx):
             self.ctx = ctx
@@ -253,3 +234,6 @@ class Tools(utils.Utils):  # Short for Tools
             # if no default entry, an error will be thrown.
 
     Avatars = DiscordAvatars
+
+
+tls = Tools()

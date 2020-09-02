@@ -1,6 +1,6 @@
 from core.defaults import defaults
 from core.bot.funcs import log
-from core.bot.time import *
+from core.time import *
 from core.bot import tools
 from core import json
 from data import data

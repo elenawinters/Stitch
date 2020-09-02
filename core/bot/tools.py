@@ -1,5 +1,5 @@
 from discord.ext import commands
-from core.bot.time import time
+from core.time import time
 from .enums import *
 import traceback
 import colorsys

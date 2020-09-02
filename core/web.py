@@ -13,7 +13,6 @@ class Client:
             try:
                 with httpx.Client() as client:
                     client.post(url=self.url, json=dict(json))
-                    client.post(url=self.url, json=dict(json))
                 return
             except httpx._exceptions.WriteError:
                 log.error(f'[POST] {self.url} Write Error (Attempt #{x})')
@@ -43,8 +42,6 @@ class Client:
     async def async_post(self, json):
         for x in range(1, self.limit + 1):
             try:
-                # if x <= self.limit:
-                #     raise httpx._exceptions.WriteError
                 async with httpx.AsyncClient() as client:
                     await client.post(url=self.url, json=dict(json))
                 return

@@ -2,7 +2,7 @@ from ..api import app, loop, base
 from core.logger import log
 from data.data import data
 from flask import request
-from core.bot import time
+from core import time
 import core.json
 import datetime
 

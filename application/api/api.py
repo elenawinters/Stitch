@@ -10,17 +10,10 @@ import json
 import sys
 import os
 
-flask_log = logger.logging.getLogger('werkzeug')
-# flask_log.setLevel(logging.DEBUG)
-
-# Empty handlers, and add our custom ones
-flask_log.handlers = []
-flask_log.addHandler(logger.stream)
-flask_log.addHandler(logger.files)
-
 # https://gist.github.com/jerblack/735b9953ba1ab6234abb43174210d356
 cli = sys.modules['flask.cli']  # Hide warning message
 cli.show_server_banner = lambda *x: None
+
 
 loop = asyncio.get_event_loop()  # Define loop so that things that require it can use it
 app = Flask(__name__)
@@ -32,10 +25,11 @@ app.config.update(
 
 # https://werkzeug.palletsprojects.com/en/1.0.x/utils/#werkzeug.useragents.UserAgent.browser
 def base(render, request=None):  # Dark theme JSON in browsers
+    def dumps(r): return json.dumps(r, indent=2, separators=(",", ":"), default=str)  # JSON Format
     if request is None or request.user_agent.browser is None:
         return jsonify(render)
     else:  # base.html is located in the templates folder. You can modify it there
-        return render_template('base.html', render=json.dumps(render, indent=2, separators=(",", ":"), default=str))
+        return render_template('base.html', render=dumps(render))
 
 
 # I absolutely hate this shit

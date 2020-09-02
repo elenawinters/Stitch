@@ -1,7 +1,7 @@
 from .tools import get_files, split_string, tls, append_cog
 from .enums import ImageURLs, LogLevel
 from core.color import trace
-from .time import *
+from ..time import *
 from core import json
 import traceback
 import discord

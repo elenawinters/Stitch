@@ -1,6 +1,6 @@
 from core.defaults import setup
 from core.bot.tools import tls
-from core.bot.time import time
+from core.time import time
 from core.color import trace
 from core import json
 import logging
