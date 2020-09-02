@@ -65,7 +65,7 @@ class Moderation(commands.Cog):
     @commands.Cog.listener()  # Sweep every 5 minutes based on member updates, which are quite frequent
     async def on_member_update(self, before, after):  # This should be called constantly, hopefully. At least once a minute
         global rate
-        if time.time.diff(rate, datetime.datetime.utcnow()).seconds >= 300:  # 5 minute rate limit
+        if time.misc.diff(rate, datetime.datetime.utcnow()).seconds >= 300:  # 5 minute rate limit
             rate = datetime.datetime.utcnow()
             await ban_sweep(self)
 
@@ -131,12 +131,12 @@ bl_list = {}
 
 
 async def ban_list():  # Use this to prevent sql errors
-    host = core.json.json.orm['api']
+    host = core.json.orm['api']
     try:
         global bl_list
         global bl_rate
         global bl_first
-        if time.time.diff(bl_rate, datetime.datetime.utcnow()).seconds >= 10 or bl_first:
+        if time.misc.diff(bl_rate, datetime.datetime.utcnow()).seconds >= 10 or bl_first:
             r = await core.web.Client(f"http://{host['host']}:{host['port']}/bans/list").async_get()
             bl_list = r.json()  # Can't make this a one liner cuz it tries to call await on the .json
             bl_rate = datetime.datetime.utcnow()

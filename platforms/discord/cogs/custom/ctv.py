@@ -12,7 +12,7 @@ from core.bot.tools import crypt
 import core.web
 # import httpx as requests
 header = {
-    'Client-ID': crypt(json.json.orm['secure']['extractors']['twitch']),
+    'Client-ID': crypt(json.orm['secure']['extractors']['twitch']),
     'Accept': 'application/vnd.twitchtv.v5+json'}
 rate = datetime.datetime.utcnow()
 last_live = 0
@@ -146,14 +146,14 @@ async def find_online_users(self):
 
 async def name_to_id(_name):
     if _name is not None:
-        host = json.json.orm['api']
+        host = json.orm['api']
         r = await core.web.Client(f"http://{host['host']}:{host['port']}/ctv/id/{_name}").async_get()
         return r.json()
     return False
 
 
 async def is_online():
-    host = json.json.orm['api']
+    host = json.orm['api']
     r = await core.web.Client(f"http://{host['host']}:{host['port']}/ctv/online").async_get()
     return r.json()
 

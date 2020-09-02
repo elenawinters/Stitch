@@ -1,47 +1,89 @@
+from core.defaults.default import default
 import collections
-default = 'settings.json'
-test = False
-mem = {}
+import datetime
+import json
+import os
 
 
-class JSON:
-    def __init__(self):
-        global mem
-        mem = external.loads()
-        try:
-            from core.logger import log
-            log.debug('> JSON Memory Refreshed.')
-        except ModuleNotFoundError:
-            pass
-        except ImportError:
-            pass
+class memory:
+    @classmethod
+    def load(cls, files=default):
+        cls.exists(files)
+        if files not in cls.memory.keys():
+            cls.memory[files] = {}
+            return cls.reload(files)
+        return cls.memory[files]
 
     @classmethod
-    def reader(cls, data_type: str, f=default):
-        if test:
-            print('JSON File Read')
-        if external.exists(f):
-            return internal.fetch(data_type, f)
-
-        try:
-            # raise Exception
-            from .enums import ReturnType
-            return ReturnType.error
-        except ModuleNotFoundError:
-            raise IndexError("JSON Reader came back with an unknown error. "
-                             "This happens when JSON Internal Fetch doesn't return anything, "
-                             "or when the input file does not exist.")
+    def reload(cls, files=default):  # Yuck
+        cls.exists(files)
+        internal.merge(cls.memory[files], external.loads(files=files))
+        return cls.memory
 
     @classmethod
-    def update(cls, data_type: str, value, f=default):
-        if test:
-            print('JSON File Update')
-        internal.append(file, data_type, value, internal.open(f))
-        if f == default:
-            json()  # Reload memory
+    def refresh(cls, files=default):
+        cls.reload(files)
 
-    write = update
+    @classmethod
+    def exists(cls, files=default):
+        try: cls.memory
+        except Exception:
+            cls.memory = {}
 
+
+class ORMFile(object):  # Why does this fucking work?
+    def __init__(self, files=default):
+        return files
+
+    def files(self):
+        return dict(self)['files']
+
+
+class ORM(dict, ORMFile):  # This is a huge mess
+    def __init__(self, files=default):
+        super(self.__class__, self).__init__(files=files)
+
+    def __getitem__(self, key):
+        files = self.files()
+        self.__dict__[files] = memory.load(files)
+
+        if key not in self.__dict__[files]:
+            self.__dict__[files][key] = {}
+            external.write(self.__dict__[files], files=files)
+            memory.reload(files)
+
+        return self.__dict__[files][key]
+
+    def __setitem__(self, key, value):
+        self.update(self, key, value)
+
+    def update(self, key, value):
+        files = self.files()
+        self.__dict__[files] = memory.load(files)
+
+        # self.__dict__[key] = value
+        internal.merge(self.__dict__[files], {key: value})
+        external.write(self.__dict__[files], files=files)
+        memory.reload()
+
+
+orm = ORM()
+
+
+# Eg: https://gist.github.com/simonw/7000493
+class Encode(json.JSONEncoder):
+    pass
+
+
+class Decode(json.JSONDecoder):
+    pass
+
+
+encode = Encode()
+decode = Decode()
+
+
+class Internal:
     @classmethod
     def merge(cls, dct, merge_dct):  # https://gist.github.com/angstwad/bf22d1822c38a92ec0a9
         for k, v in merge_dct.items():
@@ -51,138 +93,30 @@ class JSON:
                 dct[k] = merge_dct[k]
         return dct
 
-    class ORMFile(object):  # Why does this fucking work?
-        def __init__(self, f=default):
-            return f
-
-        def f(self):
-            return dict(self)['f']
-
-    class ORM(dict, ORMFile):
-        def __init__(self, f=default):
-            super(self.__class__, self).__init__(f=f)
-
-        def __getitem__(self, key):
-            if test:
-                print('JSON ORM Load')
-
-            if self.f() == default:
-                self.__dict__ = mem
-            else:
-                self.__dict__ = external.loads(f=self.f())
-
-            if key not in self.__dict__:
-                self.__dict__[key] = {}
-                external.write(self.__dict__, f=self.f())
-                if self.f() == default:
-                    json()  # Reload memory
-            return self.__dict__[key]
-
-        def __setitem__(self, key, value):
-            JSON.ORM.update(self, key, value)
-
-        def update(self, key, value):
-            if test:
-                print('JSON ORM Write')
-
-            if self.f() == default:
-                self.__dict__ = mem
-            else:
-                self.__dict__ = external.loads(f=self.f())
-
-            # self.__dict__[key] = value
-            JSON.merge(self.__dict__, {key: value})
-            external.write(self.__dict__, f=self.f())
-            if self.f() == default:
-                json()  # Reload memory
-
-    orm = ORM()
-
-    # The JSON ORM is still a work in progress (WIP)
-    # Most issues will revolve around actually setting values using the ORM.
-    # The ORM allows for very complicated usage. Using the ORM is preferred.
-
-
-class Internal:  # Underlying functions for JSON
-    @classmethod  # JSON -> Dict
+    @classmethod
     def loads(cls, data):
-        if test:
-            print('JSON Internal Loads')
-        import json
-        literal = json.loads(data)
-        return literal
-
-    @classmethod  # Dict -> JSON
-    def dumps(cls, data):
-        if test:
-            print('JSON Internal Dumps')
-        import json
-        literal = json.dumps(data)
-        return literal
+        return json.loads(data)
 
     @classmethod
-    def fetch(cls, data_type: str, f=default, data=None):
-        if test:
-            print('JSON Internal Fetch')
-        if data is None:
-            data = external.loads(f)
-        if data is not None:
-            args = [x for x in data]  # PARSE ARGUMENTS
-            for x in args:
-                if data_type == x:
-                    return data[x]
-        try:
-            from .enums import ReturnType
-            return ReturnType.none
-        except ModuleNotFoundError:
-            return None
-
-    @classmethod
-    def append(cls, f: str, data_type: str, value: str, data=None):
-        if test:
-            print('JSON Internal Append')
-        if data is None:
-            data = external.loads(f)
-        args = [x for x in data]  # PARSE ARGUMENTS
-        found = False
-        for x in args:
-            if data_type == x:
-                data[data_type] = value
-                found = True
-
-        if found is False:
-            dump = {data_type: value}
-            data.update(dump)
-
-        external.write(data, f)
-
-        return data
-
-    update = append
-    open = fetch
+    def dumps(cls, data, pretty=False):
+        if pretty: return json.dumps(data, indent=2, separators=(",", ":"), default=str)
+        else: return json.dumps(data)
 
 
 class External:
     @classmethod
-    def exists(cls, f: str = default):
-        if test:
-            print('JSON External Exists')
-        import os
-        return os.path.isfile(f)
+    def exists(cls, files: str = default):
+        return os.path.isfile(files)
 
     @classmethod
-    def loads(cls, f: str = default):
-        if test:
-            print('JSON External Loads')
-        import os
-        import json
+    def loads(cls, files: str = default):
         try:
-            with open(f) as json_file:
+            with open(files) as json_file:
                 data = json.load(json_file)
 
             try:  # Update to new format
                 data = json.loads(data)
-                External.write(data, f=f)
+                cls.write(data, files=files)
             except TypeError:
                 pass  # Up to date
 
@@ -191,15 +125,10 @@ class External:
         return data
 
     @classmethod
-    def write(cls, data, f: str = default, mode='w'):
-        if test:
-            print('JSON External Write')
-        import json
-        with open(f, mode) as json_file:
+    def write(cls, data, files: str = default, mode='w'):
+        with open(files, mode) as json_file:
             json.dump(data, json_file, indent=4)
 
 
 internal = Internal
 external = External
-Json = JSON
-json = JSON

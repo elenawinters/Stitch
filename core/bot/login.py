@@ -26,7 +26,7 @@ class LoginManager:
                  f'{trace.cyan}v{trace.cyan.s}{discord.__version__}{trace.cyan}.')
         version.Discord.latest()
         version.YouTubeDL.latest()
-        tokens = json.json.orm['tokens']['discord']
+        tokens = json.orm['tokens']['discord']
         threads = [threading.Thread(target=login_threads, args=(self.prefix, crypt(x),), daemon=True) for x in tokens]
         # threads = [threading.Thread(target=login_threads, args=(self.prefix, crypt(x),)) for x in tokens]
         return threads
@@ -51,7 +51,7 @@ async def _login(client, token=None):
                      f'{trace.cyan}v{trace.cyan.s}{discord.__version__}{trace.cyan}.')
             version.Discord.latest()
             version.YouTubeDL.latest()
-            # token = json.json.reader('token')
+            # token = json.reader('token')
             if token == enums.ReturnType.fail or token == enums.ReturnType.none:
                 raise discord.errors.LoginFailure('No token')
             else:

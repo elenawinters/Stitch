@@ -1,6 +1,4 @@
 from discord.ext import commands
-# from core.bot.time import time
-# from .enums import *
 from core import utils
 import traceback
 import colorsys
@@ -14,22 +12,52 @@ import os
 
 
 # Todo: Convert all to use self. fuck classmethods
-class Tools(utils.Utils):  # Short for Tools
+class DiscordTools(utils.Utils):  # Discord utils
+    def __init__(cls):  # inherit utils
+        super().__init__()
+
     class Snowflake:  # just impersonate a snowflake obj
         def __init__(self, snowflake):
             self.id = snowflake
+
+    class Message:
+        @classmethod
+        async def respond(cls, ctx, err, url=discord.Embed.Empty, content=None):
+            embed = tls.Embed(description=f'{err}', colour=discord.Colour.dark_red(), timestamp=True)
+            embed.set_author(name=f'{type(err).__name__}', url=url, icon_url=ImageURLs.error)
+            await ctx.send(content=content, embed=embed)
+
+    class Command:
+        @classmethod
+        async def execute(cls, self, ctx, name):
+            for x in self.bot.commands:
+                if x.name.lower() == name.lower():
+                    await x.callback(self, ctx)
+                    break
+
+        @classmethod
+        def fetch(cls, self, name):
+            for x in self.bot.commands:
+                if x.name.lower() == name.lower():
+                    return x
+                if name.lower() in x.aliases:
+                    return x
+            return None
+
+    class Cog:
+        @classmethod
+        def fetch(cls, self, name):
+            for _name, _cog in self.bot.cogs.items():
+                if _name.lower() == name.lower():
+                    return _cog
+            return None
 
     class Voice:
         def __init__(self, ctx):
             self.ctx = ctx
 
         def clients(self):
-            # r = [x.voice_client for x in self.bot.guilds if x.voice_client is not None]
-            r = []
-            for x in self.ctx.bot.guilds:
-                if x.voice_client is not None:
-                    r.append(x.voice_client)
-            return r
+            return [x.voice_client for x in self.ctx.bot.guilds if x.voice_client is not None]
 
         async def disconnect(self):
             for x in tls.Voice.clients(self):
@@ -59,41 +87,8 @@ class Tools(utils.Utils):  # Short for Tools
         @classmethod
         async def preset(cls, bot):
             from core import json
-            activity = tls.Activity.from_dict(json.json.orm['discord']['activity'].get(str(bot.user.id), json.json.orm['discord']['activity']['default']))
+            activity = tls.Activity.from_dict(json.orm['discord']['activity'].get(str(bot.user.id), json.orm['discord']['activity']['default']))
             await bot.change_presence(activity=activity)
-
-    class Command:
-        @classmethod
-        async def execute(cls, self, ctx, name):
-            for x in self.bot.commands:
-                if x.name.lower() == name.lower():
-                    await x.callback(self, ctx)
-                    break
-
-        @classmethod
-        def fetch(cls, self, name):
-            for x in self.bot.commands:
-                if x.name.lower() == name.lower():
-                    return x
-                if name.lower() in x.aliases:
-                    return x
-            return None
-
-    class Cog:
-        @classmethod
-        def fetch(cls, self, name):
-            for _name, _cog in self.bot.cogs.items():
-                if _name.lower() == name.lower():
-                    return _cog
-            return None
-
-        # @classmethod
-        # def commands(cls, self, name):
-        #     pass
-        #
-        # @classmethod
-        # def listeners(cls, self, name):
-        #     pass
 
     class Users:
         @classmethod
@@ -137,58 +132,58 @@ class Tools(utils.Utils):  # Short for Tools
 
             return embed
 
-        @classmethod
-        def parse(cls, ctx, string, bot=None):  # Parse JSON to Embed
-            if bot is None:  # R-Filter needs to be reworked. Doesn't
-                # work in private chats, even when it really should.
-                try:
-                    replaced = rfilterm(ctx.author, string, ctx.bot, ctx.guild.id)
-                except Exception:
-                    replaced = string
-            else:
-                try:
-                    replaced = rfilterm(ctx.author, string, bot, ctx.guild.id)
-                except Exception:
-                    try:
-                        replaced = rfilterm(ctx, string, bot, ctx.guild.id)
-                    except Exception:
-                        replaced = string
+        # @classmethod  # This will be re-added eventually
+        # def parse(cls, ctx, string, bot=None):  # Parse JSON to Embed
+        #     if bot is None:  # R-Filter needs to be reworked. Doesn't
+        #         # work in private chats, even when it really should.
+        #         try:
+        #             replaced = rfilterm(ctx.author, string, ctx.bot, ctx.guild.id)
+        #         except Exception:
+        #             replaced = string
+        #     else:
+        #         try:
+        #             replaced = rfilterm(ctx.author, string, bot, ctx.guild.id)
+        #         except Exception:
+        #             try:
+        #                 replaced = rfilterm(ctx, string, bot, ctx.guild.id)
+        #             except Exception:
+        #                 replaced = string
 
-            # JSON -> Dict
-            try:
-                try:
-                    import ast
-                    literal = ast.literal_eval(replaced)
-                except Exception:  # If json function fails,
-                    # it'll output the error for it instead
-                    # of the ast.literal_eval error.
-                    import json
-                    literal = json.loads(replaced)
-            except Exception:
-                literal = dict(string)
+        #     # JSON -> Dict
+        #     try:
+        #         try:
+        #             import ast
+        #             literal = ast.literal_eval(replaced)
+        #         except Exception:  # If json function fails,
+        #             # it'll output the error for it instead
+        #             # of the ast.literal_eval error.
+        #             import json
+        #             literal = json.loads(replaced)
+        #     except Exception:
+        #         literal = dict(string)
 
-            message = None
-            if 'embed' in literal:
-                try:
-                    message = literal['content']
-                except KeyError:
-                    pass
-                literal = literal['embed']
+        #     message = None
+        #     if 'embed' in literal:
+        #         try:
+        #             message = literal['content']
+        #         except KeyError:
+        #             pass
+        #         literal = literal['embed']
 
-            if 'timestamp' in literal:
-                if literal['timestamp'] == '0000-00-00T00:00:00Z':
-                    literal['timestamp'] = time.Now()
-                else:
-                    literal['timestamp'] = time.Parse.iso(literal['timestamp'])
-            if 'color' in literal:
-                if literal['color'] < 0:
-                    try:
-                        literal['color'] = get_color(bot, ctx.author).value
-                    except Exception:
-                        literal['color'] = 0
+        #     if 'timestamp' in literal:
+        #         if literal['timestamp'] == '0000-00-00T00:00:00Z':
+        #             literal['timestamp'] = time.Now()
+        #         else:
+        #             literal['timestamp'] = time.Parse.iso(literal['timestamp'])
+        #     if 'color' in literal:
+        #         if literal['color'] < 0:
+        #             try:
+        #                 literal['color'] = get_color(bot, ctx.author).value
+        #             except Exception:
+        #                 literal['color'] = 0
 
-            embed = discord.Embed.from_dict(literal)
-            return embed, message
+        #     embed = discord.Embed.from_dict(literal)
+        #     return embed, message
 
     command = Command
     embed = Embed
@@ -216,24 +211,5 @@ class Tools(utils.Utils):  # Short for Tools
     colour = Color
     color = Color
 
-    class Enums:
-        def __init__(self, enum):
-            self.enum = enum
 
-        def find(self, fetch):
-            fetch = str(fetch).lower()
-            for x in self.enum.__members__.items():
-                if fetch == str(x[1].value):
-                    return x[1]
-                elif fetch == str(x[1]):
-                    return x[1]
-                elif fetch == str(x[0]):
-                    return x[1]
-            return self.enum.default  # Only meant to be
-            # used with enums that have a default entry.
-            # if no default entry, an error will be thrown.
-
-    Avatars = DiscordAvatars
-
-
-tls = Tools()
+tls = DiscordTools()  # Define tls so we can skip having to do DiscordTools() before everything. Reee

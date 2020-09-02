@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 from core.bot.funcs import extensions
-from core.bot.tools import *
+from ..core.tools import tls
 from core.bot import perms
 import core.checks
 
@@ -24,20 +24,14 @@ class Core(commands.Cog):
                 except IndexError:
                     user = None
         # nicknames = []
-        display = []
-        servers = []
         async with ctx.typing():
-            for x in self.bot.guilds:
-                for y in x.members:
-                    if y.id == user.id:
-                        servers.append(x)
-                        if y.nick:
-                            display.append(y.nick)
-        display = remove_duplicates(display)
-        display = ', '.join(display)
+            display = [y.nick for x in self.bot.guilds for y in x.members if y.id == user.id if y.nick]
+            servers = [x for x in self.bot.guilds for y in x.members if y.id == user.id]
+
+        display = ', '.join(tls.remove_duplicates(display))
         if display == '':
             display = None
-        age = time.readable.From.timedelta.seconds(time.diff(user.created_at, datetime.datetime.utcnow()))
+        age = readable.timedelta(misc.diff(user.created_at, datetime.datetime.utcnow()))
         embed = tls.Embed(ctx, description=f'Information about {user.mention} **({user})**', timestamp=True)
         embed.add_field(name='Identifier:', value=f'`{user.id}`', inline=True)
         embed.add_field(name='Created At:', value=f'`{user.created_at}`', inline=True)

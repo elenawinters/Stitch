@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from core.color import trace
 # from core.bot.funcs import *
-from core.bot.tools import *
+from ..core.tools import tls
 from core.logger import log
 
 
@@ -14,11 +14,9 @@ class Core(commands.Cog, command_attrs=dict(hidden=True)):
     @commands.is_owner()  # OWNER ONLY FOR ENTIRE GROUP
     async def dev(self, ctx):
         if not ctx.invoked_subcommand:
-            com = []
-            for x in self.bot.walk_commands():
-                com.append(x)
+            com = [x for x in self.bot.walk_commands()]
             pos = len(com)
-            com = remove_duplicates(com)
+            com = tls.remove_duplicates(com)
             log.info(f'{len(com)} commands (including sub-commands)')
             log.info(f'{pos} possible command combinations (including aliases)')
             t = tls.search(ctx.command.name, com)

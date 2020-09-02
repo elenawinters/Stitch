@@ -34,11 +34,11 @@ class Experiments(commands.Cog):
     def cog_unload(self):
         log.debug('Cog was unloaded')
 
-    @commands.group(name='test')
+    @commands.group(name='tests')
     @settings.enabled()
     @perms.subcommand()
     @core.checks.is_banned()
-    async def test(self, ctx):
+    async def tests(self, ctx):
         # Actively test things
         if not ctx.invoked_subcommand:
             d1 = {
@@ -47,7 +47,7 @@ class Experiments(commands.Cog):
             d2 = {
                 'test': 'This is test command 2'
             }
-            core.json.json.merge(d1, d2)
+            core.json.merge(d1, d2)
             # log.debug(d1)
             # log.debug(d1.pop)
             d1[('test', 'test2', 'tart')] = d1.pop(('test'))
@@ -103,8 +103,8 @@ class Experiments(commands.Cog):
             #     await client.post(url='http://localhost:5001/stat/post', json=dict(send))
             # ban = data.base['bans'].find_one(id=141802236861743104)
             # log.debug(ban)
-            # json.json.ORM('test.json')['test'] = 1
-            # log.debug(json.json.ORM('test.json')['test'])
+            # json.ORM('test.json')['test'] = 1
+            # log.debug(json.ORM('test.json')['test'])
             # while True:
             #     try:
             #         log.debug(ctx.me.guild.voice_client.timestamp)
@@ -121,7 +121,7 @@ class Experiments(commands.Cog):
             # for x in funcs.extensions():
             #     cog = importlib.import_module(x, abspath)
             #     await cog.cleanup()
-            # log.debug(json.json.orm['activity'].get(str(self.bot.user.id)))
+            # log.debug(json.orm['activity'].get(str(self.bot.user.id)))
             # import sys
             # sys.exit('Burn it with fire')
             # roles = [706752710896123934, 706752711541915719, 706752713353855108]

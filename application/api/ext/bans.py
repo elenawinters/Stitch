@@ -25,7 +25,7 @@ def ban_list():
     global rate
     global bans
     global first
-    if time.time.diff(rate, datetime.datetime.utcnow()).seconds >= 10 or first:
+    if time.misc.diff(rate, datetime.datetime.utcnow()).seconds >= 10 or first:
         rate = datetime.datetime.utcnow()
         bans = ban_list()
         first = False

@@ -12,7 +12,7 @@ class Ext(commands.Cog):
     async def on_member_join(self, member):
         pass
 
-        # print(json.json.reader('test', 'test.txt'))
+        # print(json.reader('test', 'test.txt'))
 
         # n1 = ctx.author.created_at
         # n2 = datetime.datetime.utcnow()

@@ -1,11 +1,9 @@
 import discord
 from discord.ext import commands
-from core.bot.tools import tls
 from core.color import trace
+from ..core.tools import tls
 from core.logger import log
 from data.data import data
-from core.bot import funcs
-import core.exceptions
 import traceback
 import random
 import sys
@@ -32,7 +30,7 @@ class Stitch(commands.Cog):
         if hasattr(ctx.command, 'on_error'):
             return
 
-        elif isinstance(exc, core.exceptions.GlobanBanExcpetion):
+        elif isinstance(exc, tls.GlobanBanExcpetion):
             return await ctx.send(f'You are globally banned from using this bot {ctx.message.author.mention}.')
 
         if isinstance(exc, commands.CommandNotFound):

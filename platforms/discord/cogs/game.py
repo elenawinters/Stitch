@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
+from ..core.tools import tls
 from core.ext import assets
-from core.bot.tools import tls
 from core import json
 import datetime
 
@@ -21,10 +21,10 @@ class Core(commands.Cog):
             activity = discord.Streaming(name=parse[0], url=parse[1])
         else:
             activity = discord.Activity(type=_type, name=_game, flags=None)
-            jack = json.json.orm['activity']
+            jack = json.orm['activity']
             jack[str(self.bot.user.id)] = activity.to_dict()
-            json.json.orm['activity'] = jack
-            # json.json.orm['activity'][self.bot.user.id] = activity.to_dict()
+            json.orm['activity'] = jack
+            # json.orm['activity'][self.bot.user.id] = activity.to_dict()
         await self.bot.change_presence(activity=activity)
         activity = activity.to_dict()
         if activity['type'] == 1:

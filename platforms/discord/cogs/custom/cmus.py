@@ -461,7 +461,7 @@ class Player:
         try:
             if info is None:
                 if extractor == 'youtube':  # 2 points
-                    base = f"https://www.googleapis.com/youtube/v3/channels?part=snippet&id={_id}&key={crypt(json.json.orm['secure']['extractors'][extractor])}"
+                    base = f"https://www.googleapis.com/youtube/v3/channels?part=snippet&id={_id}&key={crypt(json.orm['secure']['extractors'][extractor])}"
                     info = requests.get(base, timeout=5).json()['items'][0]['snippet']['thumbnails']['high']['url']
                     # log.debug(info)
                     data.base['cache'].upsert(dict(platform=extractor, id=_id, data=info), ['id'])
@@ -470,7 +470,7 @@ class Player:
                     if version == 'kraken':  # Kraken implementation
                         url = "https://api.twitch.tv/kraken/users?login=" + _id
                         header = {
-                            'Client-ID': crypt(json.json.orm['secure']['extractors']['twitch']),
+                            'Client-ID': crypt(json.orm['secure']['extractors']['twitch']),
                             'Accept': 'application/vnd.twitchtv.v5+json'
                         }
                         async with requests.AsyncClient() as client:

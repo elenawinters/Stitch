@@ -1,12 +1,11 @@
-# from data.data import get_data_file
-from core.json import default
-settings_file = default
+# This file is a template
+default = 'settings.json'
 settings = {
     'discord': {
         'prefix': '.',
         'tokens': [],
-        'activity': {
-            'default': {
+        'default': {
+            'activity': {
                 'name': 'games',
                 'type': 0
             }
@@ -32,12 +31,13 @@ settings = {
             'file': {
                 'level': 'default',
                 'name': 'log.txt',
-                'mode': 'a+'
+                'mode': 'a+'  # Too much freedom
             }
         },
         'database': {
             'engine': 'sqlite',
             'address': '/'
         }
-    }
+    },
+    'revision': '2020.09.01'
 }

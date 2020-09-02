@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 from core.bot import settings
-from core.bot.tools import *
+from .core.tools import tls
 from core.bot import perms
 import core.checks
 color = discord.Colour.from_rgb(r=59, g=136, b=195)

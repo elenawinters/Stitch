@@ -1,5 +1,5 @@
 from ..api import app, loop, base
-from core.bot.tools import crypt
+from core.utils import util
 from core.logger import log
 from data.data import data
 from core import time
@@ -9,7 +9,7 @@ import datetime
 import httpx
 
 header = {
-    'Client-ID': crypt(json.json.orm['external']['twitch']),
+    'Client-ID': util.crypt(json.orm['external']['twitch']),
 }
 
 rate = datetime.datetime.utcnow()
@@ -49,7 +49,7 @@ def name_to_id(name):
 def ctv_online():
     global rate
     global is_online_data
-    if time.time.diff(rate, datetime.datetime.utcnow()).seconds >= 10:
+    if time.misc.diff(rate, datetime.datetime.utcnow()).seconds >= 10:
         rate = datetime.datetime.utcnow()
         is_online_data = is_online()
     return base(is_online_data, request)

@@ -1,14 +1,14 @@
 import discord
 from discord.ext import commands
+from ..core.tools import tls
 from core.logger import log
-import core.bot.tools
-import core.bot.time
+import core.time
 # import core.checks
 import core.json
 import core.web
 import asyncio
 import httpx
-import time
+import json
 
 
 class Core(commands.Cog):
@@ -23,7 +23,7 @@ class Core(commands.Cog):
         'latency', 'lat', 'late', 'wump',
         'uptime', 'time'
     ])
-    @core.checks.is_banned()
+    # @core.checks.is_banned()
     async def status(self, ctx):
         """Reveal stats about the Discord and the bot"""
         if ctx.invoked_subcommand is None:
@@ -33,7 +33,7 @@ class Core(commands.Cog):
                 msg = await ctx.send('Grabbing status...')
                 ping = round((time.monotonic() - before) * 1000)
 
-                host = core.json.json.orm['api']
+                host = core.json.orm['api']
                 r = await core.web.Client(f"http://{host['host']}:{host['port']}/stat/").async_get()
                 # log.debug(r.content)
 
@@ -42,11 +42,11 @@ class Core(commands.Cog):
                 bots = 'N/A'
                 vcs = 'N/A'
 
-                if r.status_code == 200 and r.json() != {}:
-                    t = r.json()
-                    guilds = len(core.bot.tools.remove_duplicates([z for x in t for z in t[x]['guilds']]))
-                    users = len(core.bot.tools.remove_duplicates([z for x in t for z in t[x]['users']]))
-                    bots = len(t)
+                r_json = json.reads(r.text)
+                if r.status_code == 200 and r_json != {}:
+                    guilds = len(tls.remove_duplicates([z for x in r_json for z in r_json[x]['guilds']]))
+                    users = len(tls.remove_duplicates([z for x in r_json for z in r_json[x]['users']]))
+                    bots = len(r_json)
 
                 listeners = []
                 for y in self.bot.cogs:  # listeners
@@ -54,7 +54,7 @@ class Core(commands.Cog):
                     for name, func in cog.get_listeners():
                         listeners.append(name)
 
-                embed = core.bot.tools.tls.Embed(ctx, title='Uptime:', description=core.bot.time.time.uptime(core.bot.time.time()), timestamp=True)
+                embed = tls.Embed(ctx, title='Uptime:', description=core.time.misc.uptime(core.time.time()), timestamp=True)
                 embed.add_field(name=f'Bots: ', value=str(bots))
                 embed.add_field(name=f'Members: ', value=ctx.guild.member_count)
                 embed.add_field(name=f'Guilds: ', value=str(guilds))  # Flagged
@@ -115,5 +115,5 @@ async def update(self):
         }
     }
 
-    host = core.json.json.orm['api']
+    host = core.json.orm['api']
     await core.web.Client(f"http://{host['host']}:{host['port']}/stat/").async_post(send)

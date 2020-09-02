@@ -1,16 +1,22 @@
 from core import logger
+from core import utils
+import threading
 import inspect
 import types
 import sys
 
 
 # https://stackoverflow.com/a/3467879/14125122
-class Initialize():  # Execute all functions in this class. Cannot be inherited from (yet)
-    def __init__(self):  # Probably bad practice, but I don't care
+class Initialize():  # Execute all functions in this class. Cannot be inherited from.
+    def __init__(self):  # Probably bad practice, but I don't care.
         for name, run in inspect.getmembers(Initialize):
             if isinstance(run, types.FunctionType) and name != self.__init__.__name__:
                 run(self)
         logger.log.debug('Application extended')
+
+    # def exception_hook(self):  # VS Code doesn't like exception hooks. This gets disabled in testing
+    #     threading.excepthook = utils.util.excepthook
+    #     sys.excepthook = utils.util.excepthook
 
     def asyncio_override(self):
         class asyncfilter(logger.logging.Filter):

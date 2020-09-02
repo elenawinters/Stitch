@@ -23,7 +23,7 @@ def ban_assitant():
 
 
 async def ban_assistants():
-    host = core.json.json.orm['api']
+    host = core.json.orm['api']
     try:
         r = await core.web.Client(f"http://{host['host']}:{host['port']}/bans/assist").async_get()
         return r.json()

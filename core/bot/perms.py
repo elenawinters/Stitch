@@ -1,8 +1,8 @@
 # PERMISSION CONTROLLER. THIS STORES USER PERMISSIONS.
 from discord.ext import commands
-from core.bot.tools import items
+from core.utils import items
 from data.data import data
-from core.bot.funcs import log
+from core.logger import log
 
 
 def is_guild(guilds):
