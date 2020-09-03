@@ -11,7 +11,10 @@ class Initialize():  # Execute all functions in this class. Cannot be inherited 
     def __init__(self):  # Probably bad practice, but I don't care.
         for name, run in inspect.getmembers(Initialize):
             if isinstance(run, types.FunctionType) and name != self.__init__.__name__:
-                run(self)
+                logger.log.debug(f'Executing {__name__} function {name}')
+                try: run(self)
+                except Exception as exc:
+                    logger.log.exception(exc)
         logger.log.debug('Application extended')
 
     # def exception_hook(self):  # VS Code doesn't like exception hooks. This gets disabled in testing

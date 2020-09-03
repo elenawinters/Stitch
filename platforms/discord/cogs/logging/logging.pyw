@@ -1,7 +1,6 @@
 import discord
 from discord.ext import commands
-from core.color import trace
-from core.logger import log
+from core.logger import log, trace
 
 
 class Logs(commands.Cog):

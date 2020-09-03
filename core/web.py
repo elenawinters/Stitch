@@ -1,4 +1,4 @@
-from core.logger import log
+from core.logger import log, trace
 import httpx
 import os
 
@@ -8,11 +8,11 @@ class Client:
         self.limit = int(kwargs.get('limit', 3))
         self.url = url
 
-    def post(self, json):
+    def post(self, _json: dict):
         for x in range(1, self.limit + 1):
             try:
                 with httpx.Client() as client:
-                    client.post(url=self.url, json=dict(json))
+                    client.post(url=self.url, json=_json)
                 return
             except httpx._exceptions.WriteError:
                 log.error(f'[POST] {self.url} Write Error (Attempt #{x})')
@@ -39,11 +39,11 @@ class Client:
         log.error(f'[GET] {self.url} failed after {self.limit} attempts')
         return None
 
-    async def async_post(self, json):
+    async def async_post(self, _json: dict):
         for x in range(1, self.limit + 1):
             try:
                 async with httpx.AsyncClient() as client:
-                    await client.post(url=self.url, json=dict(json))
+                    await client.post(url=self.url, json=_json)
                 return
             except httpx._exceptions.WriteError as exc:
                 log.error(f'[POST] {self.url} Write Error (Attempt #{x})')

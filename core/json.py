@@ -1,7 +1,7 @@
 from core.defaults.default import default
+import json as _json
 import collections
 import datetime
-import json
 import os
 
 
@@ -71,11 +71,13 @@ orm = ORM()
 
 
 # Eg: https://gist.github.com/simonw/7000493
-class Encode(json.JSONEncoder):
-    pass
+class Encode(_json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, (datetime.date, datetime.datetime)):
+            return obj.isoformat()
 
 
-class Decode(json.JSONDecoder):
+class Decode(_json.JSONDecoder):
     pass
 
 
@@ -95,12 +97,12 @@ class Internal:
 
     @classmethod
     def loads(cls, data):
-        return json.loads(data)
+        return _json.loads(data)
 
     @classmethod
     def dumps(cls, data, pretty=False):
-        if pretty: return json.dumps(data, indent=2, separators=(",", ":"), default=str)
-        else: return json.dumps(data)
+        if pretty: return _json.dumps(data, indent=2, separators=(", ", ": "), default=str)
+        else: return _json.dumps(data)
 
 
 class External:
@@ -112,22 +114,22 @@ class External:
     def loads(cls, files: str = default):
         try:
             with open(files) as json_file:
-                data = json.load(json_file)
+                data = _json.load(json_file)
 
             try:  # Update to new format
-                data = json.loads(data)
+                data = _json.loads(data)
                 cls.write(data, files=files)
             except TypeError:
                 pass  # Up to date
 
-        except json.JSONDecodeError:
+        except _json.JSONDecodeError:
             data = {}
         return data
 
     @classmethod
     def write(cls, data, files: str = default, mode='w'):
         with open(files, mode) as json_file:
-            json.dump(data, json_file, indent=4)
+            _json.dump(data, json_file, indent=4)
 
 
 internal = Internal

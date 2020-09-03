@@ -1,9 +1,10 @@
 import discord
 from discord.ext import commands
-from core.bot.funcs import extensions
-from ..core.tools import tls
-from core.bot import perms
-import core.checks
+from ...core.tools import tls
+from core.logger import log
+from core import time
+import datetime
+# import core.checks
 
 
 class Core(commands.Cog):
@@ -11,7 +12,6 @@ class Core(commands.Cog):
         self.bot = bot
 
     @commands.command(aliases=['userinfo'])
-    @core.checks.is_banned()
     async def whois(self, ctx, *, user):
         try:
             user = await commands.MemberConverter().convert(ctx=ctx, argument=user)
@@ -24,86 +24,28 @@ class Core(commands.Cog):
                 except IndexError:
                     user = None
         # nicknames = []
-        async with ctx.typing():
-            display = [y.nick for x in self.bot.guilds for y in x.members if y.id == user.id if y.nick]
-            servers = [x for x in self.bot.guilds for y in x.members if y.id == user.id]
+        try:
+            async with ctx.typing():
+                display = [y.nick for x in self.bot.guilds for y in x.members if y.id == user.id if y.nick]
+                servers = [x for x in self.bot.guilds for y in x.members if y.id == user.id]
 
-        display = ', '.join(tls.remove_duplicates(display))
-        if display == '':
-            display = None
-        age = readable.timedelta(misc.diff(user.created_at, datetime.datetime.utcnow()))
-        embed = tls.Embed(ctx, description=f'Information about {user.mention} **({user})**', timestamp=True)
-        embed.add_field(name='Identifier:', value=f'`{user.id}`', inline=True)
-        embed.add_field(name='Created At:', value=f'`{user.created_at}`', inline=True)
-        embed.add_field(name=f'Account Age:', value=f'```{age}```', inline=False)
-        embed.add_field(name=f'Known Nicknames:', value=f'```{display}```', inline=False)
-        if len(servers) == 1:
-            embed.set_footer(icon_url=user.avatar_url, text=f'In {len(servers)} guild (that can be seen)')
-        else:
-            embed.set_footer(icon_url=user.avatar_url, text=f'In {len(servers)} guilds (that can be seen)')
+            display = ', '.join(tls.remove_duplicates(display))
+            if display == '':
+                display = None
+            age = time.readable.timedelta(time.misc.diff(user.created_at, datetime.datetime.utcnow()))
+            embed = tls.Embed(ctx, description=f'Information about {user.mention} **({user})**', timestamp=True)
+            embed.add_field(name='Identifier:', value=f'`{user.id}`', inline=True)
+            embed.add_field(name='Created At:', value=f'`{user.created_at}`', inline=True)
+            embed.add_field(name=f'Account Age:', value=f'```{age}```', inline=False)
+            embed.add_field(name=f'Known Nicknames:', value=f'```{display}```', inline=False)
+            if len(servers) == 1:
+                embed.set_footer(icon_url=user.avatar_url, text=f'In {len(servers)} guild (that can be seen)')
+            else:
+                embed.set_footer(icon_url=user.avatar_url, text=f'In {len(servers)} guilds (that can be seen)')
 
-        await ctx.send(embed=embed)
-
-    # @commands.command()
-    # async def help(self, ctx):
-    #     """Displays this help menu."""
-    #     embed = tls.Embed(ctx, description='This command is a WIP. Use **.oldhelp**')
-    #     await ctx.send(embed=embed)
-    #     # pass
-
-    @commands.command(hidden=True)
-    @core.checks.is_banned()
-    async def help(self, ctx):
-        """Displays the old help menu."""
-        com = ctx.message.content.split(' ')
-        color = get_color(ctx)
-        # SORT COMMANDS
-        command = []
-        new = []
-        for x in self.bot.commands:
-            new.append(x.name)
-        sortednew = sorted(new)
-        for x in range(len(sortednew)):
-            for y in self.bot.commands:
-                if sortednew[x] == y.name:
-                    if y.enabled:
-                        if y.short_doc != '':
-                            command.append(y)
-
-#
-#   The help command will only display commands that you have permission to
-#   use, that have a description (usage is optional), and are not hidden.
-#
-#   Even hidden commands can have descriptions. They can by viewed by doing
-#   .help [command]. This can be used/viewed regardless of permission.
-#
-
-        if len(com) == 1:
-            embed = tls.Embed(ctx, description=f'Here are the commands available to you *{ctx.message.author.mention}*:')
-            for x in command:
-                try:
-                    if not x.hidden:
-                        embed.add_field(name=f'**.{x.name}**', value=f' - {x.short_doc}', inline=False)
-                    # else:
-                    #    if perms.help_perms(ctx):
-                    #        embed.add_field(name=f'**.{x.name}**', value=f' - {x.short_doc}', inline=False)
-                except Exception as e:
-                    print(e)
-        else:
-            is_com = False
-            embed = discord.Embed(colour=color)
-            for x in command:
-                if x.name == com[1]:
-                    is_com = True
-                    embed.add_field(name=f'**{x.name.capitalize()} command:**', value=f'{x.short_doc}', inline=False)
-                    if x.short_doc != x.help:
-                        content = x.help[len(f'{x.short_doc}'):]
-                        embed.add_field(name=f'**Usage:**', value=f'{content}', inline=False)
-                    break
-            if is_com is False:
-                embed = tls.Embed(ctx, description=f'Sorry {ctx.message.author.mention}, but no instance of that command was found.')
-
-        await ctx.send(embed=embed)
+            await ctx.send(embed=embed)
+        except Exception as exc:
+            log.exception(exc)
 
     @commands.command(hidden=True)
     @commands.is_owner()
@@ -159,7 +101,6 @@ class Core(commands.Cog):
             await tls.Command.execute(self, ctx, 'status')
 
     @commands.command(aliases=['aliases', 'al'], hidden=True)
-    @core.checks.is_banned()
     async def alias(self, ctx, name=None):
         if name is not None:
             x = tls.Command.fetch(self, name)

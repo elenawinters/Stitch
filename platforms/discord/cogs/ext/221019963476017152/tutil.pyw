@@ -12,6 +12,9 @@ class Ext(commands.Cog):
     async def on_member_join(self, member):
         pass
 
+        # This will never be finished.
+        # This was prototyped for guild 221019963476017152, but they lost interest
+
         # print(json.reader('test', 'test.txt'))
 
         # n1 = ctx.author.created_at

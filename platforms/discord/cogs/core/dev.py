@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from core.color import trace
 # from core.bot.funcs import *
-from ..core.tools import tls
+from ...core.tools import tls
 from core.logger import log
 
 

@@ -1,13 +1,11 @@
-# from os.path import dirname, basename, isfile, join, abspath
 from flask import Flask, jsonify, render_template, make_response
+from core import logger, utils, json
 from threading import Thread
-from core import logger
-from core import utils
-from core import json
 import importlib
 import asyncio
 import sys
 import os
+
 
 # https://gist.github.com/jerblack/735b9953ba1ab6234abb43174210d356
 cli = sys.modules['flask.cli']  # Hide warning message
@@ -27,14 +25,16 @@ def base(render, request=None):  # Dark theme JSON in browsers
     if request is None or request.user_agent.browser is None:
         return jsonify(render)
     else:  # base.html is located in the templates folder. You can modify it there
-        return render_template('base.html', render=json.dumps(render))
+        return render_template('base.html', render=json.internal.dumps(render, True))
 
 
-imports = utils.util.imports(__file__, 'ext')
+imports = utils.util.imports(utils.util.path(__file__), 'ext')
 abspath = os.path.abspath('')
+
 
 for x in imports:
     try:
         importlib.import_module(x, abspath)
+        # logger.log.debug(f'Loaded {x}')
     except Exception as exc:
         logger.log.error(exc)

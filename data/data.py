@@ -16,20 +16,20 @@ import os
 
 class Initialize():
     def __init__(self):
-        log.info(f'{trace.cyan}> Initializing {trace.black.s}dataset{trace.cyan} Database.')
         try:
-            data().start()
+            data.start()
             log.info(f'{trace.cyan}> Initialized {trace.black.s}dataset{trace.cyan} engine ({data.engine}).')
-            # log.info(f'{trace.cyan}> Initialized {trace.black.s}dataset{trace.cyan}. Engine: {tracer.yellow.s}{}')
-        except Exception as err:
-            log.exception(err)
+        except Exception as exc:
             log.warning(f'> Failed to load {trace.black.s}dataset{trace.warn}. Restarting!')
-            # log.error(f'> {short_traceback()}')
-            # log.critical(f'> {traceback.format_exc()}')
+            log.exception(exc)
             sys.exit(0)
 
 
-class data:
+class Data:
+    def __new__(cls):  # This is disgusting
+        cls.start(cls)
+
+    @classmethod
     def start(cls):
         jdb = json.orm['settings']['database']
         if jdb['address'] == '/':  # Assuming SQLite, get default location
@@ -42,6 +42,7 @@ class data:
 
     @classmethod
     def engine(cls):
+        log.debug(cls.engine)
         return cls.engine
 
     @classmethod
@@ -51,3 +52,6 @@ class data:
 
 class create:  # Create database/tables if not existant
     pass
+
+
+data = Data

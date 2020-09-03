@@ -12,7 +12,7 @@ exceptions = ['restart', 'reload', 'help', 'enable', 'disable']
 class Owner(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-    
+
     @commands.group(name='profile', hidden=True)
     @commands.is_owner()
     async def profile(self, ctx):

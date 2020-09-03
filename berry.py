@@ -6,13 +6,12 @@
 #
 #
 
-from core.color import trace
-from core.logger import log
+from core.logger import log, trace, json
+from dateutil import parser
 from core import manager
 from core import utils
 from data import data
 from core import web
-import core.json
 import threading
 import datetime
 import extends
@@ -22,22 +21,22 @@ import sys
 
 
 if __name__ == '__main__':
-    extends.Initialize()
-    debug.Initialize()
+    extends.Initialize()  # Setup
+    data.Initialize()  # Launch dataset
 
-    data.Initialize()
-
+    # Start threads
     threads = manager.Initialize().threads
-
-    host = core.json.orm['api']
-    core.web.Client(f"http://{host['host']}:{host['port']}/uptime/").post({'uptime': str(datetime.datetime.utcnow())})
-
     log.debug(f'Current threads: {threads}')
 
-    while all(x.is_alive() for x in threads):
+    host = json.orm['api']  # Post current time to api
+    web.Client(f"http://{host['host']}:{host['port']}/uptime/").post({'uptime': str(datetime.datetime.utcnow())})
+
+    debug.Initialize()  # Run debugging functions
+
+    while all(x.is_alive() for x in threads):  # Kill program if a thread dies
         time.sleep(2)
 
-    uptime = (core.web.Client(f"http://{host['host']}:{host['port']}/uptime/").get()).json()
-    log.debug(uptime)
+    uptime = web.Client(f"http://{host['host']}:{host['port']}/uptime/").get()
+    log.debug(parser.parse(uptime.json()['uptime']))
 
     sys.exit(0)

@@ -1,5 +1,5 @@
 from discord.ext import commands
-from core import utils
+from core import utils, assets
 import traceback
 import colorsys
 import datetime
@@ -22,10 +22,23 @@ class DiscordTools(utils.Utils):  # Discord utils
 
     class Message:
         @classmethod
-        async def respond(cls, ctx, err, url=discord.Embed.Empty, content=None):
+        def base(cls, err, url=discord.Embed.Empty):
             embed = tls.Embed(description=f'{err}', colour=discord.Colour.dark_red(), timestamp=True)
-            embed.set_author(name=f'{type(err).__name__}', url=url, icon_url=ImageURLs.error)
-            await ctx.send(content=content, embed=embed)
+            embed.set_author(name=f'{type(err).__name__}', url=url, icon_url=assets.Discord.error)
+            return embed
+
+        @classmethod
+        async def respond(cls, ctx, err, url=discord.Embed.Empty, content=None):
+            await ctx.send(content=content, embed=cls.base(err, url=discord.Embed.Empty))
+
+        @classmethod
+        async def modify(cls, msg, err, url=discord.Embed.Empty, content=None):
+            await msg.edit(content=content, embed=cls.base(err, url=discord.Embed.Empty))
+
+        @classmethod
+        def not_ready(cls):
+            return tls.Embed(description='This action could not be completed because the bot is not ready.',
+                             colour=discord.Colour.dark_grey())
 
     class Command:
         @classmethod
@@ -113,7 +126,7 @@ class DiscordTools(utils.Utils):  # Discord utils
 
     class Embed:
         def __new__(cls, ctx=None, **kwargs):
-            color = kwargs.get('colour', get_color(ctx))
+            color = kwargs.get('colour', DiscordTools().Color.get_color(ctx))
             title = kwargs.get('title', discord.Embed.Empty)
             _type = kwargs.get('type', 'rich')
             url = kwargs.get('url', discord.Embed.Empty)
@@ -207,9 +220,36 @@ class DiscordTools(utils.Utils):  # Discord utils
             color = discord.Color.from_rgb(r, g, b)
             return color
 
+        @classmethod
+        def get_color(ctx=None, other=None):  # Dumb code
+            if ctx is None:
+                return discord.Colour.blurple()
+            else:
+                try:
+                    member = ctx.message.guild.get_member(ctx.bot.user.id)
+                except AttributeError:
+                    try:
+                        member = other.guild.get_member(ctx.user.id)
+                    except AttributeError:
+                        member = ctx
+                try:
+                    color = member.top_role.color
+                except AttributeError:
+                    return discord.Colour.blurple()
+                if color.value == discord.Colour.default().value:
+                    return discord.Colour.blurple()
+                else:
+                    return color
+
     Colour = Color
     colour = Color
     color = Color
+
+    class Exceptions:
+        class GlobalBanException(commands.CheckFailure):
+            pass
+
+    exceptions = Exceptions
 
 
 tls = DiscordTools()  # Define tls so we can skip having to do DiscordTools() before everything. Reee

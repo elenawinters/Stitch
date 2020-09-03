@@ -1,13 +1,14 @@
 import discord
 from discord.ext import commands
-from core.color import trace
+from core.logger import log, trace
 from ..core.tools import tls
-from core.logger import log
 from data.data import data
+import core.time
 import traceback
 import random
 import sys
 import ast
+import re
 
 
 class Stitch(commands.Cog):
@@ -26,11 +27,18 @@ class Stitch(commands.Cog):
         log.info(f'{trace.cyan}> Logged in: {trace.yellow.s}{self.bot.user.name}, {trace.cyan.s}{self.bot.user.id}, {trace.magenta.s}Initiated.')
 
     @commands.Cog.listener()
+    async def on_connect(self):
+        if not self.bot.is_ready():
+            log.info(f'{trace.cyan}> Logging in at {core.time.readable.at()}.')
+        else:
+            log.debug(f'{trace.cyan}> Connection with {trace.white}Discord{trace.cyan} achieved.')
+
+    @commands.Cog.listener()
     async def on_command_error(self, ctx, exc):  # COMMAND ERROR HANDLER
         if hasattr(ctx.command, 'on_error'):
             return
 
-        elif isinstance(exc, tls.GlobanBanExcpetion):
+        elif isinstance(exc, tls.Exceptions.GlobalBanException):
             return await ctx.send(f'You are globally banned from using this bot {ctx.message.author.mention}.')
 
         if isinstance(exc, commands.CommandNotFound):
@@ -39,7 +47,6 @@ class Stitch(commands.Cog):
                 com_name = list(ctx.message.content)
                 if len(com_name) > 0:
                     if com_name[0] == self.bot.command_prefix and len(com_name) > 1:
-                        import re
                         if re.match(r'[a-zA-Z]', com_name[1]):  # IS IN COMMAND FORMAT?
                             try:
                                 await ctx.message.delete()
@@ -50,15 +57,15 @@ class Stitch(commands.Cog):
                                 ccom = ast.literal_eval(data.base['ccom'].find_one(server=ctx.guild.id)['commands'])
                             except Exception:  # Whatever the exception, move on. People who use this base might not have cComs.
                                 ccom = {}
-                            cname = funcs.split_string(ctx.message.content, f'{self.bot.command_prefix}').split(' ')[0]
+                            cname = tls.split(ctx.message.content, f'{self.bot.command_prefix}').split(' ')[0]
                             if cname not in ccom:
                                 return await ctx.send(f'Sorry {ctx.message.author.mention}, but the given command does not currently exist!')
 
         elif isinstance(exc, commands.MissingRequiredArgument):
-            return await funcs.respond(ctx, exc, content=f'Sorry {ctx.message.author.mention}, but you\'re missing an important argument!')
+            return await tls.Message.respond(ctx, exc, content=f'Sorry {ctx.message.author.mention}, but you\'re missing an important argument!')
 
         elif isinstance(exc, commands.BadArgument):
-            return await funcs.respond(ctx, exc, content=f'Sorry {ctx.message.author.mention}, but an argument is incorrect!')
+            return await tls.Message.respond(ctx, exc, content=f'Sorry {ctx.message.author.mention}, but an argument is incorrect!')
 
         elif isinstance(exc, commands.DisabledCommand):
             return await ctx.send(f'Sorry {ctx.message.author.mention}, but the given command is currently disabled!')

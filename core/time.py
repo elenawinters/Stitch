@@ -1,6 +1,6 @@
 from core.color import trace
+import time as _time
 import datetime
-import time
 
 
 class Misc:
@@ -18,12 +18,12 @@ class Misc:
 
         @classmethod
         def unix(cls):
-            return time.strftime("%X", time.localtime(time.time()))
+            return _time.strftime("%X", _time.localtime(_time.time()))
         logger = unix
 
     @classmethod
     def test(cls):
-        return time.strftime("%X and %x", time.localtime(time.time()))
+        return _time.strftime("%X and %x", _time.localtime(_time.time()))
 
 
 class Parse:  # This is meant primarily for the discord bot's .embed command
@@ -54,18 +54,18 @@ class Readable:
 
     @classmethod
     def date(cls):
-        return time.strftime("%A, %B %d, %Y", time.localtime(time.time()))
+        return _time.strftime("%A, %B %d, %Y", _time.localtime(_time.time()))
 
     @classmethod
     def time(cls):
-        return time.strftime("%r", time.localtime(time.time()))
+        return _time.strftime("%r", _time.localtime(_time.time()))
 
     @classmethod
     def military(cls):
-        return time.strftime("%R", time.localtime(time.time()))
+        return _time.strftime("%R", _time.localtime(_time.time()))
 
     class Timedelta:
-        def __init__(cls, r: datetime.timedelta, micro=False):
+        def __new__(cls, r: datetime.timedelta, micro=False):
             hours = r.seconds // 3600
             minutes = (r.seconds // 60) % 60
             seconds = r.seconds % 60

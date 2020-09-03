@@ -1,9 +1,8 @@
 from ..api import app, loop, base
 from core.logger import log
+from core import time, json
 from data.data import data
 from flask import request
-from core import time
-import core.json
 import datetime
 
 rate = datetime.datetime.utcnow()
@@ -13,10 +12,11 @@ bans = {}
 
 @app.route("/bans/assist")
 def ban_assistants():
+    json.orm['permissions']
     f = 'application/api/ext/ban_assist.json'
-    if not core.json.external.exists(f=f):
-        core.json.external.write([], f=f)
-    assists = core.json.external.loads(f=f)
+    if not json.external.exists():
+        json.external.write([], files=files)
+    assists = json.external.loads(files=files)
     return base(assists, request)
 
 
