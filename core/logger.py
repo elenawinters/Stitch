@@ -12,6 +12,7 @@ colorama.init()
 
 
 class LogLevel(enum.Enum):
+    none = logging.NOTSET  # 0
     debug = logging.DEBUG  # 10
     info = logging.INFO  # 20
     warn = logging.WARN  # 30

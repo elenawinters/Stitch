@@ -46,3 +46,9 @@ class Initialize():  # Execute all functions in this class. Cannot be inherited 
         flasklog.addFilter(flaskfilter())
         flasklog.addHandler(logger.stream)
         flasklog.addHandler(logger.files)
+
+    def discord_override(self):
+        discolog = logger.logging.getLogger('discord')
+        discolog.setLevel(logger.LogLevel.info.value)
+        discolog.addHandler(logger.stream)
+        discolog.addHandler(logger.files)

@@ -24,6 +24,9 @@ settings = {
         'twitch': None
     },
     'settings': {
+        'manager': {
+            'ignore': []  # Do not load the items in this list
+        },
         'logging': {
             'console': {
                 'level': 'default'
@@ -40,5 +43,5 @@ settings = {
         }
     },
     'permissions': {},
-    'revision': '2020.09.03'  # Remember to always update this when changes are made to this file
+    'revision': '2020.09.05'  # Remember to always update this when changes are made to this file
 }

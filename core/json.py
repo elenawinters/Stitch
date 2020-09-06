@@ -1,3 +1,4 @@
+# https://codebeautify.org/json-generator
 from core.defaults.default import default
 import json as _json
 import collections
@@ -7,63 +8,81 @@ import os
 
 class memory:
     @classmethod
-    def load(cls, files=default):
-        cls.exists(files)
-        if files not in cls.memory.keys():
-            cls.memory[files] = {}
-            return cls.reload(files)
-        return cls.memory[files]
+    def merge(cls, file):
+        internal.merge(cls.memory[file], external.loads(file=file))
 
     @classmethod
-    def reload(cls, files=default):  # Yuck
-        cls.exists(files)
-        internal.merge(cls.memory[files], external.loads(files=files))
+    def loads(cls, files: list = [default]):
+        for file in files:
+            cls.load(file)
+
+    @classmethod
+    def load(cls, file=default):
+        cls.exists()
+        if file not in cls.memory.keys():
+            cls.memory[file] = {}
+            cls.merge(file)
+        return cls.memory[file]
+
+    @classmethod
+    def reloads(cls):
+        for x in cls.memory.keys():
+            cls.reload(x)
+
+    @classmethod
+    def reload(cls, file=default):  # Yuck
+        cls.exists()
+        cls.merge(file)
         return cls.memory
 
     @classmethod
-    def refresh(cls, files=default):
-        cls.reload(files)
+    def refresh(cls, file=default):
+        cls.reload(file)
 
     @classmethod
-    def exists(cls, files=default):
+    def internal(cls):
+        return cls.memory
+
+    @classmethod
+    def exists(cls):
         try: cls.memory
         except Exception:
             cls.memory = {}
 
 
 class ORMFile(object):  # Why does this fucking work?
-    def __init__(self, files=default):
-        return files
+    def __init__(self, file=default):
+        return file
 
-    def files(self):
-        return dict(self)['files']
+    def file(self):
+        return dict(self)['file']
 
 
 class ORM(dict, ORMFile):  # This is a huge mess
-    def __init__(self, files=default):
-        super(self.__class__, self).__init__(files=files)
+    def __init__(self, file=default):
+        super(self.__class__, self).__init__(file=file)
 
     def __getitem__(self, key):
-        files = self.files()
-        self.__dict__[files] = memory.load(files)
+        file = self.file()
+        self.__dict__[file] = memory.load(file)
 
-        if key not in self.__dict__[files]:
-            self.__dict__[files][key] = {}
-            external.write(self.__dict__[files], files=files)
-            memory.reload(files)
+        if key not in self.__dict__[file]:
+            self.__dict__[file][key] = {}
+            external.write(self.__dict__[file], file=file)
+            memory.reload(file)
 
-        return self.__dict__[files][key]
+        return self.__dict__[file][key]
 
     def __setitem__(self, key, value):
         self.update(self, key, value)
 
     def update(self, key, value):
-        files = self.files()
-        self.__dict__[files] = memory.load(files)
+        file = self.file()
+        self.__dict__[file] = memory.load(file)
 
         # self.__dict__[key] = value
-        internal.merge(self.__dict__[files], {key: value})
-        external.write(self.__dict__[files], files=files)
+        internal.merge(self.__dict__[file], {key: value})
+        external.write(self.__dict__[file], file=file)
         memory.reload()
 
 
@@ -107,28 +126,20 @@ class Internal:
 
 class External:
     @classmethod
-    def exists(cls, files: str = default):
-        return os.path.isfile(files)
+    def exists(cls, file: str = default):
+        return os.path.isfile(file)
 
     @classmethod
-    def loads(cls, files: str = default):
-        try:
-            with open(files) as json_file:
+    def loads(cls, file: str = default):
+        if cls.exists(file):
+            with open(file) as json_file:
                 data = _json.load(json_file)
-
-            try:  # Update to new format
-                data = _json.loads(data)
-                cls.write(data, files=files)
-            except TypeError:
-                pass  # Up to date
-
-        except _json.JSONDecodeError:
-            data = {}
-        return data
+            return data
+        return {}  # File does not exist.
 
     @classmethod
-    def write(cls, data, files: str = default, mode='w'):
-        with open(files, mode) as json_file:
+    def write(cls, data, file: str = default, mode='w'):
+        with open(file, mode) as json_file:
             _json.dump(data, json_file, indent=4)
 
 

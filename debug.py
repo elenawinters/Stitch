@@ -19,6 +19,14 @@ class Initialize():  # Runtime debug
     #     sys.exit(0)
 
     def tests(self):
-        host = json.orm['api']  # Post current time to api
-        uptime = web.Client(f"http://{host['host']}:{host['port']}/uptime/").get()
-        logger.log.debug(uptime.json()['uptime'])
+        json.memory.loads(['test.json', 'test2.json', 'extreme_test.json', 'rerere.json'])
+        t = json.memory.internal()
+        json.external.write(t, 'test_dump.json')
+        # logger.log.debug(json.memory.internal())
+
+        # r = json.ORM('settings.json')
+        # json.ORM('test.json')
+        # logger.log.debug(t)
+        # host = json.orm['api']  # Post current time to api
+        # uptime = web.Client(f"http://{host['host']}:{host['port']}/uptime/").get()
+        # logger.log.debug(uptime.json()['uptime'])
