@@ -90,7 +90,7 @@ orm = ORM()
 
 
 # Eg: https://gist.github.com/simonw/7000493
-class Encode(_json.JSONEncoder):
+class Encode(_json.JSONEncoder):  # This isn't used
     def default(self, obj):
         if isinstance(obj, (datetime.date, datetime.datetime)):
             return obj.isoformat()

@@ -82,3 +82,5 @@ files.setFormatter(file_formatter)
 files.addFilter(FileRecords())
 files.setLevel(util.Enums(LogLevel).find(settings['file']['level']).value)
 log.addHandler(files)
+
+level = LogLevel  # Alias for LogLevel

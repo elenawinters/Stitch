@@ -1,7 +1,9 @@
 from core.color import trace
 from core import logger
 import traceback
+import inspect
 import random
+import types
 import sys
 import re
 import os
@@ -62,6 +64,16 @@ class Utils:
 
     def excepthook(self, exctype, value, tb):
         logger.log.exception(**self.Traceback((exctype, value, tb)).code())
+
+    def hack_the_planet(self, ignore: list = []):  # This is overly complicated.
+        frame = inspect.stack()[1][0]  # Somehow it works. Fuck inspect. I hate it
+        ignores = [frame.f_code.co_name] + ignore
+        funcs = []  # I love list comprehensions but I can't here cuz core/logger throws an error for some reason when I do it.
+        for name, run in inspect.getmembers(frame.f_locals['self'].__class__):  # I hate this
+            if isinstance(run, types.FunctionType) or isinstance(run, types.MethodType):
+                if name not in ignores and not name.startswith('__') and not name.endswith('__'):
+                    funcs.append(run)
+        return funcs
 
     def split(self, string, remove, offset=0):
         return string[len(f'{remove}') + offset:]
