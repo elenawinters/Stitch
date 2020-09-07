@@ -67,7 +67,7 @@ class Utils:
 
     def hack_the_planet(self, ignore: list = []):  # This is overly complicated.
         frame = inspect.stack()[1][0]  # Somehow it works. Fuck inspect. I hate it
-        ignores = [frame.f_code.co_name] + ignore
+        ignores = [frame.f_code.co_name] + ignore  # I will never touch this code ever again
         funcs = []  # I love list comprehensions but I can't here cuz core/logger throws an error for some reason when I do it.
         for name, run in inspect.getmembers(frame.f_locals['self'].__class__):  # I hate this
             if isinstance(run, types.FunctionType) or isinstance(run, types.MethodType):
