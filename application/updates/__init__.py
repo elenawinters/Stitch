@@ -3,8 +3,6 @@ from core.logger import log
 from core.utils import util
 import subprocess
 import threading
-import inspect
-import types
 import time
 import sys
 import ast
