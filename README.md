@@ -1,6 +1,10 @@
 # Stitch
-Stitch is a multipurpose Discord bot made by me.
+Stitch is a bot framework.
 
-# Discord Bot
-You can add this Discord bot to your Discord server!
-https://discordapp.com/api/oauth2/authorize?client_id=589637708901646361&scope=bot
+# Notes
+This is the development branch.
+Everything here is **in development.**
+
+I do not know if everything works on other systems. 
+
+If there are compatibility issues, please open a ticket in [our Discord](https://discord.gg/u2ShZQa).

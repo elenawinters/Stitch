@@ -36,6 +36,9 @@ if __name__ == '__main__':
     while all(x.is_alive() for x in threads):  # Kill program if a thread dies
         time.sleep(2)
 
+    # Log which threads died
+    [log.debug(f'{trace.warn}Thread "{x.name}" has died.') for x in threads if not x.is_alive()]
+
     uptime = web.Client(f"http://{host['host']}:{host['port']}/uptime/").get()
     log.debug(parser.parse(uptime.json()['uptime']))
 
