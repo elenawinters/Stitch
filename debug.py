@@ -12,19 +12,9 @@ class Initialize():  # Runtime debug
             try: run(self)
             except Exception as exc:
                 logger.log.exception(exc)
-        # [run(self) for run in util.hack_the_planet()]
-        # for name, run in inspect.getmembers(self.__class__):
-        #     if isinstance(run, types.FunctionType) and name != self.__init__.__name__:
-        #         logger.log.debug(f'Executing {__name__} function {name}')
-        #         try: run(self)
-        #         except Exception as exc:
-        #             logger.log.exception(exc)
 
     # def z_exit(self):  # If this is uncommented, it kills the program after all debug functions have run
     #     sys.exit(0)
 
     def tests(self):
-        logger.log.debug(logger.level.debug.value)
-
-    def _r(self):
-        logger.log.debug('test?')
+        logger.log.debug("Nothing to test")

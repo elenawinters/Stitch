@@ -74,7 +74,7 @@ class ORM(dict, ORMFile):  # This is a huge mess
         return self.__dict__[file][key]
 
     def __setitem__(self, key, value):
-        self.update(self, key, value)
+        self.update(key, value)
 
     def update(self, key, value):
         file = self.file()

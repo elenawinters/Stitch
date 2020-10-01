@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, render_template, make_response
+from flask import Flask, jsonify, render_template, make_response, send_from_directory
 from core import logger, utils, json
 from threading import Thread
 import importlib
@@ -18,6 +18,12 @@ app.config.update(
     JSONIFY_PRETTYPRINT_REGULAR=False,  # This is handled by base() now, and not necessary
     ENV='production'
 )
+
+
+@app.route('/favicon.ico')
+def favicon():  # Knit by Aenne Brielmann from the Noun Project
+    return send_from_directory(os.path.join(app.root_path, 'static'),
+                               'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 
 # https://werkzeug.palletsprojects.com/en/1.0.x/utils/#werkzeug.useragents.UserAgent.browser

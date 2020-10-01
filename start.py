@@ -6,9 +6,9 @@ import os
 # Restart loop, so if program stops, it restarts
 if __name__ == '__main__':
 	if sys.platform == "win32":
-		ctypes.windll.kernel32.SetConsoleTitleW("Stitch")
-	elif sys.platform == "linux" or sys.platform == "linux2" or sys.platform == "darwin":
-		print("\033]0;Stitch\007", flush='')
+		ctypes.windll.kernel32.SetConsoleTitleW("| Stitch")
+	elif sys.platform in ['linux', 'linux2', 'darwin']:
+		print("\033]0;| Stitch\007", flush='')
 
 	os.chdir(os.path.dirname(os.path.realpath(__file__)))
 

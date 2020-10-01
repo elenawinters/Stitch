@@ -1,18 +1,18 @@
 import discord
 from discord.ext import commands
-from core.bot import perms
 from core.color import trace
 from core.logger import log
 from core import json
 from data.data import data
-from core.bot.tools import tls
+from ...core.tools import tls
 import asyncio
 import ast
-from core.bot.tools import crypt
+from core.utils import util
+# from core.bot.tools import crypt
 import core.web
 # import httpx as requests
 header = {
-    'Client-ID': crypt(json.orm['secure']['extractors']['twitch']),
+    'Client-ID': util.crypt(json.orm['secure']['extractors']['twitch']),
     'Accept': 'application/vnd.twitchtv.v5+json'}
 rate = datetime.datetime.utcnow()
 last_live = 0
