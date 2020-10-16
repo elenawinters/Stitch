@@ -1,9 +1,6 @@
 import discord
-from core.bot.tools import is_number
 from discord.ext import commands
-from core.bot import funcs
-from core.bot import perms
-import core.checks
+from ...core import decorators
 
 
 class Moderation(commands.Cog):
@@ -11,8 +8,7 @@ class Moderation(commands.Cog):
         self.bot = bot
 
     @commands.command(aliases=['purge', 'claer'])
-    @perms.has_perms()
-    @core.checks.is_banned()
+    @decorators.banned()
     async def clear(self, ctx, arg='1'):
         """Clears up to 250 messages
         .clear [number of messages]"""
@@ -21,7 +17,7 @@ class Moderation(commands.Cog):
         except Exception:
             pass
         if len(arg) > 0:
-            if is_number(arg):
+            if isinstance(arg, float):
                 if int(arg) <= 250:  # Hard limit.
                     await ctx.message.channel.purge(limit=int(arg))
                 else:

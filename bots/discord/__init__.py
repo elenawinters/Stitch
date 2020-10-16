@@ -31,5 +31,5 @@ class Initialize():
         loop.close()
 
     def prefix(self):
-        # Todo: Implement https://stackoverflow.com/a/56797589/14125122
+        # TODO: Implement https://stackoverflow.com/a/56797589/14125122
         return json.orm['discord']['prefixes']['default']

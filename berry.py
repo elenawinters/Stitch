@@ -22,7 +22,6 @@ import sys
 
 if __name__ == '__main__':
     extends.Initialize()  # Setup
-    data.Initialize()  # Launch dataset
 
     # Start threads
     threads = manager.Initialize().threads

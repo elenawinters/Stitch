@@ -2,13 +2,8 @@ import discord
 from discord.ext import commands
 from core.color import trace
 # from core.bot.funcs import *
-from core.bot.funcs import extensions
-from core.bot import settings
 from ...core.tools import tls
-from core.bot import perms
-from core.bot import enums
 from core.logger import log
-import core.checks
 
 
 class Core(commands.Cog, command_attrs=dict(hidden=True)):

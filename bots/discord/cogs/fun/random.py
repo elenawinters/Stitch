@@ -12,40 +12,6 @@ class Fun(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name='number', aliases=['random', 'rand', 'num', 'randomnumber', 'rando'])
-    @core.checks.is_banned()
-    async def number_generator(self, ctx, number='1-100', *, seed=None):
-        """Pseudorandom number generator.
-        `.number [range] [seed]`
-        Examples:
-        : .number 1-100
-        : .number 1-100 Test
-        """
-        channel = [
-            'r', 'radio',
-            'radiochannel',
-            'setradiochannel'
-        ]
-        phone = [
-            'n', 'number',
-            'phonenumber',
-            'phone'
-        ]
-        if number in channel:
-            number = '0-256'
-        if number in phone:
-            number = '1000000-9999999'
-        n = number.split('-')
-        if seed is not None:
-            random.seed(seed)
-        number = random.randint(int(n[0]), int(n[1]))
-        embed = tls.Embed(description=f'Pseudorandom number in range from {n[0]} to {n[1]}', timestamp=True)
-        # embed = tls.Embed(timestamp=False)
-        if seed is None:
-            seed = 'Random'
-        embed.set_footer(text=f'{number} | {seed}')
-        await ctx.send(embed=embed)
-
     @commands.command(name='name', aliases=['handmeaname', 'hman', 'names'])
     @core.checks.is_banned()
     async def name_generator(self, ctx, sex=None, *, seed=None):

@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from ..core import predicates
+from ..core import decorators
 from ..core.tools import tls
 from core import logger
 from core import json
@@ -11,12 +11,12 @@ class Debug(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    # @commands.is_owner()
-    @predicates.manager()
+    @commands.command()
+    @decorators.permissions(0)
     async def test(self, ctx):
-        logger.json
-        logger.json.load("application\\api\\ext\\ban_assist.json")
-        logger.json.load("test.json")
+        logger.log.debug('Testing permissions')
+        # logger.json.load("application\\api\\ext\\ban_assist.json")
+        # logger.json.load("test.json")
 
 
 def setup(bot):

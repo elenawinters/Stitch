@@ -1,3 +1,8 @@
+"""
+    This is a version of CMUS that was ported over directly from an older version.
+    This will not work with the current version of the bot.
+"""
+
 import discord
 from discord.ext import commands
 from core.bot.tools import tls

@@ -42,6 +42,5 @@ settings = {
             'address': '/'
         }
     },
-    'permissions': {},
-    'revision': '2020.09.05'  # Remember to always update this when changes are made to this file
+    'revision': '2020.10.16'  # YYYY/MM/DD
 }

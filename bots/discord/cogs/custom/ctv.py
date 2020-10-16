@@ -27,7 +27,7 @@ class Custom(commands.Cog):
     @commands.is_owner()
     async def ctv(self, ctx):
         if not ctx.invoked_subcommand:
-            # Todo: Implement announcements
+            # TODO: Implement announcements
             # # This is old code, probably wont work
             # ctv_live = await is_online()
             # await assignment_checks(self, ctv_live)

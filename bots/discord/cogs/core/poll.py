@@ -1,9 +1,7 @@
 import discord
 from discord.ext import commands
-from core.bot import settings
-from .core.tools import tls
-from core.bot import perms
-import core.checks
+from ...core import decorators
+from ...core.tools import tls
 color = discord.Colour.from_rgb(r=59, g=136, b=195)
 
 
@@ -12,9 +10,7 @@ class Core(commands.Cog):
         self.bot = bot
 
     @commands.command(name='vote')
-    @settings.enabled()
-    @perms.has_perms()
-    @core.checks.is_banned()
+    @decorators.banned()
     async def vote(self, ctx, *, msg=''):
         """Command to open vote
         `.vote [text]`"""
@@ -30,15 +26,13 @@ class Core(commands.Cog):
             await ctx.send(f'Something went wrong. {e}')
 
     @commands.command(name='poll')
-    @settings.enabled()
-    @perms.has_perms()
-    @core.checks.is_banned()
+    @decorators.banned()
     async def poll(self, ctx, amount, *, msg=''):
         """Command to open poll
         `.poll [number of options] [text]`"""
         base = ord(u"\U0001F1E6")  # INDICATOR A
         try:
-            if is_number(amount):
+            if isinstance(amount, float):
                 if 2 <= int(amount) <= 20:
                     if len(msg) > 0:
                         embed = tls.Embed(ctx, title=f"Poll by **{ctx.author}**:", description=msg)
@@ -57,9 +51,7 @@ class Core(commands.Cog):
             await ctx.send(f'Something went wrong. {e}')
 
     @commands.command(name='ask', aliases=['question', 'questions'])
-    @settings.enabled()
-    @perms.has_perms()
-    @core.checks.is_banned()
+    @decorators.banned()
     async def ask(self, ctx, *, msg):
         """Command to ask question
         `.ask [text]`"""

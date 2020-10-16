@@ -14,18 +14,7 @@ import os
 '''
 
 
-class Initialize():
-    def __init__(self):
-        try:
-            data.start()
-            log.info(f'{trace.cyan}> Initialized {trace.black.s}dataset{trace.cyan} engine ({data.engine}).')
-        except Exception as exc:
-            log.warning(f'> Failed to load {trace.black.s}dataset{trace.warn}. Restarting!')
-            log.exception(exc)
-            sys.exit(0)
-
-
-class Data:
+class data:
     def __new__(cls):  # This is disgusting
         cls.start(cls)
 
@@ -52,6 +41,3 @@ class Data:
 
 class create:  # Create database/tables if not existant
     pass
-
-
-data = Data

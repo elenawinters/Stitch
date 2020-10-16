@@ -17,3 +17,4 @@ class Initialize():
                     log.debug(f'Loaded {x[:-9]}')
                 except Exception as exc:
                     log.error(exc)
+        log.debug('Manager has loaded all extensions')

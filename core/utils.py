@@ -52,6 +52,26 @@ class Utils:
             err = self.trace()
             return f"{err[0].__name__}: {err[1]}"
 
+    class switch(object):  # https://stackoverflow.com/a/6606540/14125122
+        def __init__(self, value):
+            self.value = value
+            self.fall = False
+
+        def __iter__(self):
+            """Return the match method once, then stop"""
+            yield self.match
+            raise StopIteration
+
+        def match(self, *args):
+            """Indicate whether or not to enter a case suite"""
+            if self.fall or not args:
+                return True
+            elif self.value in args:
+                self.fall = True
+                return True
+            else:
+                return False
+
     def crypt(self, s):
         x = []
         for i in range(len(s)):

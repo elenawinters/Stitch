@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+from ..core import decorators
 from ..core.tools import tls
 from core.logger import log
 from core import assets
@@ -12,7 +13,7 @@ class Core(commands.Cog):
         self.bot = bot
 
     @commands.command(aliases=['stream'])
-    @commands.is_owner()
+    @decorators.permissions(2)
     async def game(self, ctx, _type: int, *, _game):
         try:
             parse = _game.split(' -s ', 1)
@@ -38,7 +39,7 @@ class Core(commands.Cog):
             await tls.Message.respond(ctx, exc)
 
     @commands.command(aliases=['unstream'])
-    @commands.is_owner()  # Name will probably change
+    @decorators.permissions(2)
     async def reset(self, ctx):
         await tls.Activity.preset(self.bot)
 

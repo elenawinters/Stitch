@@ -38,15 +38,6 @@ class Discord:
     emotes = Emotes
 
 
-class Images:
-    class Coins:
-        class Quarter:
-            heads = 'https://www.mediafire.com/convkey/e737/0w5u9efs03xo5gxzg.jpg'
-            tails = 'https://www.mediafire.com/convkey/43a4/tcrxt39knsguqm6zg.jpg'
-    error = Discord.error
-    default = error
-
-
 class Game:
     type = {
         0: 'Playing',

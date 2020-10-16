@@ -11,12 +11,12 @@ import re
 import os
 
 
-# Todo: Convert all to use self. fuck classmethods
+# TODO: Convert all to use self. fuck classmethods
 class DiscordTools(utils.Utils):  # Discord utils
     def __init__(cls):  # inherit utils
         super().__init__()
 
-    class Snowflake:  # just impersonate a snowflake obj
+    class Snowflake:  # TODO: phase this out and use discord.Object()
         def __init__(self, snowflake):
             self.id = snowflake
 
