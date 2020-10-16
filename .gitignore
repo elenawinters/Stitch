@@ -9,12 +9,6 @@ __pycache__/
 # VS Code
 .vscode/
 
-# Stitch Bot
-*.json
-*.txt
-*.mp3
-
-
 # C extensions
 *.so
 
@@ -139,5 +133,10 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Stitch Bot
+*.json
+*.txt
+*.mp3
 *.bat
 *.sqlite

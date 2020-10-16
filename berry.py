@@ -10,7 +10,6 @@ from core.logger import log, trace, json
 from dateutil import parser
 from core import manager
 from core import utils
-from data import data
 from core import web
 import threading
 import datetime
