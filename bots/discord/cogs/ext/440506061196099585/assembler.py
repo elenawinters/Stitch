@@ -11,17 +11,19 @@ class Ext(commands.Cog):
 
     @commands.command()
     @decorators.banned()
-    async def assemble(self, ctx):
+    async def assemble(self, ctx, limit=4):
         assembler = []
         async with ctx.typing():
             async for x in ctx.message.channel.history(limit=500):
-                if len(x.content.split(' ')) < 4:
+                if len(x.content.split(' ')) < limit:
                     if x.content and not x.content.startswith(f'{self.bot.command_prefix}{ctx.command.name}'):
                         assembler.insert(0, x.content)
                 else: break
 
             if assembled := ' '.join(assembler):
-                await ctx.send(assembled)
+                try: await ctx.send(assembled)
+                except Exception as exc:
+                    await tls.Message.respond(ctx, exc)
             else:
                 await ctx.send(f"There's nothing to {ctx.command.name}!")
 
