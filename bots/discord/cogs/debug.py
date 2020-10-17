@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from ..core import decorators
 from ..core.tools import tls
-from core import logger
+from core.logger import log
 from core import json
 
 
@@ -14,9 +14,12 @@ class Debug(commands.Cog):
     @commands.command()
     @decorators.permissions(0)
     async def test(self, ctx):
-        logger.log.debug('Testing permissions')
-        # logger.json.load("application\\api\\ext\\ban_assist.json")
-        # logger.json.load("test.json")
+        async for x in ctx.message.channel.history(limit=500):
+            log.debug(x.content)
+            if x.content == 't':
+                log.debug('breaking')
+                break
+        log.debug('broke')
 
 
 def setup(bot):

@@ -1,9 +1,7 @@
 import discord
 from discord.ext import commands
-from core.bot import settings
-from core.bot.tools import *
-from core.bot import perms
-import core.checks
+from ...core import decorators
+from ...core.tools import tls
 
 
 class Core(commands.Cog):
@@ -11,9 +9,8 @@ class Core(commands.Cog):
         self.bot = bot
 
     @commands.command(name='say', aliases=['me'], hidden=True)
-    @settings.enabled()
-    @perms.has_perms()
-    @core.checks.is_banned()
+    @decorators.permissions(3)
+    @decorators.banned()
     async def say(self, ctx, *, arg=''):
         """Make the bot say something!
         `.say [text]`"""
@@ -22,9 +19,8 @@ class Core(commands.Cog):
             await ctx.send(embed=embed)
 
     @commands.command(name='sudo', aliases=['echo'], hidden=True)
-    @settings.enabled()
-    @perms.has_perms()
-    @core.checks.is_banned()
+    @decorators.permissions(3)
+    @decorators.banned()
     async def sudo(self, ctx, *, arg=''):
         """Make the bot say something!
         `.sudo [text]`"""

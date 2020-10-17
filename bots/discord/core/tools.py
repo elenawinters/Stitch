@@ -29,11 +29,11 @@ class DiscordTools(utils.Utils):  # Discord utils
 
         @classmethod
         async def respond(cls, ctx, err, url=discord.Embed.Empty, content=None):
-            await ctx.send(content=content, embed=cls.base(err, url=discord.Embed.Empty))
+            await ctx.send(content=content, embed=cls.base(err, url=url))
 
         @classmethod
         async def modify(cls, msg, err, url=discord.Embed.Empty, content=None):
-            await msg.edit(content=content, embed=cls.base(err, url=discord.Embed.Empty))
+            await msg.edit(content=content, embed=cls.base(err, url=url))
 
         @classmethod
         def not_ready(cls):

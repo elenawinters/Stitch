@@ -1,5 +1,8 @@
 from discord.ext import commands
 from ....core import decorators
+from ....core.tools import tls
+from core.logger import log
+import discord
 
 
 class Ext(commands.Cog):
@@ -9,19 +12,18 @@ class Ext(commands.Cog):
     @commands.command()
     @decorators.banned()
     async def assemble(self, ctx):
-        test = ''
+        assembler = []
         async with ctx.typing():
-            for x in reversed(await ctx.message.channel.history(limit=500).flatten()):
+            async for x in ctx.message.channel.history(limit=500):
                 if len(x.content.split(' ')) < 4:
-                    start = True
-                else:
-                    start = False
-                    test = ''
+                    if x.content and not x.content.startswith(f'{self.bot.command_prefix}{ctx.command.name}'):
+                        assembler.insert(0, x.content)
+                else: break
 
-                if start is True:
-                    if x.content != f'{self.bot.command_prefix}assemble':
-                        test += f'{x.content} '
-            await ctx.send(test)
+            if assembled := ' '.join(assembler):
+                await ctx.send(assembled)
+            else:
+                await ctx.send(f"There's nothing to {ctx.command.name}!")
 
 
 def setup(bot):
