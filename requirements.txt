@@ -6,3 +6,4 @@ PyNaCl
 flask
 httpx
 twitchio
+pyreadline; sys_platform == 'win32'

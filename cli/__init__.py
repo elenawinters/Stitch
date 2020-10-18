@@ -3,6 +3,7 @@ from core.color import trace
 from core.logger import log
 from core.utils import util
 import threading
+import readline
 import asyncio
 import time
 import sys
@@ -20,5 +21,7 @@ class Initialize():
         [thread.start() for thread in self.threads]
 
     def stitches(self):
-        for line in sys.stdin:
-            log.debug(line.replace('\n', ''))
+        while True:
+            log.debug(input())
+        # for line in sys.stdin:
+        #     log.debug(line.replace('\n', ''))
