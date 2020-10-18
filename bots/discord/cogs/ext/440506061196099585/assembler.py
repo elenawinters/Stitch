@@ -1,8 +1,6 @@
 from discord.ext import commands
 from ....core import decorators
 from ....core.tools import tls
-from core.logger import log
-import discord
 
 
 class Ext(commands.Cog):
