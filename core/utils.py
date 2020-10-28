@@ -124,7 +124,7 @@ class Utils:
     def abspath(self):
         return os.path.abspath('')
 
-    def imports(self, fpath, folder):  # Get specific subfolder
+    def imports(self, fpath, folder=''):  # Get specific subfolder
         path = os.path.join(fpath, folder)
         return [self.split(os.path.join(root, name), self.abspath(), 1).replace('\\', '.')[:-3]
                 for root, dirs, files in os.walk(path) for name in files

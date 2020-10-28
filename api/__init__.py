@@ -1,4 +1,4 @@
-from .api import app, logger
+from .web.api import app, logger
 from core import json
 import threading
 import importlib
@@ -10,7 +10,7 @@ class Initialize():
         [thread.start() for thread in self.threads]
 
     def run(self):
-        try:  # Start API
+        try:  # Start Web API
             app.run(host=json.orm['api']['host'], port=json.orm['api']['port'])
         except Exception as exc:
             logger.log.exception(exc)

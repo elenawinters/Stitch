@@ -1,4 +1,3 @@
-
 from core.color import trace
 from core.utils import util
 from core import json
@@ -67,7 +66,7 @@ class Logger():  # Define internal functions
 Logger.Initialize()
 settings = json.orm['settings']['logging']
 log = logging.getLogger('stitches')
-log.setLevel(logging.NOTSET)  # Void
+log.setLevel(logging.DEBUG)  # Void
 
 stream_formatter = logging.Formatter('%(time)s [%(thrcol)s%(threadName)s%(reset)s] %(color)s%(message)s%(end)s')
 stream = logging.StreamHandler(sys.stdout)

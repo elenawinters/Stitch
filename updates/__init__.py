@@ -13,7 +13,6 @@ class Initialize():  # Yes, I'm addicted to list comprehensions - EW
     def __init__(self):  # Run every function in this class on a different thread
         funcs = util.hack_the_planet()
         [threading.Thread(target=funcs[x], args=(self,), daemon=True, name=f'Updates-{x+1}').start() for x in range(len(funcs))]
-        self.threads = []  # We don't return any threads since these are discarded after the functions are completed
 
     def check_for_package_updates(self):
         log.warn(f'{trace.warn}Checking for updates. This may take a minute.')

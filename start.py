@@ -5,6 +5,7 @@ import os
 
 # Restart loop, so if program stops, it restarts
 if __name__ == '__main__':
+	# log.debug(f'Starting at {__file__}')
 	if sys.platform == "win32":
 		ctypes.windll.kernel32.SetConsoleTitleW("| Stitch")
 	elif sys.platform in ['linux', 'linux2', 'darwin']:
