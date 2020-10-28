@@ -13,6 +13,7 @@ class Initialize():
         mods = []
         for x in utils.util.scan('__init__.py'):
             mod = importlib.import_module(x, utils.util.abspath())
+            # priortity = (2 - 2**-23) * 2**127
             priority = 9223372036854775807
             if hasattr(mod, 'priority'):
                 priority = mod.priority

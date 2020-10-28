@@ -21,7 +21,7 @@ import sys
 
 
 if __name__ == '__main__':
-    # queue([])  # Create queue
+    # queue.assign([])  # Create queue
 
     # Start threads
     threads = manager.Initialize().threads
@@ -30,7 +30,7 @@ if __name__ == '__main__':
     # host = json.orm['api']  # Post current time to api
     # web.Client(f"http://{host['host']}:{host['port']}/uptime/").post({'uptime': str(datetime.datetime.utcnow())})
 
-    # debug.Initialize()  # Run debugging functions
+    debug.Initialize()  # Run debugging functions
     if len(threads) > 0:
         while all(x.is_alive() for x in threads):  # Kill program if a thread dies
             # log.debug(queue())

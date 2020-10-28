@@ -52,25 +52,64 @@ class Utils:
             err = self.trace()
             return f"{err[0].__name__}: {err[1]}"
 
-    class switch(object):  # https://stackoverflow.com/a/6606540/14125122
+    class switch:  # https://stackoverflow.com/a/6606540/14125122
         def __init__(self, value):
             self.value = value
-            self.fall = False
+            self._entered = False
+            self._broken = False
+            self._prev = None
 
-        def __iter__(self):
-            """Return the match method once, then stop"""
-            yield self.match
-            raise StopIteration
+        def __enter__(self):
+            return self
 
-        def match(self, *args):
-            """Indicate whether or not to enter a case suite"""
-            if self.fall or not args:
-                return True
-            elif self.value in args:
-                self.fall = True
-                return True
-            else:
+        def __exit__(self, type, value, traceback):
+            return False  # Allows a traceback to occur
+
+        def __call__(self, *values):
+            if self._broken:
                 return False
+
+            if not self._entered:
+                if values and self.value not in values:
+                    return False
+                self._entered, self._prev = True, values
+                return True
+
+            if self._prev is None:
+                self._prev = values
+                return True
+
+            if self._prev != values:
+                self._broken = True
+                return False
+
+            if self._prev == values:
+                self._prev = None
+                return False
+
+        @property
+        def default(self):
+            return self()
+
+    # class switch(object):  # https://stackoverflow.com/a/6606540/14125122
+    #     def __init__(self, value):
+    #         self.value = value
+    #         self.fall = False
+
+    #     def __iter__(self):
+    #         """Return the match method once, then stop"""
+    #         yield self.match
+    #         raise StopIteration
+
+    #     def match(self, *args):
+    #         """Indicate whether or not to enter a case suite"""
+    #         if self.fall or not args:
+    #             return True
+    #         elif self.value in args:
+    #             self.fall = True
+    #             return True
+    #         else:
+    #             return False
 
     def crypt(self, s):
         x = []
