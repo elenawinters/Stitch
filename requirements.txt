@@ -7,3 +7,4 @@ flask
 httpx
 twitchio
 pyreadline; sys_platform == 'win32'
+python-fity3

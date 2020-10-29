@@ -2,6 +2,7 @@ from core.logger import log
 from core.utils import util
 import threading
 import inspect
+import fity3
 import time
 
 
@@ -15,19 +16,23 @@ class Queue:
         if not isinstance(queue, type(None)):
             self.queue = queue
 
+    def snowflake(self):
+        return next(fity3.generator(0))
+
     def ident(self):
         thread = threading.current_thread().getName().split('-')[0]
         loc = inspect.stack()[2][1].split('\\')[-1].split('.')[0]
         return (thread + '.' + loc).lower()
 
-    def send(self, receiver, message, expire=5):
+    def send(self, receiver, message, expire=30):
         self.queue.append({
-            'id': time.time_ns(),
+            'id': self.snowflake(),
             'sender': self.ident(),
             'receiver': receiver.lower(),
             'message': message,
             'expire': time.time() + expire
         })
+        log.debug(self.queue[-1])
 
     def mark(self, id):
         self.seen.append(tuple([threading.current_thread().ident, id]))
