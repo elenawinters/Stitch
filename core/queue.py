@@ -30,19 +30,17 @@ class Queue:
         })
 
     def mark(self, id):
-        self.seen.append(tuple(threading.current_thread().ident, id))
+        self.seen.append(tuple([threading.current_thread().ident, id]))
 
     def verify(self, id):
-        return (tuple(threading.current_thread().ident, id) in self.seen)
+        return (tuple([threading.current_thread().ident, id]) in self.seen)
 
     def listen(self, expire=None):
         start = time.time()
         while True:
             for x in range(len(q := self.queue)):
                 if q[x]['expire'] < time.time():
-                    for y in range(len(s := self.seen)):
-                        if y[s][1] == q[x]['id']:
-                            del self.seen[s]
+                    self.seen = [y for y in self.seen if y[1] != q[x]['id']]
                     del self.queue[x]
                     break
 

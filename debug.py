@@ -1,4 +1,4 @@
-# from core.queue import queue
+from core.queue import queue
 from core.logger import log
 from core.utils import util
 from dateutil import parser
@@ -26,12 +26,12 @@ class Initialize():  # Runtime debug
         log.debug(threading.current_thread().ident)
         # print(q.get())
         # self.queue.task_done()
-        # queue.send('Debug.debug', 'what')
-        # queue.send('Debug.debug', 'are')
-        # queue.send('Debug.debug', 'you')
-        # queue.send('Debug.debug', 'looking')
-        # queue.send('Debug.debug', 'at', 9)
-        # queue.send('Debug-6.debug', 'at', 9)
+        queue.send('Debug.debug', 'what')
+        queue.send('Debug.debug', 'are')
+        queue.send('Debug.debug', 'you')
+        queue.send('Debug.debug', 'looking')
+        queue.send('Debug.debug', 'at', 9)
+        queue.send('Debug-6.debug', 'at', 9)
 
         # queue().append('test')
         # log.debug(queue.q())
@@ -46,10 +46,10 @@ class Initialize():  # Runtime debug
         # }
         # )
 
-    # def test2(self):
-    #     if item := queue.listen():
-    #         log.debug(item)
-        # log.debug(queue.listen(5))
+    def test2(self):
+        if item := queue.listen():
+            log.debug(item)
+        log.debug(queue.listen(5))
 
         # time.sleep(5)
         # queue.listen()
@@ -57,10 +57,10 @@ class Initialize():  # Runtime debug
         # log.debug(queue.q())
         # pass
 
-    # def test3(self):
-    #     time.sleep(7)
-    #     if item := queue.listen():
-    #         log.debug(item)
+    def test3(self):
+        time.sleep(7)
+        if item := queue.listen():
+            log.debug(item)
 
     # def test4(self):
     #     time.sleep(7)
@@ -71,10 +71,11 @@ class Initialize():  # Runtime debug
     #     if item := queue.listen():
     #         log.debug(item)
 
-    # def test6(self):
-    #     if item := queue.listen():
-    #         log.debug(item)
+    def test6(self):
+        if item := queue.listen():
+            log.debug(item)
 
-    # def test7(self):
-    #     time.sleep(12)
-    #     log.debug(queue.queue)
+    def test7(self):
+        time.sleep(12)
+        log.debug(queue.queue)
+        log.debug(queue.seen)
