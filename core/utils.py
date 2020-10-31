@@ -3,6 +3,7 @@ from core import logger
 import traceback
 import inspect
 import random
+import string
 import types
 import sys
 import re
@@ -133,6 +134,9 @@ class Utils:
                 if name not in ignores and not name.startswith('__') and not name.endswith('__'):
                     funcs.append(run)
         return funcs
+
+    def random_string(self, **kwargs):
+        return ''.join(random.choice(string.ascii_letters + string.digits) for i in range(random.randint(kwargs.get('min', 1), kwargs.get('max', 25))))
 
     def split(self, string, remove, offset=0):
         return string[len(f'{remove}') + offset:]

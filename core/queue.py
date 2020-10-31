@@ -1,3 +1,14 @@
+"""
+    Set custom variables for this class by following this example: https://stackoverflow.com/a/8307639/14125122
+
+    Use queue.__class__ to get the class object and use setattr(class_object, variable, value)
+
+    For example, "setattr(queue, mod, 0)" sets the variable mod of class queue (the class below) to 0
+
+    This could theoretically be set to a class to allow for further setattr action
+
+"""
+
 from core.logger import log
 from core.utils import util
 import threading
@@ -15,6 +26,7 @@ class Queue:
     def assign(self, queue):  # Override
         if not isinstance(queue, type(None)):
             self.queue = queue
+            self.seen = []
 
     def snowflake(self):
         return next(fity3.generator(0))
@@ -25,14 +37,18 @@ class Queue:
         return (thread + '.' + loc).lower()
 
     def send(self, receiver, message, expire=30):
-        self.queue.append({
+        ident = self.ident()
+        rec = receiver.lower()
+        if ident == rec: return
+        _dict = {
             'id': self.snowflake(),
-            'sender': self.ident(),
-            'receiver': receiver.lower(),
+            'sender': ident,
+            'receiver': rec,
             'message': message,
             'expire': time.time() + expire
-        })
-        log.debug(self.queue[-1])
+        }
+        self.queue.append(_dict)
+        return _dict
 
     def mark(self, id):
         self.seen.append(tuple([threading.current_thread().ident, id]))
@@ -40,9 +56,16 @@ class Queue:
     def verify(self, id):
         return (tuple([threading.current_thread().ident, id]) in self.seen)
 
-    def listen(self, expire=None):
+    def listen(self, expire=None, rate=20):
+        # log.debug(self.ident())
+        """
+            Set expiration if you need to have this in your own loops.
+            Setting to 0 will cause it to exit loop as soon as it can.
+
+            This needs to be optimized.
+        """
         start = time.time()
-        while True:
+        while True:  # <- This will likely cause issues.
             for x in range(len(q := self.queue)):
                 if q[x]['expire'] < time.time():
                     self.seen = [y for y in self.seen if y[1] != q[x]['id']]
@@ -55,8 +78,10 @@ class Queue:
                     self.mark(q[x]['id'])
                     return q[x]
 
-                if expire and (expire + start) < time.time():
+                if not isinstance(expire, type(None)) and (expire + start) < time.time():
                     return None
+
+            time.sleep(1 / rate)  # Rate is 1 second divided by times per second
 
 
 queue = Queue()
