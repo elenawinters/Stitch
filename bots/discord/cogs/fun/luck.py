@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from core.ext import assets
+from core import assets
 from core.bot.tools import tls
 import core.checks
 import random

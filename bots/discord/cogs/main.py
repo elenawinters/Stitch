@@ -1,8 +1,10 @@
 import discord
 from discord.ext import commands
 from core.logger import log, trace
+from ..core import decorators
 from ..core.tools import tls
 from data.data import data
+from core import web, json
 import core.time
 import traceback
 import random
@@ -46,7 +48,7 @@ class Stitch(commands.Cog):
             if delete_invalid_command:
                 com_name = list(ctx.message.content)
                 if len(com_name) > 0:
-                    if com_name[0] == self.bot.command_prefix and len(com_name) > 1:
+                    if com_name[0] == self.bot.command_prefix(self.bot, ctx.message) and len(com_name) > 1:
                         if re.match(r'[a-zA-Z]', com_name[1]):  # IS IN COMMAND FORMAT?
                             try:
                                 await ctx.message.delete()
@@ -57,7 +59,7 @@ class Stitch(commands.Cog):
                                 ccom = ast.literal_eval(data.base['ccom'].find_one(server=ctx.guild.id)['commands'])
                             except Exception:  # Whatever the exception, move on. People who use this base might not have cComs.
                                 ccom = {}
-                            cname = tls.split(ctx.message.content, f'{self.bot.command_prefix}').split(' ')[0]
+                            cname = tls.split(ctx.message.content, f'{self.bot.command_prefix(self.bot, ctx.message)}').split(' ')[0]
                             if cname not in ccom:
                                 return await ctx.send(f'Sorry {ctx.message.author.mention}, but the given command does not currently exist!')
 
@@ -90,6 +92,22 @@ class Stitch(commands.Cog):
         log.error(f'> {trace.red}{event.capitalize()}{trace.alert} encountered {trace.red}'
                   f'{exc[0].__name__}{trace.alert} with message {trace.red}{exc[1]}')
         log.exception(**tls.Traceback(exc).code())
+
+    @commands.command()
+    @commands.guild_only()
+    @decorators.permissions(3)
+    async def prefix(self, ctx, prefix):
+        form = dict(platform='discord', type='prefix', id=ctx.guild.id)
+        if self.bot.command_prefix(self.bot, ctx.message) == prefix: return
+        if json.orm['discord']['prefixes']['default'] == prefix:
+            data.base['cache'].delete(**form)
+            embed = tls.Embed(ctx, title='Deleted guld prefix', description=f'Default Prefix: `{prefix}`', timestamp=True)
+        else:
+            data.base['cache'].upsert(dict(**form, data=prefix), ['id'])
+            embed = tls.Embed(ctx, title='Updated guld prefix', description=f'New Prefix: `{prefix}`', timestamp=True)
+
+        embed.set_author(name=ctx.author.nick or ctx.author.name, icon_url=ctx.author.avatar_url, url=f'https://discord.com/users/{ctx.author.id}')
+        await ctx.send(embed=embed)
 
 
 def setup(bot):

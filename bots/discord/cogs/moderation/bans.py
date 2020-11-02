@@ -1,8 +1,7 @@
 import discord
 from discord.ext import commands
-from core.bot import funcs
-from core.bot import perms
-from core.bot.tools import tls
+from ...core import decorators
+from ...core.tools import tls
 from core.logger import log
 from data.data import data
 from core import time
@@ -19,22 +18,18 @@ class Moderation(commands.Cog):
         self.bot = bot
 
     @commands.command(aliases=['ban', 'hban'])
-    @commands.has_permissions(ban_members=True)
-    @core.checks.is_banned()  # Simple hackban
+    @commands.check_any(decorators.permissions(3), commands.has_permissions(ban_members=True), decorators.banned())
     async def hackban(self, ctx, snowflake, *, reason='User was hackbanned'):
         try:
-            await ctx.guild.ban(tls.Snowflake(snowflake), delete_message_days=0, reason=reason)
+            await ctx.guild.ban(discord.Object(snowflake), delete_message_days=0, reason=reason)
             await ctx.send(f'Hackbanned <@!{snowflake}> with reason `{reason}`.')
-        except discord.Forbidden as err:
-            await funcs.respond(ctx, err)
-        except discord.HTTPException as err:
-            await funcs.respond(ctx, err)
+        except (discord.Forbidden, discord.HTTPException) as exc:
+            await tls.Message.respond(ctx, exc)
         except Exception as err:
             log.exception(err)
 
     @commands.command(aliases=['gban'])
-    @core.checks.is_banned()  # To globally ban an account. (complicated D: )
-    @commands.check_any(commands.is_owner(), core.checks.ban_assitant())
+    @commands.check_any(decorators.permissions(1), decorators.banned())
     async def globalban(self, ctx, snowflake, *, reason='User was globally banned'):
         ban = data.base['bans'].find_one(id=snowflake)
         if not ban:  # If None, ban
@@ -84,7 +79,7 @@ async def ban_attempt(self, guild, snowflake):
                 log.debug(f'Attempting ban on {snowflake}')
 
             # Attempt ban
-            await guild.ban(tls.Snowflake(snowflake), delete_message_days=0, reason=ban[str(snowflake)]['reason'])
+            await guild.ban(discord.Object(snowflake), delete_message_days=0, reason=ban[str(snowflake)]['reason'])
 
             if bDebug:  # reee cant make it 1 line
                 log.debug(f'Ban success on {snowflake}')
@@ -99,7 +94,7 @@ async def ban_attempt(self, guild, snowflake):
                 log.debug(f'Attempting kick on {snowflake}')
 
             # Attempt kick
-            await guild.kick(tls.Snowflake(snowflake), reason=ban[str(snowflake)]['reason'])
+            await guild.kick(discord.Object(snowflake), reason=ban[str(snowflake)]['reason'])
 
             if bDebug:
                 log.debug(f'Kick success on {snowflake}')

@@ -9,9 +9,14 @@ class Initialize():
     def __init__(self):
         patches = util.imports(util.path(__file__), '')
         for x in patches:
-            log.debug(f"Patching {x.split('.')[-1]}")
             try:
-                importlib.import_module(x, util.abspath()).patch()
+                patch = importlib.import_module(x, util.abspath()).patch()
+                if hasattr(patch, 'response'):
+                    if not isinstance(patch.response, type(None)):
+                        log.debug(patch.response)
+                else:
+                    log.debug(f"Patching {x.split('.')[-1]}")
             except Exception as exc:
                 log.exception(exc)
+
         self.response = f'Completed {len(patches)} patches'

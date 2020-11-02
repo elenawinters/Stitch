@@ -167,11 +167,11 @@ class Utils:
     def abspath(self):
         return os.path.abspath('')
 
-    def imports(self, fpath, folder=''):  # Get specific subfolder
+    def imports(self, fpath, folder='', ext='.py'):  # Get specific subfolder
         path = os.path.join(fpath, folder)
-        return [self.split(os.path.join(root, name), self.abspath(), 1).replace('\\', '.')[:-3]
+        return [self.split(os.path.join(root, name), self.abspath(), 1).replace('\\', '.')[:-len(ext)]
                 for root, dirs, files in os.walk(path) for name in files
-                if name.endswith('.py') and not name.endswith('__init__.py')]
+                if name.endswith(ext) and not name.endswith(f'__init__.py')]
 
     def scan(self, _file):  # Scan entire workspace for files
         return [self.split(os.path.join(root, name), self.abspath(), 1).replace('\\', '.')[:-3]

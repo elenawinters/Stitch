@@ -22,7 +22,7 @@ class Load:
             log.warning(f'Failed to load extension {x}')
             log.error(self.exc[x])
 
-        count = len(self.exc) - len(self.client.extensions)
+        count = len(self.exc)
         if count == 1: log.error(f'> Failed to load {trace.yellow.s}{count}{trace.cyan} extension.')
         else: log.error(f'> Failed to load {trace.yellow.s}{count}{trace.cyan} extensions.')
         log.info(f'{trace.cyan}> Loaded {trace.yellow.s}{len(self.client.extensions)}{trace.cyan} extensions!')

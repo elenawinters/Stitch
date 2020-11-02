@@ -234,8 +234,8 @@ async def on_live(self, ctv_channel):
         for x in guilds:
             gid = data.base['ctv_guilds'].find_one(guild=x.id)
             if gid:  # do some list comprehension stuff
-                give_roles = [tls.Snowflake(r) for r in ast.literal_eval(gid['give_roles'])]
-                has_roles = [tls.Snowflake(r) for r in ast.literal_eval(gid['has_roles'])]
+                give_roles = [discord.Object(r) for r in ast.literal_eval(gid['give_roles'])]
+                has_roles = [discord.Object(r) for r in ast.literal_eval(gid['has_roles'])]
 
                 member = x.get_member(did['discorduid'])
                 if [y for y in member.roles for x in has_roles if y.id == x.id]:
@@ -250,7 +250,7 @@ async def on_offline(self, ctv_channel):
         for x in guilds:
             gid = data.base['ctv_guilds'].find_one(guild=x.id)
             if gid:  # do some list comprehension stuff again
-                give_roles = [tls.Snowflake(r) for r in ast.literal_eval(gid['give_roles'])]
+                give_roles = [discord.Object(r) for r in ast.literal_eval(gid['give_roles'])]
 
                 member = x.get_member(did['discorduid'])
                 if [y for y in member.roles for x in give_roles if y.id == x.id]:
@@ -267,7 +267,7 @@ async def reset(self):
             gid = data.base['ctv_guilds'].find_one(guild=x.id)
             if gid:
                 for m in x.members:
-                    roles = [tls.Snowflake(r) for r in ast.literal_eval(gid['give_roles'])]
+                    roles = [discord.Object(r) for r in ast.literal_eval(gid['give_roles'])]
                     if [y for y in m.roles for x in roles if y.id == x.id]:
                         await m.remove_roles(*roles)
 

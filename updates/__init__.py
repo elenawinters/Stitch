@@ -26,7 +26,3 @@ class Initialize():  # Yes, I'm addicted to list comprehensions - EW
         upd = [x for x in pipreqs for y in reqs if x['name'].lower() == y.lower()]
         log.warn(f"Found updates for '{len(upd)}' module(s).")
         [log.warn(f"{trace.warn}{x['name'].capitalize()} v{x['latest_version']} is available (v{x['version']} installed).") for x in upd]
-
-    def update_settings_file(self):  # TODO: update settings file if revision number does not match
-        log.debug('Update settings file')
-        pass
