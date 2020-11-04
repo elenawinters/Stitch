@@ -1,4 +1,5 @@
 from core.logger import log, trace, json
+import inspect
 import httpx
 import os
 
@@ -6,6 +7,7 @@ httpxcept = (httpx._exceptions.WriteError,
              httpx._exceptions.ConnectTimeout,
              httpx._exceptions.ReadTimeout,
              httpx._exceptions.ConnectError,
+             ConnectionResetError,
              Exception)
 
 
@@ -23,17 +25,9 @@ class Client:
                 with httpx.Client() as client:
                     client.post(url=self.url, json=_json)
                 return
+
             except httpxcept as exc:
                 self.process(exc)
-            # except httpx._exceptions.WriteError:
-            #     log.error(f'[POST] {self.url} Write Error (Attempt #{x})')
-            # except httpx._exceptions.ConnectTimeout:
-            #     log.error(f'[POST] {self.url} Connect Timeout (Attempt #{x})')
-            # except httpx._exceptions.ReadTimeout:
-            #     log.error(f'[POST] {self.url} Read Timeout (Attempt #{x})')
-            # except Exception as exc:
-            #     log.exception(exc)
-        log.error(f'[POST] {self.url} failed after {self.limit} attempts')
 
     def get(self, header=None):
         for x in range(1, self.limit + 1):
@@ -41,15 +35,10 @@ class Client:
                 with httpx.Client() as client:
                     r = client.get(url=self.url, headers=header)
                 return r
+
             except _exc as exc:
-                log.error('Web exception occured')
-            # except httpx._exceptions.ConnectTimeout:
-            #     log.error(f'[GET] {self.url} Connect Timeout (Attempt #{x})')
-            # except httpx._exceptions.ReadTimeout:
-            #     log.error(f'[GET] {self.url} Read Timeout (Attempt #{x})')
-            # except Exception as exc:
-            #     log.exception(exc)
-        log.error(f'[GET] {self.url} failed after {self.limit} attempts')
+                self.process(exc)
+
         return None
 
     async def async_post(self, _json: dict):
@@ -58,16 +47,9 @@ class Client:
                 async with httpx.AsyncClient() as client:
                     await client.post(url=self.url, json=_json)
                 return
-            except httpx._exceptions.WriteError as exc:
-                log.error(f'[POST] {self.url} Write Error (Attempt #{x})')
-                # log.exception(exc)
-            except httpx._exceptions.ConnectTimeout:
-                log.error(f'[POST] {self.url} Connect Timeout (Attempt #{x})')
-            except httpx._exceptions.ReadTimeout:
-                log.error(f'[POST] {self.url} Read Timeout (Attempt #{x})')
-            except Exception as exc:
-                log.exception(exc)
-        log.error(f'[POST] {self.url} failed after {self.limit} attempts')
+
+            except _exc as exc:
+                self.process(exc)
 
     async def async_get(self):
         for x in range(1, self.limit + 1):
@@ -75,13 +57,10 @@ class Client:
                 async with httpx.AsyncClient() as client:
                     r = await client.get(url=self.url)
                 return r
-            except httpx._exceptions.ConnectTimeout:
-                log.error(f'[GET] {self.url} Connect Timeout (Attempt #{x})')
-            except httpx._exceptions.ReadTimeout:
-                log.error(f'[GET] {self.url} Read Timeout (Attempt #{x})')
-            except Exception as exc:
-                log.exception(exc)
-        log.error(f'[GET] {self.url} failed after {self.limit} attempts')
+
+            except _exc as exc:
+                self.process(exc)
+
         return None
 
 

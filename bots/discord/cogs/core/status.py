@@ -100,10 +100,10 @@ class Core(commands.Cog):
     # async def on_voice_state_update(self, member, before, after):
     #     await update(self)
 
-    # @commands.Cog.listener()
-    # async def on_ready(self):
-    #     # await asyncio.sleep(2)
-    #     await update(self)
+    @commands.Cog.listener()
+    async def on_ready(self):
+        # await asyncio.sleep(2)
+        await update(self)
 
 
 def setup(bot):
@@ -126,5 +126,6 @@ async def update(self):
         }
     }
 
-    host = json.orm['api']
-    await web.Client(f"http://{host['host']}:{host['port']}/stat/").async_post(send)
+    # host = json.orm['api']
+    await web.api('stat').async_post(send)
+    # await web.Client(f"http://{host['host']}:{host['port']}/stat/").async_post(send)

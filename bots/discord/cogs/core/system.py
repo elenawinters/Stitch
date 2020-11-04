@@ -4,6 +4,8 @@ from core.color import trace
 # from core.bot.funcs import *
 from ...core.tools import tls
 from core.logger import log
+from ... import loader
+import time
 
 
 class Core(commands.Cog, command_attrs=dict(hidden=True)):
@@ -45,63 +47,68 @@ class Core(commands.Cog, command_attrs=dict(hidden=True)):
 
     @commands.command(aliases=['refresh'])
     @commands.is_owner()  # I hate this command.
-    async def reload(self, ctx, arg='silent'):
-        warnings = []
-        loading = []
-        unloaded = []
-        import time
-        before = time.monotonic()
+    async def reload(self, ctx):
         log.info(f'{trace.red.s}> Reloading Extensions')
-        loaded = []
-        for x in self.bot.extensions:
-            loaded.append(x)
-        cogs = extensions()
-        for x in cogs:
-            if x in loaded:
-                try:
-                    self.bot.reload_extension(x)
-                    if not arg == 'silent':
-                        log.info(f'{trace.cyan}> Reloaded {trace.yellow.s}{x}')
-                    loaded.remove(x)
-                except Exception as e:
-                    warnings.append(f'Failed to reload extension {x}.\n{e}')
-            elif x not in loaded:
-                try:
-                    self.bot.load_extension(x)
-                    loading.append(x)
-                except Exception as e:
-                    warnings.append(f'Failed to load extension {x}.\n{e}')
+        before = time.monotonic()
+        loader.Load(self.bot).reload()
+        ping = round((time.monotonic() - before) * 1000)
+        await ctx.send(f'Extensions reloaded. ({len(self.bot.extensions)}) (`{ping}ms`)')
+        # warnings = []
+        # loading = []
+        # unloaded = []
+        # import time
+        # before = time.monotonic()
+        # log.info(f'{trace.red.s}> Reloading Extensions')
+        # loaded = []
+        # for x in self.bot.extensions:
+        #     loaded.append(x)
+        # cogs = extensions()
+        # for x in cogs:
+        #     if x in loaded:
+        #         try:
+        #             self.bot.reload_extension(x)
+        #             if not arg == 'silent':
+        #                 log.info(f'{trace.cyan}> Reloaded {trace.yellow.s}{x}')
+        #             loaded.remove(x)
+        #         except Exception as e:
+        #             warnings.append(f'Failed to reload extension {x}.\n{e}')
+        #     elif x not in loaded:
+        #         try:
+        #             self.bot.load_extension(x)
+        #             loading.append(x)
+        #         except Exception as e:
+        #             warnings.append(f'Failed to load extension {x}.\n{e}')
 
-        for x in loaded:
-            try:
-                self.bot.unload_extension(x)
-                unloaded.append(x)
-                loaded.remove(x)
-            except Exception as e:
-                warnings.append(f'Failed to unload extension {x}.\n{e}')
+        # for x in loaded:
+        #     try:
+        #         self.bot.unload_extension(x)
+        #         unloaded.append(x)
+        #         loaded.remove(x)
+        #     except Exception as e:
+        #         warnings.append(f'Failed to unload extension {x}.\n{e}')
 
-        if not cogs:
-            log.warn('No extensions were found.')
-        else:
-            for x in loading:
-                log.warn(f'> Loaded {x}')
-            for x in unloaded:
-                log.error(f'> Unloaded {x}')
-            for x in warnings:
-                y = x.split('\n')
-                log.warn(f'> {y[0]}')
-                log.error(f'> {y[1]}')
-            ping = round((time.monotonic() - before) * 1000)
-            log.info(f'{trace.cyan}> Reloaded {trace.yellow.s}{len(self.bot.extensions)} extensions {trace.cyan}in {trace.yellow.s}{ping}ms{trace.cyan}.')
-            await ctx.send(f'Extensions reloaded. ({len(self.bot.extensions)}) (`{ping}ms`)')
-            from core import json
-            json.json()  # Reload memory
-            from core.bot.login import version
-            version.Discord.latest()  # Check for updates for Discord.py
-            version.YouTubeDL.latest()  # Check for updates for YouTubeDL
-            await tls.Activity.preset(self.bot)  # Update activity
-            # activity = tls.Activity.from_dict(json.orm['activity'])
-            # await self.bot.change_presence(activity=activity)  # Update activity
+        # if not cogs:
+        #     log.warn('No extensions were found.')
+        # else:
+        #     for x in loading:
+        #         log.warn(f'> Loaded {x}')
+        #     for x in unloaded:
+        #         log.error(f'> Unloaded {x}')
+        #     for x in warnings:
+        #         y = x.split('\n')
+        #         log.warn(f'> {y[0]}')
+        #         log.error(f'> {y[1]}')
+        #     ping = round((time.monotonic() - before) * 1000)
+        #     log.info(f'{trace.cyan}> Reloaded {trace.yellow.s}{len(self.bot.extensions)} extensions {trace.cyan}in {trace.yellow.s}{ping}ms{trace.cyan}.')
+        #     await ctx.send(f'Extensions reloaded. ({len(self.bot.extensions)}) (`{ping}ms`)')
+        #     from core import json
+        #     json.json()  # Reload memory
+        #     from core.bot.login import version
+        #     version.Discord.latest()  # Check for updates for Discord.py
+        #     version.YouTubeDL.latest()  # Check for updates for YouTubeDL
+        #     await tls.Activity.preset(self.bot)  # Update activity
+        #     # activity = tls.Activity.from_dict(json.orm['activity'])
+        #     # await self.bot.change_presence(activity=activity)  # Update activity
 
     @commands.command()
     @commands.is_owner()
@@ -114,7 +121,7 @@ class Core(commands.Cog, command_attrs=dict(hidden=True)):
         await tls.Voice(ctx).disconnect()
         await self.bot.close()
 
-    @commands.command(aliases=['lockdown', 'lock', 'halt'])
+    @commands.command(aliases=['lockdown', 'lock', 'halt', 'quarantine'])
     @commands.is_owner()
     async def quit(self, ctx):
         for x in self.bot.commands:

@@ -4,10 +4,13 @@ settings = {
     'discord': {
         'prefix': '.',
         'tokens': [],
-        'default': {
-            'activity': {
-                'name': 'games',
-                'type': 0
+        'presence': {
+            'default': {
+                'status': 'online',
+                'activity': {
+                    'name': 'games',
+                    'type': 0
+                }
             }
         }
     },

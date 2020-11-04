@@ -10,18 +10,8 @@ first = True
 bans = {}
 
 
-@app.route("/bans/assist")
-def ban_assistants():
-    json.orm['permissions']
-    f = 'application/api/ext/ban_assist.json'
-    if not json.external.exists():
-        json.external.write([], files=files)
-    assists = json.external.loads(files=files)
-    return base(assists, request)
-
-
-@app.route("/bans/list")  # Use this to prevent the database blocking
-def ban_list():
+@app.route("/bans")  # Use this to prevent the database blocking
+def bans():
     global rate
     global bans
     global first

@@ -18,12 +18,12 @@ class Utils:
         def __init__(self, enum):
             self.enum = enum
 
-        def find(self, fetch):
-            fetch = str(fetch).lower()
-            for x in self.enum.__members__.items():
-                if fetch == str(x[1].value) or fetch == str(x[1]) or fetch == str(x[0]):
-                    return x[1]
-            return self.enum.default  # Only meant to beused with enums that have a default entry. if no default entry, an error will be thrown.
+        def find(self, fetch, default='default'):
+            # fetch = str(fetch).lower()
+            # for x in self.enum.__members__.items():
+            #     if fetch == str(x[1].value) or fetch == str(x[1]) or fetch == str(x[0]):
+            #         return x[1]
+            return getattr(self.enum, fetch, default)
 
     class Traceback:
         def __init__(self, exc):
@@ -181,3 +181,4 @@ class Utils:
 
 utils = Utils()
 util = Utils()
+utl = Utils()

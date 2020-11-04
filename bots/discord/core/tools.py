@@ -95,8 +95,14 @@ class DiscordTools(utils.Utils):  # Discord utils
         @classmethod
         async def preset(cls, bot):
             from core import json
-            activity = tls.Activity.from_dict(json.orm['discord']['activity'].get(str(bot.user.id), json.orm['discord']['activity']['default']))
-            await bot.change_presence(activity=activity)
+            status = json.orm['discord']['presence'].get(str(bot.user.id), 'default').get('status', json.orm['discord']['presence']['default']['status'])
+            activity = tls.Activity.from_dict(json.orm['discord']['presence'].get(str(bot.user.id), 'default').get('activity'))
+            await bot.change_presence(activity=activity, status=getattr(discord.Status, status, 'online'))
+            return activity, status
+
+        @classmethod
+        async def refresh(cls, bot):
+            return await cls.preset(bot)
 
     class Users:
         @classmethod

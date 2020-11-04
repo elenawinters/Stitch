@@ -17,7 +17,8 @@ class LogLevel(enum.Enum):
     warn = logging.WARN  # 30
     error = logging.ERROR  # 40
     critical = logging.CRITICAL  # 50
-    default = info  # 20, required by tls.Enums to be set
+    default = info  # 20
+    notset = none  # 0
 
 
 class StreamRecords(logging.Filter):
