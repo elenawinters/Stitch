@@ -66,8 +66,8 @@ class Client:
 
 class API(Client):
     def __init__(self, loc='', **kwargs):
-        _pre = f"http://{json.orm['api']['host']}:{json.orm['api']['port']}/{loc}"
-        super().__init__(_pre, **kwargs)
+        pre = f"http://{json.orm['api']['host']}:{json.orm['api']['port']}/{loc}"
+        super().__init__(pre, **kwargs)
 
 
 api = API

@@ -60,7 +60,7 @@ class ORMFile(object):  # Why does this fucking work?
 
 class ORM(dict, ORMFile):  # This is a huge mess
     def __init__(self, file=default):
-        super(self.__class__, self).__init__(file=file)
+        super().__init__(file=file)
 
     def __getitem__(self, key):
         file = self.file()

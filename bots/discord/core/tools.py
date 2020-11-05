@@ -12,7 +12,7 @@ import os
 
 
 class DiscordTools(utils.Utils):  # Discord utils
-    def __init__(cls):  # inherit utils
+    def __init__(cls):  # inherit core.utils
         super().__init__()
 
     class Message:

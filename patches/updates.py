@@ -9,8 +9,8 @@ import ast
 import re
 
 
-class Initialize():  # Yes, I'm addicted to list comprehensions - EW
-    def __init__(self):  # Run every function in this class on a different thread
+class patch():
+    def __init__(self):
         funcs = util.hack_the_planet()
         [threading.Thread(target=funcs[x], args=(self,), daemon=True, name=f'Updates-{x+1}').start() for x in range(len(funcs))]
 
