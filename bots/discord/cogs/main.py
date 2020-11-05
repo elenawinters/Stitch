@@ -101,10 +101,10 @@ class Stitch(commands.Cog):
         if self.bot.command_prefix(self.bot, ctx.message) == prefix: return
         if json.orm['discord']['prefixes']['default'] == prefix:
             data.base['cache'].delete(**form)
-            embed = tls.Embed(ctx, title='Deleted guld prefix', description=f'Default Prefix: `{prefix}`', timestamp=True)
+            embed = tls.Embed(ctx, title='Deleted guild prefix', description=f'Default Prefix: `{prefix}`', timestamp=True)
         else:
             data.base['cache'].upsert(dict(**form, data=prefix), ['id'])
-            embed = tls.Embed(ctx, title='Updated guld prefix', description=f'New Prefix: `{prefix}`', timestamp=True)
+            embed = tls.Embed(ctx, title='Updated guild prefix', description=f'New Prefix: `{prefix}`', timestamp=True)
 
         embed.set_author(name=ctx.author.nick or ctx.author.name, icon_url=ctx.author.avatar_url, url=f'https://discord.com/users/{ctx.author.id}')
         await ctx.send(embed=embed)
