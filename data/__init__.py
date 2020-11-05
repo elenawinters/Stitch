@@ -1,7 +1,7 @@
 from core.logger import log, trace
 from .data import data
 
-priority = 0
+priority = 1
 
 
 class Initialize():
