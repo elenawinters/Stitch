@@ -36,6 +36,12 @@ class memory:
         return cls.memory
 
     @classmethod
+    def update(cls, file=default):
+        cls.exists()
+        cls.memory[file] = {}
+        cls.merge(file)
+
+    @classmethod
     def refresh(cls, file=default):
         cls.reload(file)
 

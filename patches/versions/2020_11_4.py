@@ -1,4 +1,3 @@
-from core.logger import log
 from core import json
 
 
@@ -10,6 +9,19 @@ from core import json
 
 class update():
     def __init__(self):
-        log.debug('here')
-        # for x in json.orm['discord']:
-        #     log.debug('here')
+        for k, v in json.orm['discord']['activity'].items():
+            json.orm['discord'] = {
+                'presence': {
+                    k: {
+                        'status': 'online',
+                        'activity': v
+                    }
+                }
+            }
+
+        js = json.external.loads()
+        del js['discord']['activity']
+        json.external.write(js)
+        json.memory.update()
+
+        json.orm['revision'] = '2020.11.4'
