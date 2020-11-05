@@ -9,22 +9,8 @@ import string
 import time
 import sys
 import ast
+import os
 import re
-
-
-letters = {l: i for i, l in enumerate(string.ascii_lowercase, start=1)}
-versions = ['.'.join(x.split('.')[-3:]) for x in util.imports(util.path(__file__), ext='.pyw')]
-
-
-def numeric(i):
-    s = list(i.split('.'))
-    if (l := s[-1]) in letters:
-        s.append(letters[l])
-    else:
-        s.append(letters['a'])
-
-    num = ''.join(f'{int(x):02d}' for x in s)
-    return num
 
 
 class patch():
@@ -48,13 +34,30 @@ class patch():
         threading.Thread(target=in_thread, daemon=True, name='Updates').start()
 
     def update_resources(self):
+        letters = {l: i for i, l in enumerate(string.ascii_lowercase, start=1)}
+        versions = [x.split('.')[-1] for x in util.imports(util.path(__file__), 'versions')]
+
+        def numeric(i):
+            s = list(i.split('_'))
+            if (l := s[-1]) in letters:
+                s.append(letters[l])
+            else:
+                s.append(letters['a'])
+
+            num = ''.join(f'{int(x):02d}' for x in s)
+            return num
+
         versions.sort(key=numeric)
-        log.debug(versions)
 
-        if versions[-1] == (rev := json.orm['revision']): return
+        if versions[-1] == (rev := json.orm['revision'].replace('.', '_')): return
         if rev not in versions: return
-        
-        log.debug('Revision update found. Updating.')
 
+        log.info('Revision update found. Updating.')
+
+        loc = os.path.basename(os.path.dirname(os.path.realpath(__file__))) + '.versions.'
         for x in versions[(versions.index(rev) + 1):]:
-            log.debug(x)
+            log.debug(f'Updating to {x}')
+            try:
+                importlib.import_module(loc + x, util.abspath()).update()
+            except Exception as exc:
+                log.critical(exc)
