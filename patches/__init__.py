@@ -7,7 +7,7 @@ priority = 0
 
 class Initialize():
     def __init__(self):
-        patches = util.imports(util.path(__file__), '')
+        patches = util.imports(util.path(__file__))
         for x in patches:
             try:
                 patch = importlib.import_module(x, util.abspath()).patch()

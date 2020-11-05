@@ -1,6 +1,7 @@
 from core.color import trace
 from core.logger import log
 from core.utils import util
+from core import json
 import subprocess
 import threading
 import importlib
@@ -12,12 +13,12 @@ import re
 
 
 letters = {l: i for i, l in enumerate(string.ascii_lowercase, start=1)}
-versions = [x for x in util.imports(util.path(__file__), '', '.pyw')]
+versions = ['.'.join(x.split('.')[-3:]) for x in util.imports(util.path(__file__), ext='.pyw')]
 
 
 def numeric(i):
-    s = i.split('.')[-3:]
-    if (l := list(''.join(s))[-1]) in letters:
+    s = list(i.split('.'))
+    if (l := s[-1]) in letters:
         s.append(letters[l])
     else:
         s.append(letters['a'])
@@ -47,6 +48,13 @@ class patch():
         threading.Thread(target=in_thread, daemon=True, name='Updates').start()
 
     def update_resources(self):
-        versions.sort(key=numeric, reverse=True)
-
+        versions.sort(key=numeric)
         log.debug(versions)
+
+        if versions[-1] == (rev := json.orm['revision']): return
+        if rev not in versions: return
+        
+        log.debug('Revision update found. Updating.')
+
+        for x in versions[(versions.index(rev) + 1):]:
+            log.debug(x)
