@@ -39,10 +39,13 @@ class patch():
 
         def numeric(i):
             s = list(i.split('_'))
-            if (l := s[-1]) in letters:
+            if (l := s[-1][-1]) in letters:
+                s.append(s.pop(2)[:-1])
                 s.append(letters[l])
             else:
                 s.append(letters['a'])
+
+            log.debug(s)
 
             num = ''.join(f'{int(x):02d}' for x in s)
             return num
@@ -56,7 +59,7 @@ class patch():
 
         loc = os.path.basename(os.path.dirname(os.path.realpath(__file__))) + '.versions.'
         for x in versions[(versions.index(rev) + 1):]:
-            log.debug(f'Updating to {x}')
+            log.debug(f"Updating to {x.replace('_', '.')}")
             try:
                 importlib.import_module(loc + x, util.abspath()).update()
             except Exception as exc:

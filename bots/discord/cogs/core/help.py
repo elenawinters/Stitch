@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 from ...core.tools import tls
-from core.logger import log
+from core.logger import log, json
 from core import time
 import datetime
 # import core.checks
@@ -10,6 +10,12 @@ import datetime
 class Core(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+
+    @commands.command()
+    async def support(self, ctx):
+        support = json.orm['discord']['support']
+        embed = tls.Embed(ctx, description=f"Join the [{support['name']}]({support['url']}) Discord server!")
+        await ctx.send(embed=embed)
 
     @commands.command(aliases=['userinfo'])
     async def whois(self, ctx, *, user):
