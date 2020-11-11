@@ -8,6 +8,7 @@ priority = 0
 class Initialize():
     def __init__(self):
         patches = util.imports(util.path(__file__))
+        num = 0
         for x in patches:
             try:
                 _patch = importlib.import_module(x, util.abspath())
@@ -20,7 +21,8 @@ class Initialize():
                             log.debug(patch.response)
                     else:
                         log.debug(f"Patching {x.split('.')[-1]}")
+                    num += 1
             except Exception as exc:
                 log.exception(exc)
 
-        self.response = f'Completed {len(patches)} patches'
+        self.response = f'Completed {num} patches'

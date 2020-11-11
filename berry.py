@@ -7,7 +7,6 @@
 #
 
 from core.logger import log, trace, json
-from core.queue import queue
 from dateutil import parser
 from core import manager
 from core import utils

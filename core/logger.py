@@ -39,7 +39,7 @@ class StreamRecords(logging.Filter):
             record.thrcol = trace.red
             record.color = trace.warn
         elif record.levelno <= 10:
-            record.thrcol = trace.blue
+            record.thrcol = trace.cyan
 
         return True
 
@@ -66,6 +66,7 @@ class Logger():  # Define internal functions
 
 Logger.Initialize()
 settings = json.orm['settings']['logging']
+level = getattr(LogLevel, settings['level'], 'debug').value
 log = logging.getLogger('stitches')
 log.setLevel(logging.DEBUG)  # Void
 
@@ -73,14 +74,14 @@ stream_formatter = logging.Formatter('%(time)s [%(thrcol)s%(threadName)s%(reset)
 stream = logging.StreamHandler(sys.stdout)
 stream.setFormatter(stream_formatter)
 stream.addFilter(StreamRecords())
-stream.setLevel(util.Enums(LogLevel).find(settings['console']['level']).value)
+stream.setLevel(level)
 log.addHandler(stream)
 
 file_formatter = logging.Formatter('[%(levelno)s] [%(name)s] [%(threadName)s] [%(module)s] [%(asctime)s] %(clean_msg)s')
-files = logging.FileHandler(settings['file']['name'], mode=settings['file']['mode'])
+files = logging.FileHandler(settings['name'], mode=settings['mode'])
 files.setFormatter(file_formatter)
 files.addFilter(FileRecords())
-files.setLevel(util.Enums(LogLevel).find(settings['file']['level']).value)
+files.setLevel(level)
 log.addHandler(files)
 
-level = LogLevel  # Alias for LogLevel
+levels = LogLevel  # Alias for LogLevel

@@ -1,4 +1,3 @@
-from core.queue import queue
 from core.logger import log
 from core.utils import util
 from dateutil import parser
@@ -18,8 +17,8 @@ class Initialize():  # Runtime debug
         # funcs = util.hack_the_planet()
         # [threading.Thread(target=funcs[x], args=(self,), daemon=True, name=f'Debug-{x+1}').start() for x in range(len(funcs))]
 
-    def z_exit(self):  # If this is uncommented, it kills the program after all debug functions have run
-        sys.exit(0)
+    # def z_exit(self):  # If this is uncommented, it kills the program after all debug functions have run
+    #     sys.exit(0)
 
     def tests(self):
         log.debug('Nothing to test!')

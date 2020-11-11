@@ -1,4 +1,4 @@
-from core import logger
+from core import logger, json, utils
 
 
 class patch():
@@ -13,7 +13,7 @@ class patch():
                 return True
 
         flasklog = logger.logging.getLogger('werkzeug')
-        flasklog.setLevel(logger.LogLevel.debug.value)
+        flasklog.setLevel(logger.level)  # This needs to match the core logger, otherwise it will log using it's default
         flasklog.handlers = []  # Remove all handlers
         flasklog.addFilter(flaskfilter())
         flasklog.addHandler(logger.stream)

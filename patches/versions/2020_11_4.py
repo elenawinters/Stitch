@@ -25,3 +25,7 @@ class update():
         json.memory.update()
 
         json.orm['revision'] = '2020.11.4'
+
+
+if __name__ == "__main__":
+    update()

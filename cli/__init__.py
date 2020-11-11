@@ -3,7 +3,6 @@ from core.color import trace
 from core.logger import log
 from core.utils import util
 import threading
-import readline
 import asyncio
 import time
 import sys
