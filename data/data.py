@@ -1,5 +1,6 @@
 from core.logger import log, trace, json
 import collections
+import sqlalchemy
 import dataset
 import sys
 import os
@@ -25,7 +26,9 @@ class data:
             jdb['address'] = '/' + str(os.path.abspath('data\\data.sqlite'))
             json.orm['settings'] = {'database': jdb}  # Merge updates
 
-        db = dataset.connect(f"{jdb['engine']}://{jdb['address']}", engine_kwargs={'pool_recycle': 3600})
+        db = dataset.connect(f"{jdb['engine']}://{jdb['address']}?check_same_thread=false", engine_kwargs={
+            'pool_recycle': 3600,
+        })
         cls.engine = jdb['engine']
         cls.base = db
 

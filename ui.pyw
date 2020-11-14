@@ -2,7 +2,7 @@ from core import logger
 import subprocess as sub
 from tkinter import *
 import tkinter as tk
-from threading import Thread
+import threading
 import start as berry
 import asyncio
 import time
@@ -26,51 +26,56 @@ class tkhandler(logger.logging.Handler):
         self.widget.see(END)
 
 
-class tkfilter(logger.logging.Filter):
-    def filter(self, record):
-        # Special cases for all of the different log levels after this
-        # This is a huge mess and I hate everything about it
-        record.time = f'{trace.reset}[{trace.time}{core.time.misc.Now.unix()}{trace.reset}]'
-        record.end = f'{trace.reset}{trace.alert}'
-        record.reset = f'{trace.reset}'
+# class tkfilter(logger.logging.Filter):
+#     def filter(self, record):
+#         # Special cases for all of the different log levels after this
+#         # This is a huge mess and I hate everything about it
+#         record.time = f'{trace.reset}[{trace.time}{core.time.misc.Now.unix()}{trace.reset}]'
+#         record.end = f'{trace.reset}{trace.alert}'
+#         record.reset = f'{trace.reset}'
 
-        record.thrcol = ''
-        record.color = ''
+#         record.thrcol = ''
+#         record.color = ''
 
-        if record.levelno >= 40:  # If error/critical
-            record.thrcol = trace.red.s
-            record.color = trace.alert
-        elif record.levelno >= 30:  # If warning
-            record.thrcol = trace.red
-            record.color = trace.warn
-        elif record.levelno <= 10:
-            record.thrcol = trace.cyan
-        return True
+#         if record.levelno >= 40:  # If error/critical
+#             record.thrcol = trace.red.s
+#             record.color = trace.alert
+#         elif record.levelno >= 30:  # If warning
+#             record.thrcol = trace.red
+#             record.color = trace.warn
+#         elif record.levelno <= 10:
+#             record.thrcol = trace.cyan
+#         return True
 
 
 class stitches():
     def __init__(self):
-        self.app = Tk()
-        self.frame_left = Frame(self.app, width=200, height=400, bg='#6f7676')
-        self.frame_right = Frame(self.app, width=650, height=400, bg='#6f7676')
-        self.toolbar = Frame(self.frame_left, width=180, height=185, bg='#6f7676')
+        if not hasattr(self, 'app') and threading.current_thread() is threading.main_thread():
+            self.app = Tk()
+            self.frame_left = Frame(self.app, width=200, height=400, bg='#6f7676')
+            self.frame_right = Frame(self.app, width=650, height=400, bg='#6f7676')
+            self.toolbar = Frame(self.frame_left, width=180, height=185, bg='#6f7676')
 
-        self.console = Text(self.frame_right, bg="black", fg="green")
-        self.console.pack(side='left', padx=5, pady=5)
-        # self.console.grid(row=0, column=0, padx=5, pady=5)
+            self.console = Text(self.frame_right, bg="black", fg="green")
+            self.console.pack(side='left', padx=5, pady=5)
+            # self.console.grid(row=0, column=0, padx=5, pady=5)
 
-        self.cscroll = Scrollbar(self.frame_right, orient="vertical", command=self.console.yview)
-        self.cscroll.pack(side="right", expand=True, fill="y")
+            self.cscroll = Scrollbar(self.frame_right, orient="vertical", command=self.console.yview)
+            self.cscroll.pack(side="right", expand=True, fill="y")
 
-        self.console.configure(yscrollcommand=self.cscroll.set)
-        # self.console_scroll.configure(command=self.console.yview)
-        # self.console['yscrollcommand'] = Scrollbar(self.app, command=self.console.yview).grid(row=0, column=1, sticky='nsew').set
-        # scrollb.grid(row=0, column=1, sticky='nsew')
-        # self.txt['yscrollcommand'] = scrollb.set
-        # self.console = tk.scrolledtext.ScrolledText(self.frame_right, bg="black", fg="green")
-        # tk.scrolledtext.ScrolledText()
-        tkhand = tkhandler(self.console)  # .addFilter(tkfilter())
-        logger.log.addHandler(tkhand)
+            self.console.configure(yscrollcommand=self.cscroll.set)
+            # self.console.tag_config()
+            # self.console_scroll.configure(command=self.console.yview)
+            # self.console['yscrollcommand'] = Scrollbar(self.app, command=self.console.yview).grid(row=0, column=1, sticky='nsew').set
+            # scrollb.grid(row=0, column=1, sticky='nsew')
+            # self.txt['yscrollcommand'] = scrollb.set
+            # self.console = tk.scrolledtext.ScrolledText(self.frame_right, bg="black", fg="green")
+            # tk.scrolledtext.ScrolledText()
+            tkhand = tkhandler(self.console)  # .addFilter(tkfilter())
+            logger.log.addHandler(tkhand)
+
+    def active(self):
+        if hasattr(self, 'app'): return True
 
     def run(self):
         self.app.title("Stitch")
@@ -96,7 +101,7 @@ class stitches():
 
         self.app.configure(bg='#212121')
 
-        Thread(target=self.start_program, name='Stitch-UI', daemon=True).start()
+        threading.Thread(target=self.start_program, name='Stitch-UI', daemon=True).start()
 
         self.app.mainloop()
 
@@ -104,6 +109,10 @@ class stitches():
 
     def test(self):
         logger.log.debug('testing frame widget thing')
+        Button(self.toolbar, text="Test2", command=self.test2).grid(row=3, column=0, padx=5, pady=5, sticky='w' + 'e' + 'n' + 's')
+
+    def test2(self):
+        logger.log.debug('Will this run?')
 
     def start_program(self):
         try:
