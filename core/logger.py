@@ -6,8 +6,6 @@ import core.time
 import logging
 import enum
 import sys
-import colorama
-colorama.init()
 
 
 class LogLevel(enum.Enum):

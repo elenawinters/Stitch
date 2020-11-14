@@ -1,10 +1,14 @@
 from core.logger import log, trace
+import threading
+import asyncio
+import berry
 import sys
 import os
 
 title = '| Stitch'
 
-if __name__ == '__main__':
+
+def start():
 	log.debug(sys.version)
 
 	print(f"\033]0;{title}\007", flush='', end='')  # This works on Windows, and is also claimed to work on other platforms
@@ -13,7 +17,12 @@ if __name__ == '__main__':
 
 	while True:
 		try:
-			print(trace.reset, end='')  # Fix color
-			os.system(sys.executable + ' berry.py')
+			t = threading.Thread(target=berry.start, name='Stitch', daemon=True)
+			t.start()
+			t.join()
 		except Exception as exc:
 			log.exception(exc)
+
+
+if __name__ == '__main__':
+	start()

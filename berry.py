@@ -14,12 +14,14 @@ from core import web
 import importlib
 import threading
 import datetime
+import asyncio
 import debug
 import time
 import sys
 
 
-if __name__ == '__main__':
+def start():
+    asyncio.set_event_loop(asyncio.new_event_loop())
     # queue.assign([])  # Create queue
 
     # Start threads
@@ -45,3 +47,7 @@ if __name__ == '__main__':
     # log.debug(parser.parse(uptime.json()['uptime']))
 
     sys.exit(0)
+
+
+if __name__ == '__main__':
+    start()

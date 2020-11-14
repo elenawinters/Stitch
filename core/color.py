@@ -1,6 +1,12 @@
 from colorama import Fore, Back, Style
-# B stands for background
-# S stands for strong
+import colorama
+colorama.init()
+
+"""
+    B stands for background
+    S stands for strong
+
+"""
 
 
 class Trace:
@@ -21,14 +27,8 @@ class Trace:
         bold = Style.BRIGHT
         dim = Style.DIM
         bright = bold
-        # The following aren't in colorama.
-        # As so, they aren't really used.
-        # These are the Windows code, and
-        # will thus not work on other systems
-        italics = '\033[3m'
-        underline = '\033[4m'
-        inverse = '\033[7m'
-        strike = '\033[9m'
+
+    styles = Styles
 
     class Black:
         class B:
@@ -134,9 +134,8 @@ class Trace:
             return Fore.WHITE
     white = White()
 
-    # Tuple of all color objects implemented in this class. 40 objects in total.
-    tracers = (Styles.reset, Styles.normal, Styles.bold, Styles.dim, Styles.italics,
-               Styles.underline, Styles.inverse, Styles.strike,
+    # Tuple of all color objects implemented in this class. 36 objects in total.
+    tracers = (styles.reset, styles.normal, styles.bold, styles.dim,
 
                black, black.s, black.b, black.b.s,
                red, red.s, red.b, red.b.s,
