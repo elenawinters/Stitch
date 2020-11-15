@@ -19,7 +19,7 @@ class Data:
             path = f"{get_data_file()}\\{jdb['file']}"
         else:
             path = f"{jdb['path']}\\{jdb['file']}"
-        db = dataset.connect(f'sqlite:///{path}', engine_kwargs={'pool_recycle': 3600})
+        db = dataset.connect(f'sqlite:///{path}?check_same_thread=false', engine_kwargs={'pool_recycle': 3600})
         cls.base = db
 
     @classmethod
