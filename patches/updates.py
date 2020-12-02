@@ -45,8 +45,6 @@ class patch():
             else:
                 s.append(letters['a'])
 
-            log.debug(s)
-
             num = ''.join(f'{int(x):02d}' for x in s)
             return num
 

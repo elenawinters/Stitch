@@ -18,9 +18,10 @@ import asyncio
 import debug
 import time
 import sys
+import os
 
 
-def start():
+def berry(*args):
     asyncio.set_event_loop(asyncio.new_event_loop())
     # queue.assign([])  # Create queue
 
@@ -47,6 +48,33 @@ def start():
     # log.debug(parser.parse(uptime.json()['uptime']))
 
     sys.exit(0)
+
+
+def start(*args):
+    """
+        This function runs the berry function on a loop.
+
+        We use a print function instead of ctypes for setting a title
+        because it's claimed to work on every system (untested).
+
+    """
+
+    log.debug(sys.version)
+
+    name = json.orm['name']
+    title = f'| {name}'
+
+    print(f"\033]0;{title}\007", flush='', end='')
+
+    os.chdir(os.path.dirname(os.path.realpath(__file__)))
+
+    while True:
+        try:
+            t = threading.Thread(target=berry, name=name, daemon=True)
+            t.start()  # Starts thread
+            t.join()  # Waits for completion
+        except Exception as exc:
+            log.exception(exc)
 
 
 if __name__ == '__main__':

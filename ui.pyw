@@ -1,15 +1,25 @@
+from core.color import trace
 from core import logger
 import subprocess as sub
 from tkinter import *
 import tkinter as tk
 import threading
-import start as berry
+import berry
+from core import json
 import asyncio
 import time
 import sys
+import re
 import os
 
 
+# https://stackoverflow.com/a/47947223/14125122 (potential thread communication)
+tkpattern = re.compile(r'.+?(?=\[|$)')
+tkmatch = re.compile(r'\[.*?m')
+name = json.orm['name']
+
+
+""" Convert colorama colors to tkinter colors """
 colvar = {
 
 }
@@ -26,61 +36,59 @@ class tkhandler(logger.logging.Handler):
         self.widget.see(END)
 
 
-# class tkfilter(logger.logging.Filter):
-#     def filter(self, record):
-#         # Special cases for all of the different log levels after this
-#         # This is a huge mess and I hate everything about it
-#         record.time = f'{trace.reset}[{trace.time}{core.time.misc.Now.unix()}{trace.reset}]'
-#         record.end = f'{trace.reset}{trace.alert}'
-#         record.reset = f'{trace.reset}'
+class tkfilter(logger.logging.Filter):
+    def __init__(self, widget):
+        self.widget = widget
 
-#         record.thrcol = ''
-#         record.color = ''
-
-#         if record.levelno >= 40:  # If error/critical
-#             record.thrcol = trace.red.s
-#             record.color = trace.alert
-#         elif record.levelno >= 30:  # If warning
-#             record.thrcol = trace.red
-#             record.color = trace.warn
-#         elif record.levelno <= 10:
-#             record.thrcol = trace.cyan
-#         return True
+    def filter(self, record):
+        new_msg = []
+        for match in re.findall(tkpattern, record.message):
+            if color := re.match(tkmatch, match):
+                color = color.group()
+                print(color)
+                # self.widget.tag_add('default', '5.0')
+        # col = [x for x in trace.tracers if x in record.message]
+        # for x in trace.tracers:
+        #     if x in record.message:
+        #     print(x)
+        return True
 
 
 class stitches():
     def __init__(self):
-        if not hasattr(self, 'app') and threading.current_thread() is threading.main_thread():
-            self.app = Tk()
-            self.frame_left = Frame(self.app, width=200, height=400, bg='#6f7676')
-            self.frame_right = Frame(self.app, width=650, height=400, bg='#6f7676')
-            self.toolbar = Frame(self.frame_left, width=180, height=185, bg='#6f7676')
+        self.app = Tk()
+        self.frame_left = Frame(self.app, width=200, height=400, bg='#6f7676')
+        self.frame_right = Frame(self.app, width=650, height=400, bg='#6f7676')
+        self.toolbar = Frame(self.frame_left, width=180, height=185, bg='#6f7676')
 
-            self.console = Text(self.frame_right, bg="black", fg="green")
-            self.console.pack(side='left', padx=5, pady=5)
-            # self.console.grid(row=0, column=0, padx=5, pady=5)
+        self.console = Text(self.frame_right, bg="black", fg="white")
+        self.console.pack(side='left', padx=5, pady=5)
+        # self.console.grid(row=0, column=0, padx=5, pady=5)
 
-            self.cscroll = Scrollbar(self.frame_right, orient="vertical", command=self.console.yview)
-            self.cscroll.pack(side="right", expand=True, fill="y")
+        self.cscroll = Scrollbar(self.frame_right, orient="vertical", command=self.console.yview)
+        self.cscroll.pack(side="right", expand=True, fill="y")
 
-            self.console.configure(yscrollcommand=self.cscroll.set)
-            # self.console.tag_config()
-            # self.console_scroll.configure(command=self.console.yview)
-            # self.console['yscrollcommand'] = Scrollbar(self.app, command=self.console.yview).grid(row=0, column=1, sticky='nsew').set
-            # scrollb.grid(row=0, column=1, sticky='nsew')
-            # self.txt['yscrollcommand'] = scrollb.set
-            # self.console = tk.scrolledtext.ScrolledText(self.frame_right, bg="black", fg="green")
-            # tk.scrolledtext.ScrolledText()
-            tkhand = tkhandler(self.console)  # .addFilter(tkfilter())
-            logger.log.addHandler(tkhand)
+        self.console.configure(yscrollcommand=self.cscroll.set)
+        # self.console.tag_configure('default', background='yellow')
+        # self.console.tag_config()
 
-    def active(self):
-        if hasattr(self, 'app'): return True
+        tkhand = tkhandler(self.console)
+        tkhand.addFilter(tkfilter(self.console))
+        logger.log.addHandler(tkhand)
+
+    def color_config(self):
+        foregrounds = {
+
+        }
+        backgrounds = {
+
+        }
+        # self.console.tag_configure('default', )
 
     def run(self):
-        self.app.title("Stitch")
+        self.app.title(name)
         self.app.geometry('850x450')
-        self.app.resizable(False, False)
+        # self.app.resizable(False, False)
 
         self.frame_left.grid(row=0, column=0, padx=10, pady=5)
         self.frame_right.grid(row=0, column=1, padx=10, pady=5)
@@ -88,7 +96,7 @@ class stitches():
         # self.frame_right.grid(row=0, column=1, padx=10, pady=5)
         # self.frame_right.pack(fill=BOTH, expand=YES)
 
-        Label(self.frame_left, text="Stitch testing", relief=RAISED).grid(row=0, column=0, padx=5, pady=5)
+        Label(self.frame_left, text=f'{name} User Interface', relief=RAISED).grid(row=0, column=0, padx=5, pady=5)
 
         # self.console.grid(row=0, column=0, padx=5, pady=5)
         # self.console.pack(expand=True, fill='both')
@@ -97,11 +105,11 @@ class stitches():
 
         # self.start_button = Button(self.toolbar, text="Start", command=lambda: Thread(target=self.start_program).start()).grid(row=1, column=0, padx=5, pady=5, sticky='w' + 'e' + 'n' + 's')
         # Button(self.toolbar, text="Start", command=self.start_program).grid(row=1, column=0, padx=5, pady=5, sticky='w' + 'e' + 'n' + 's')
-        Button(self.toolbar, text="Test", command=self.test).grid(row=2, column=0, padx=5, pady=5, sticky='w' + 'e' + 'n' + 's')
+        Button(self.toolbar, text="Test", command=self.test).grid(row=2, column=0, padx=5, pady=5, sticky=W + E + N + S)
 
         self.app.configure(bg='#212121')
 
-        threading.Thread(target=self.start_program, name='Stitch-UI', daemon=True).start()
+        threading.Thread(target=self.start_program, name=f'{name}-UI', daemon=True).start()
 
         self.app.mainloop()
 

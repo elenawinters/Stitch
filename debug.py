@@ -12,8 +12,11 @@ import sys
 # https://stackoverflow.com/a/3467879/14125122
 class Initialize():  # Runtime debug
     def __init__(self):
-        for run in util.hack_the_planet():
-            run(self)
+        if len(hacks := util.hack_the_planet()) > 0:
+            for run in hacks:
+                run(self)
+        else:
+            log.debug('Nothing to test!')
         # funcs = util.hack_the_planet()
         # [threading.Thread(target=funcs[x], args=(self,), daemon=True, name=f'Debug-{x+1}').start() for x in range(len(funcs))]
 
@@ -21,9 +24,10 @@ class Initialize():  # Runtime debug
     #     log.debug('Nothing to test!')
     #     sys.exit(0)
 
-    def tests(self):
-        for x in trace.tracers:
-            log.debug(f'{x}Hello world')
+    # def tests(self):
+    #     log.debug('Nothing to test!')
+    #     for x in trace.tracers:
+    #         log.debug(f'{x}Hello world')
 
     # def test1(self):
     #     log.debug(f'{}Hello this is a test')
