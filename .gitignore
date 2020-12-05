@@ -140,3 +140,5 @@ dmypy.json
 *.mp3
 *.bat
 *.sqlite
+*.sqlite-shm
+*.sqlite-wal

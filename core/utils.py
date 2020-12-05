@@ -122,14 +122,29 @@ class Utils:
         logger.log.exception(**self.Traceback((exctype, value, tb)).code())
 
     def hack_the_planet(self, ignore: list = []):  # This is overly complicated.
-        frame = inspect.stack()[1][0]  # Somehow it works. Fuck inspect. I hate it
-        ignores = [frame.f_code.co_name] + ignore  # I will never touch this code ever again
-        funcs = []  # I love list comprehensions but I can't here cuz core/logger throws an error for some reason when I do it.
-        for name, run in inspect.getmembers(frame.f_locals['self'].__class__):  # I hate this
+        """ This returns every function from the class it was executed from """
+        frame = inspect.stack()[1][0]
+        ignores = [frame.f_code.co_name] + ignore
+        funcs = []
+        for name, run in inspect.getmembers(frame.f_locals['self'].__class__):
             if isinstance(run, types.FunctionType) or isinstance(run, types.MethodType):
                 if name not in ignores and not name.startswith('__') and not name.endswith('__'):
                     funcs.append(run)
         return funcs
+
+    def match(self, obj, key):
+        """This is mainly meant for dicts with tuples as the key, to find the value"""
+        for k, v in obj.items():
+            if isinstance(k, str):
+                if key == k:
+                    return {k: v}
+            else:
+                # [return v, k for x in k if find == x]
+                for x in k:
+                    if key == x:
+                        return {k: v}
+        # print('no match')
+        return  # We don't return anything
 
     def random_string(self, **kwargs):
         return ''.join(random.choice(string.ascii_letters + string.digits) for i in range(random.randint(kwargs.get('min', 1), kwargs.get('max', 25))))

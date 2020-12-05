@@ -1,14 +1,16 @@
 import discord
 from discord.ext import commands
-from core.bot.tools import tls
+# from core.bot.tools import tls
+from ...core.tools import tls
+from core import json
 from core.color import trace
 from core.logger import log
-from core.ext import assets
+from core import assets
+from data.data import data
 import youtube_dl
 import functools
 import traceback
 import httpx as requests
-import core.checks
 import asyncio
 import random
 
@@ -18,7 +20,6 @@ class Music(commands.Cog):
         self.bot = bot
 
     @commands.command()
-    @core.checks.is_banned()
     async def play(self, ctx, url=None):
         if await Player.can_connect(ctx, False):
             await Player.join(ctx.message.author)
@@ -66,7 +67,6 @@ class Music(commands.Cog):
                 log.exception(**r)
 
     @commands.group(aliases=['q'])
-    @core.checks.is_banned()
     async def queue(self, ctx):
         if ctx.invoked_subcommand is None:
             try:
@@ -134,7 +134,6 @@ class Music(commands.Cog):
         await ctx.send(f"Queue currently contains {len(queue[ctx.guild.id]['q'])} tracks")
 
     @commands.command(aliases=['now_playing', 'nowplaying', 'now-playing', 'now', 'np'])
-    @core.checks.is_banned()
     async def playing(self, ctx):
         if Player.is_connected(ctx):
             curr = queue[ctx.guild.id]['playing'][0]
@@ -176,41 +175,35 @@ class Music(commands.Cog):
     #             await respond(ctx, err)
 
     @commands.command(aliases=['next'])
-    @core.checks.is_banned()
     async def skip(self, ctx):
         if Player.is_connected(ctx):
             Player.skip(ctx)
             await ctx.send('Skipping the current item')
 
     @commands.command(aliases=['stop'])
-    @core.checks.is_banned()
     async def pause(self, ctx):
         if Player.is_connected(ctx):
             await ctx.send('Pausing the player')
             Player.pause(ctx)
 
     @commands.command()
-    @core.checks.is_banned()
     async def resume(self, ctx):
         if Player.is_connected(ctx):
             await ctx.send('Resuming the player')
             Player.resume(ctx)
 
     @commands.command(aliases=['rejoin'])
-    @core.checks.is_banned()
     async def reconnect(self, ctx):
         if await Player.can_connect(ctx):
             await Player.join(ctx.message.author)
             await Player.loop(self, ctx)
 
     @commands.command(aliases=['connect'])
-    @core.checks.is_banned()
     async def join(self, ctx):
         if await Player.can_connect(ctx):
             await Player.join(ctx.message.author)
 
     @commands.command(aliases=['disconnect'])
-    @core.checks.is_banned()
     async def leave(self, ctx):
         await Player.disconnect(ctx.me)
 
@@ -401,7 +394,6 @@ class Player:
         loop = kwargs.get('loop', asyncio.get_event_loop())
         do_log = kwargs.get('log', False)
         ctx = kwargs.get('ctx', None)
-        from core.bot.funcs import respond
         url = inurl
         # if inurl.casefold() in MusicTests.__members__.keys():
         #     url = MusicTests[inurl.casefold()].value
@@ -410,7 +402,7 @@ class Player:
             # log.debug(data)
         except Exception as err:
             if ctx is not None:
-                await respond(ctx, err, url)
+                await tls.Message.respond(ctx, err, url)
             data = {}
 
         if do_log:
@@ -450,9 +442,7 @@ class Player:
 
     @classmethod
     async def profile_picture(cls, _id, extractor='youtube'):
-        from core.bot.tools import crypt
-        from data.data import data
-        from core import json
+        return assets.Discord.error
         # print(_id)
         # print(extractor)
         # log.debug(extractor)
@@ -461,7 +451,7 @@ class Player:
         try:
             if info is None:
                 if extractor == 'youtube':  # 2 points
-                    base = f"https://www.googleapis.com/youtube/v3/channels?part=snippet&id={_id}&key={crypt(json.orm['secure']['extractors'][extractor])}"
+                    base = f"https://www.googleapis.com/youtube/v3/channels?part=snippet&id={_id}&key={tls.crypt(json.orm['external'][extractor])}"
                     info = requests.get(base, timeout=5).json()['items'][0]['snippet']['thumbnails']['high']['url']
                     # log.debug(info)
                     data.base['cache'].upsert(dict(platform=extractor, id=_id, data=info), ['id'])
@@ -470,7 +460,7 @@ class Player:
                     if version == 'kraken':  # Kraken implementation
                         url = "https://api.twitch.tv/kraken/users?login=" + _id
                         header = {
-                            'Client-ID': crypt(json.orm['secure']['extractors']['twitch']),
+                            'Client-ID': crypt(json.orm['external']['twitch']),
                             'Accept': 'application/vnd.twitchtv.v5+json'
                         }
                         async with requests.AsyncClient() as client:
@@ -487,7 +477,7 @@ class Player:
                 info = info['data']
         except Exception as exc:
             log.exception(**tls.Traceback(exc).code())
-            info = assets.Discord.error.value
+            info = assets.Discord.error
         # log.debug(info)
         return info
 
