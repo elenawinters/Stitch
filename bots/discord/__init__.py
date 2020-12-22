@@ -1,3 +1,4 @@
+import discord
 from discord.ext import commands
 from core.logger import log, trace
 # from core.queue import queue
@@ -28,7 +29,11 @@ class Initialize():
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
 
-        client = commands.Bot(command_prefix=self.prefix)
+        intents = discord.Intents.default()
+        intents.presences = True
+        intents.members = True
+
+        client = commands.Bot(command_prefix=self.prefix, intents=intents)
         loader.Load(client).load()
 
         loop.run_until_complete(client.start(token))

@@ -127,5 +127,5 @@ async def update(self):
     }
 
     # host = json.orm['api']
-    await web.api('stat').async_post(send)
+    await web.api('stat').async_post(json=send)
     # await web.Client(f"http://{host['host']}:{host['port']}/stat/").async_post(send)

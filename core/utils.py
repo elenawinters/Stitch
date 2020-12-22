@@ -137,12 +137,12 @@ class Utils:
         for k, v in obj.items():
             if isinstance(k, str):
                 if key == k:
-                    return {k: v}
+                    return k, v
             else:
                 # [return v, k for x in k if find == x]
                 for x in k:
                     if key == x:
-                        return {k: v}
+                        return k, v
         # print('no match')
         return  # We don't return anything
 

@@ -19,46 +19,46 @@ class Client:
     def process(self, exc):
         log.debug(exc)
 
-    def post(self, _json: dict):
+    def post(self, **kwargs):
         for x in range(1, self.limit + 1):
             try:
                 with httpx.Client() as client:
-                    client.post(url=self.url, json=_json)
+                    client.post(url=self.url, **kwargs)
                 return
 
             except httpxcept as exc:
                 self.process(exc)
 
-    def get(self, header=None):
+    def get(self, **kwargs):
         for x in range(1, self.limit + 1):
             try:
                 with httpx.Client() as client:
-                    r = client.get(url=self.url, headers=header)
+                    r = client.get(url=self.url, **kwargs)
                 return r
 
-            except _exc as exc:
+            except httpxcept as exc:
                 self.process(exc)
 
         return None
 
-    async def async_post(self, _json: dict):
+    async def async_post(self, **kwargs):
         for x in range(1, self.limit + 1):
             try:
                 async with httpx.AsyncClient() as client:
-                    await client.post(url=self.url, json=_json)
+                    await client.post(url=self.url, **kwargs)
                 return
 
-            except _exc as exc:
+            except httpxcept as exc:
                 self.process(exc)
 
-    async def async_get(self):
+    async def async_get(self, **kwargs):
         for x in range(1, self.limit + 1):
             try:
                 async with httpx.AsyncClient() as client:
-                    r = await client.get(url=self.url)
+                    r = await client.get(url=self.url, **kwargs)
                 return r
 
-            except _exc as exc:
+            except httpxcept as exc:
                 self.process(exc)
 
         return None

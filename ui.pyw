@@ -17,6 +17,7 @@ import threading
 import berry
 from core import json
 import asyncio
+import random
 import time
 import sys
 import re
@@ -41,14 +42,14 @@ name = json.orm['name']
 # http://www.science.smith.edu/dftwiki/images/3/3d/TkInterColorCharts.png
 """ Convert colorama colors to tkinter colors. Use utils.util.match to get color. """
 colvar = {
-    (trace.black, trace.black.b): 'gray1', (trace.black.s, trace.black.b.s): '',
-    (trace.red, trace.red.b): '', (trace.red.s, trace.red.b.s): '',
-    (trace.green, trace.green.b): '', (trace.green.s, trace.green.b.s): '',
-    (trace.yellow, trace.yellow.b): '', (trace.yellow.s, trace.yellow.b.s): 'yellow',
-    (trace.blue, trace.blue.b): '', (trace.blue.s, trace.blue.b.s): '',
-    (trace.magenta, trace.magenta.b): '', (trace.magenta.s, trace.magenta.b.s): '',
-    (trace.cyan, trace.cyan.b): '', (trace.cyan.s, trace.cyan.b.s): '',
-    (trace.white, trace.white.b): '', (trace.white.s, trace.white.b.s): ''
+    (trace.black, trace.black.b): 'black', (trace.black.s, trace.black.b.s): 'gray',
+    (trace.red, trace.red.b): 'red3', (trace.red.s, trace.red.b.s): 'red',
+    (trace.green, trace.green.b): 'dark green', (trace.green.s, trace.green.b.s): 'green',
+    (trace.yellow, trace.yellow.b): 'gold', (trace.yellow.s, trace.yellow.b.s): 'yellow',
+    (trace.blue, trace.blue.b): 'royal blue', (trace.blue.s, trace.blue.b.s): 'blue',
+    (trace.magenta, trace.magenta.b): 'magenta3', (trace.magenta.s, trace.magenta.b.s): 'magenta',
+    (trace.cyan, trace.cyan.b): 'cyan3', (trace.cyan.s, trace.cyan.b.s): 'cyan',
+    (trace.white, trace.white.b): 'light grey', (trace.white.s, trace.white.b.s): 'white'
 }
 
 """ Tell the base color objects to load their string. """
@@ -62,26 +63,51 @@ class tkhandler(logger.logging.Handler):
         self.widget = widget
 
     def emit(self, record):
-        # Append message (record) to the widget
+        # Create list for temporary use
+        tags = []
+
+        # Get the current line in the widget (console)
+        line = self.widget.index('end-1c').split('.')[0]
+
+        # Iterate over every match defined by `tkpattern`
+        for match in re.findall(tkpattern, record.message):
+            # Match to the ascii escape sequence
+            if color := re.match(tkmatch, match):
+                col = color.group()  # color.group() gets the color code
+
+                # Get the starting position of the first match
+                start_pos = record.message.find(col)
+
+                # string.find() will return -1 if no index was found.
+                # If that happens, we skip the rest of this iteration.
+                if start_pos == -1:
+                    continue
+
+                # Get the end position of our selection
+                end_pos = start_pos - len(col) + len(match)
+
+                # Remove ascii characters in this selection from the final message
+                record.message = record.message[:start_pos] + record.message[start_pos + len(col):]
+
+                # Append a tuple with the information for the tag to the list
+                tags.append((col, f'{line}.{start_pos}', f'{line}.{end_pos}'))
+
+        # Append message (record) to the end of the widget
         self.widget.insert(END, record.message + '\n')
+
+        # Set our cursor position in the widget to the end of the widget
         self.widget.see(END)
+
+        # Iterate over our `tags` list and add tags for the selections
+        [self.widget.tag_add(x[0], x[1], x[2]) for x in tags if x[1] != x[2]]
 
 
 class tkfilter(logger.logging.Filter):
-    def __init__(self, widget):
-        self.widget = widget
-
-    def filter(self, record):
-        new_msg = []
-        for match in re.findall(tkpattern, record.message):
-            if color := re.match(tkmatch, match):
-                col = utils.util.match(colvar, color.group())
-                print(list(col.keys())[0])
-                self.widget.tag_add('default', '5.0', '6.0')
-        # col = [x for x in trace.tracers if x in record.message]
-        # for x in trace.tracers:
-        #     if x in record.message:
-        #     print(x)
+    def filter(self, record):  # This is only because of how our logging is set up.
+        if record.levelno >= 40:  # If error/critical
+            record.message = trace.alert + record.message
+        elif record.levelno >= 30:  # If warning
+            record.message = trace.warn + record.message
         return True
 
 
@@ -103,34 +129,47 @@ class stitches():
         # self.console.tag_configure('default', background='yellow')
         # self.console.tag_config()
 
-        self.coords = Label(self.frame_left, text='Mouse Coordinates', relief=RAISED)
+        self.coords = Label(self.frame_left, text='XY: None, None', relief=RAISED)
         self.coords.grid(row=99, column=0, padx=5, pady=5)
+
+        self.condex = Label(self.frame_left, text='XY: None, None', relief=RAISED)
+        self.condex.grid(row=100, column=0, padx=5, pady=5)
 
         self.color_config()
 
         self.console.bind('<Motion>', self.position)
 
         tkhand = tkhandler(self.console)
-        tkhand.addFilter(tkfilter(self.console))
+        tkhand.addFilter(tkfilter())
         logger.log.addHandler(tkhand)
 
     def test(self):
-        t = self.console.tag_names(index=None)
-        for x in t:
+        for x in self.console.tag_names(index=None):
             logger.log.debug(x)
+
+    def random_color(self):
+        k, v = random.choice(list(colvar.items()))
+        # logger.log.debug(CURRENT)
+        t = self.console.index(CURRENT)
+        print(t)
+        self.console.tag_add(str(k), CURRENT, END)
+        if v: logger.log.debug(v)
+        pass
 
     def position(self, event):
         self.coords.config(text=f'XY: {event.x}, {event.y}')
+        self.condex.config(text=f'{self.console.index(tk.INSERT)}')
         # Label(self.frame_left, text=f'XY: {event.x}, {event.y}', relief=RAISED).grid(row=99, column=0, padx=5, pady=5)
 
     def color_config(self):
         for k, v in colvar.items():
             if v:
-                self.console.tag_configure(str(k), background=str(v))
+                self.console.tag_configure(str(k[0]), foreground=str(v))
+                self.console.tag_configure(str(k[1]), background=str(v))
             else:
-                self.console.tag_configure(str(k), background='yellow')
+                self.console.tag_configure(str(k), foreground='yellow')
         pass
-        self.console.tag_configure('default', background='yellow')
+        self.console.tag_configure('default', foreground='yellow')
 
     def run(self):
         self.app.title(name)
@@ -152,8 +191,9 @@ class stitches():
 
         # self.start_button = Button(self.toolbar, text="Start", command=lambda: Thread(target=self.start_program).start()).grid(row=1, column=0, padx=5, pady=5, sticky='w' + 'e' + 'n' + 's')
         # Button(self.toolbar, text="Start", command=self.start_program).grid(row=1, column=0, padx=5, pady=5, sticky='w' + 'e' + 'n' + 's')
-        Button(self.toolbar, text="Test", command=self.test).grid(row=2, column=0, padx=5, pady=5, sticky=W + E + N + S)
-        Button(self.toolbar, text="Spam Console", command=self.test2).grid(row=3, column=0, padx=5, pady=5, sticky='w' + 'e' + 'n' + 's')
+        Button(self.toolbar, text="Random Color", command=self.random_color).grid(row=4, column=0, padx=5, pady=5, sticky=W + E + N + S)
+        Button(self.toolbar, text="Test", command=self.test).grid(row=5, column=0, padx=5, pady=5, sticky=W + E + N + S)
+        Button(self.toolbar, text="Spam Console", command=self.test2).grid(row=6, column=0, padx=5, pady=5, sticky='w' + 'e' + 'n' + 's')
 
         self.app.configure(bg='#212121')
 

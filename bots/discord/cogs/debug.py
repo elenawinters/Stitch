@@ -17,7 +17,7 @@ class Debug(commands.Cog):
         log.debug(ctx.author.nick or ctx.author.name)
         # log.debug(discord.Object(ctx.author.id))
         pass
-        # web.api(f'discord/prefix/{ctx.guild.id}').post({'prefix': '?!!?'})
+        # web.api(f'discord/prefix/{ctx.guild.id}').post(json={'prefix': '?!!?'})
     #     async for x in ctx.message.channel.history(limit=500):
     #         log.debug(x.content)
     #         if x.content == 't':

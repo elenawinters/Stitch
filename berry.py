@@ -29,7 +29,7 @@ def berry(*args):
     threads = manager.Initialize().threads
     log.debug(f'Current threads: {threads}')
 
-    web.api('uptime').post({'uptime': str(datetime.datetime.utcnow())})
+    web.api('uptime').post(json={'uptime': str(datetime.datetime.utcnow())})
 
     # host = json.orm['api']  # Post current time to api
     # web.Client(f"http://127.0.0.7:5009/utime/").post({'uptime': str(datetime.datetime.utcnow())})  # Will error
