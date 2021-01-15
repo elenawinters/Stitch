@@ -1,3 +1,10 @@
+"""
+    This will never be finished.
+    This was prototyped for guild 221019963476017152, but they lost interest.
+
+"""
+
+
 import discord
 from discord.ext import commands
 from func.time import time
@@ -11,9 +18,6 @@ class Ext(commands.Cog):
     @commands.Cog.listener()
     async def on_member_join(self, member):
         pass
-
-        # This will never be finished.
-        # This was prototyped for guild 221019963476017152, but they lost interest
 
         # print(json.reader('test', 'test.txt'))
 

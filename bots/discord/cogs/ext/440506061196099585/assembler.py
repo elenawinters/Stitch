@@ -1,3 +1,10 @@
+"""
+    This class was developed for guild 440506061196099585, which no longer exists.
+    guild 440506061196099585 was replaced by guild 794692465168351233.
+
+"""
+
+
 from discord.ext import commands
 from ....core import decorators
 from ....core.tools import tls
@@ -6,6 +13,11 @@ from ....core.tools import tls
 class Ext(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+
+    @commands.group()
+    @decorators.banned()
+    async def asm(self, ctx):
+        pass
 
     @commands.command()
     @decorators.banned()

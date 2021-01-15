@@ -12,8 +12,13 @@ class Fun(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    @commands.command(name='word', aliases=['words'])
+    async def random_words(self, ctx, *, phrase=None):
+        phrase = phrase.split('')
+        random.shuffle(phrase)
+        await ctx.send(''.join(phrase))
+
     @commands.command(name='name', aliases=['handmeaname', 'hman', 'names'])
-    @core.checks.is_banned()
     async def name_generator(self, ctx, sex=None, *, seed=None):
         """Name generator.
         `.name [sex] [seed]`

@@ -149,12 +149,13 @@ class stitches():
 
     def random_color(self):
         k, v = random.choice(list(colvar.items()))
-        # logger.log.debug(CURRENT)
-        t = self.console.index(CURRENT)
-        print(t)
-        self.console.tag_add(str(k), CURRENT, END)
-        if v: logger.log.debug(v)
-        pass
+        logger.log.debug(k[0] + v)
+        # # logger.log.debug(CURRENT)
+        # t = self.console.index(CURRENT)
+        # print(t)
+        # self.console.tag_add(str(k), CURRENT, END)
+        # if v: logger.log.debug(v)
+        # pass
 
     def position(self, event):
         self.coords.config(text=f'XY: {event.x}, {event.y}')
