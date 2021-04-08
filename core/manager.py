@@ -1,18 +1,20 @@
 from core.logger import log, json
-from core import utils
+from core import util
 import importlib
+import sys
 import os
 
 
 class Initialize():
     def __init__(self):
+        self.file = '__load__.py'
         self.threads = []
         self.load()
 
     def load(self):
         mods = []
-        for x in utils.util.scan('__init__.py'):
-            mod = importlib.import_module(x, utils.util.abspath())
+        for x in util.scan(self.file):
+            mod = importlib.import_module(x, util.abspath())
             # priortity = (2 - 2**-23) * 2**127
             priority = 9223372036854775807
             if hasattr(mod, 'priority'):
@@ -44,5 +46,7 @@ class Initialize():
                         log.debug(f"Loaded {x.get('loc')[:-9]}")
 
                 except Exception as exc:
-                    log.error(exc)
+                    log.exception(**util.Traceback(exc).code())
+                    # log.error(util.Traceback(exc).formatted(*sys.exc_info()))
+
         log.debug('Manager has loaded all extensions')

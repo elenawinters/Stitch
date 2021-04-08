@@ -29,7 +29,13 @@ class Custom(commands.Cog):
 
     # We can't see if the user is verified on a guild. If they start typing, we assume they are
     @commands.Cog.listener()
+    @commands.guild_only()
     async def on_typing(self, channel, user, when):
+        if member := channel.guild.get_member(user.id):
+            # if 'MEMBER_VERIFICATION_GATE_ENABLED' in after.guild.features:
+            # if after.guild.verification_level != discord.guild.VerificationLevel.none:
+            #     if 'MEMBER_VERIFICATION_GATE_ENABLED' in after.guild.features:
+            pass
         pass
 
 

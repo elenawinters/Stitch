@@ -1,15 +1,15 @@
-#
-#   Developed by Elena Winters (ElenaBerry#2561), aka Tracer
-#   Contributions by: Raine Bannister and RingoMar
-#
-#   This bot is used and hosted by me (Elena), for others to use.
-#
-#
+"""
+    Developed by Elena Winters (Winters#2561), aka Tracer
+    Contributions by: Raine Bannister and RingoMar
+
+    This bot is used and hosted by me (Elena), for others to use.
+
+"""
 
 from core.logger import log, trace, json
 from dateutil import parser
 from core import manager
-from core import utils
+from core import util
 from core import web
 import importlib
 import threading
@@ -21,17 +21,19 @@ import sys
 import os
 
 
-def berry(*args):
+def berry(**kwargs):
+    log.debug(f"{util.crypt('weeeeee')}")
+
     asyncio.set_event_loop(asyncio.new_event_loop())
-    # queue.assign([])  # Create queue
 
     # Start threads
     threads = manager.Initialize().threads
     log.debug(f'Current threads: {threads}')
 
     web.api('uptime').post(json={'uptime': str(datetime.datetime.utcnow())})
+    web.api('gating').post(json=kwargs)
 
-    # host = json.orm['api']  # Post current time to api
+    # host = json.orm['api']  # Post current time to api)
     # web.Client(f"http://127.0.0.7:5009/utime/").post({'uptime': str(datetime.datetime.utcnow())})  # Will error
     # web.Client(f"http://{host['host']}:{host['port']}/uptime/").post({'uptime': str(datetime.datetime.utcnow())})
 
@@ -50,7 +52,7 @@ def berry(*args):
     sys.exit(0)
 
 
-def start(*args):
+def start(**kwargs):
     """
         This function runs the berry function on a loop.
 
@@ -64,13 +66,13 @@ def start(*args):
     name = json.orm['name']
     title = f'| {name}'
 
-    print(f"\033]0;{title}\007", flush='', end='')
+    print(f"\033]0;{title}\007", flush='', end='')  # this apparently works on all systems?
 
     os.chdir(os.path.dirname(os.path.realpath(__file__)))
 
     while True:
         try:
-            t = threading.Thread(target=berry, name=name, daemon=True)
+            t = threading.Thread(target=berry, name=name, kwargs=kwargs, daemon=True)
             t.start()  # Starts thread
             t.join()  # Waits for completion
         except Exception as exc:

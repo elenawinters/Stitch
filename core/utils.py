@@ -1,7 +1,14 @@
+"""
+    I always forget what these are meant to do.
+
+    We can't import our logger here due to circular import.
+
+"""
+
 from core.color import trace
-from core import logger
 import traceback
 import inspect
+import logging
 import random
 import string
 import types
@@ -25,22 +32,33 @@ class Utils:
         def __init__(self, exc):
             self.exc = exc
 
-        def formatted(self, etype, value, tb):
-            lines = traceback.format_list(traceback.extract_tb(tb))
+        def formatted(self, tb):
+            new_frames = []  # old code https://stackoverflow.com/a/37059072
+            for x in traceback.extract_tb(tb):
+                frame = list(x)
+                frame[0] = frame[0].replace(util.abspath(), '.')
+                new_frames.append(tuple(frame))
 
-            def shorten(match):
-                return 'File "{}"'.format(os.path.basename(match.group(1)))
-            lines = [re.sub(r'File "([^"]+)"', shorten, line, 1) for line in lines]
-            try:
-                return 'Traceback (most recent call last):\n' + ''.join(lines) + f'{etype.__name__}: {value}'
-            except Exception:
-                return 'Traceback (most recent call last):\n' + ''.join(lines) + f'{etype}: {value}'
-            # Taken from https://stackoverflow.com/a/37059072
+            return traceback.StackSummary.from_list(new_frames)
 
         def code(self):
-            random.seed(self.formatted(*sys.exc_info()))
+            exc = sys.exc_info()
+            print(exc)
+            formatted = self.formatted(sys.exc_info()[2])
+            random.seed(str(formatted))
             number = random.randint(10000, 99999)
-            return {'msg': f'Code #{number}', 'exc_info': self.exc}
+
+            # test = traceback.walk_tb(formatted)
+            # print(test)
+            # test2 = traceback.StackSummary.extract(traceback.walk_tb())
+            # print(test2)
+            test3 = traceback.StackSummary.extract(traceback.walk_tb(exc[2]))
+            print(test3)
+
+            # test = traceback.format_exception(exc[0], exc[1], formatted)
+            # test = traceback.format_exception(exc[0], exc[1], formatted)
+            # print(test)
+            return {'msg': f'Code #{number}', 'exc_info': (exc[0], exc[1], test3)}
 
         def trace(self):
             return [x for x in sys.exc_info()]
@@ -119,7 +137,8 @@ class Utils:
         return ''.join(x)
 
     def excepthook(self, exctype, value, tb):
-        logger.log.exception(**self.Traceback((exctype, value, tb)).code())
+        log = logging.getLogger('stitches')  # does this even work?
+        log.exception(**self.Traceback((exctype, value, tb)).code())
 
     def hack_the_planet(self, ignore: list = []):  # This is overly complicated.
         """ This returns every function from the class it was executed from """

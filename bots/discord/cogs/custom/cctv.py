@@ -5,9 +5,9 @@ from core.logger import log
 from core import json
 from data.data import data
 from ...core.tools import tls
+from core import util
 import asyncio
 import ast
-from core.utils import util
 # from core.bot.tools import crypt
 import core.web
 # import httpx as requests

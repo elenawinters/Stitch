@@ -1,18 +1,20 @@
 from core.logger import log, trace
-from core.utils import util
 from dateutil import parser
 from core import web, json
+from core import util
 import threading
 import string
 import random
 import time
 import sys
+# import ui
 
 
 # https://stackoverflow.com/a/3467879/14125122
 class Initialize():  # Runtime debug
     def __init__(self):
         if len(hacks := util.hack_the_planet()) > 0:
+            web.api('gating/test').post(json=True)
             for run in hacks:
                 run(self)
         else:
@@ -24,10 +26,12 @@ class Initialize():  # Runtime debug
     #     log.debug('Nothing to test!')
     #     sys.exit(0)
 
-    # def tests(self):
-    #     log.debug('Nothing to test!')
-    #     for x in trace.tracers:
-    #         log.debug(f'{x}Hello world')
+    def tests(self):
+        if interface := web.api('gating/ui').get().json():
+            log.debug(f'API indicates that the UI is active! (gating/ui: {interface})')
+        # log.debug('Nothing to test!')
+        # for x in trace.tracers:
+        #     log.debug(f'{x}Hello world')
 
     # def test1(self):
     #     log.debug(f'{}Hello this is a test')

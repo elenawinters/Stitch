@@ -1,7 +1,7 @@
 # import prompt_toolkit as prompt
 from core.color import trace
 from core.logger import log
-from core.utils import util
+from core import util
 import threading
 import asyncio
 import time

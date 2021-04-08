@@ -1,6 +1,6 @@
 from core.color import trace
-from core.utils import util
 from core import json
+from core import util
 import core.defaults
 import core.time
 import logging

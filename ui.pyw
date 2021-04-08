@@ -4,12 +4,12 @@
     This emulates a console window, a command line interface,
     and allows for an overall easier operation.
 
-    I hope I never have to touch this ever again after it's done.
+    I hope I never have to touch this ever again after it's done. -EW
 
 """
 
 from core.color import trace
-from core import logger, utils
+from core import logger, util
 import subprocess as sub
 from tkinter import *
 import tkinter as tk
@@ -214,7 +214,7 @@ class stitches():
 
     def start_program(self):
         try:
-            berry.start()
+            berry.start(ui=True)
         except Exception as exc:
             logger.log.exception(exc)
 

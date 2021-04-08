@@ -1,5 +1,5 @@
 from core.logger import log
-from core.utils import util
+from core import util
 import importlib
 
 priority = 0

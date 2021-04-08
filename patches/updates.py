@@ -1,7 +1,6 @@
 from core.color import trace
 from core.logger import log
-from core.utils import util
-from core import json
+from core import json, util
 import subprocess
 import threading
 import importlib

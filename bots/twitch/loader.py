@@ -6,11 +6,12 @@ import os
 
 class Load:
     def __init__(self, client):
+        # THIS IS FOR TWITCH. THIS NEEDS TO BE PATCHED UP TO WORK AS IT IS PORTED FROM DISCORD
         self.client = client
         self.exc = {}
 
     def load(self):
-        self.client.remove_command('help')
+        # self.client.remove_command('help')
         self.reload()
 
     def reload(self):  # https://stackoverflow.com/a/42376244/14125122
