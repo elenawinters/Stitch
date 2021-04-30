@@ -10,59 +10,52 @@ httpxcept = (httpx._exceptions.WriteError,
              ConnectionResetError,
              Exception)
 
+def retry(method):  # this implements the retry functionality in a better way
+    @functools.wraps(method)
+    def _retry(self, *args, **kwargs):
+        for x in range(1, self.limit + 1):
+            try:
+                return method(self, *args, **kwargs)
+            except httpxcept as exc:
+                self.process(exc)
+        return self
+    return _retry
+
 
 class Client:
     def __init__(self, url, **kwargs):
         self.limit = int(kwargs.get('limit', 3))
         self.url = url
+        
+    def json(self):  # returns None if it fails to return anything in the retry
+        return None  # this prevents a potentially fatal error from occuring
 
     def process(self, exc):
-        log.debug(exc)
+        log.warn(exc)
 
+    @retry
     def post(self, **kwargs):
-        for x in range(1, self.limit + 1):
-            try:
-                with httpx.Client() as client:
-                    client.post(url=self.url, **kwargs)
-                return
+        with httpx.Client() as client:
+            client.post(url=self.url, **kwargs)
+        return
 
-            except httpxcept as exc:
-                self.process(exc)
-
+    @retry
     def get(self, **kwargs):
-        for x in range(1, self.limit + 1):
-            try:
-                with httpx.Client() as client:
-                    r = client.get(url=self.url, **kwargs)
-                return r
+        with httpx.Client() as client:
+            r = client.get(url=self.url, **kwargs)
+        return r
 
-            except httpxcept as exc:
-                self.process(exc)
-
-        return None
-
+    @retry
     async def async_post(self, **kwargs):
-        for x in range(1, self.limit + 1):
-            try:
-                async with httpx.AsyncClient() as client:
-                    await client.post(url=self.url, **kwargs)
-                return
-
-            except httpxcept as exc:
-                self.process(exc)
-
+        async with httpx.AsyncClient() as client:
+            await client.post(url=self.url, **kwargs)
+        return
+        
+    @retry
     async def async_get(self, **kwargs):
-        for x in range(1, self.limit + 1):
-            try:
-                async with httpx.AsyncClient() as client:
-                    r = await client.get(url=self.url, **kwargs)
-                return r
-
-            except httpxcept as exc:
-                self.process(exc)
-
-        return None
-
+        async with httpx.AsyncClient() as client:
+            r = await client.get(url=self.url, **kwargs)
+        return r
 
 class API(Client):
     def __init__(self, loc='', **kwargs):

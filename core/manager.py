@@ -47,6 +47,5 @@ class Initialize():
 
                 except Exception as exc:
                     log.exception(**util.Traceback(exc).code())
-                    # log.error(util.Traceback(exc).formatted(*sys.exc_info()))
 
         log.debug('Manager has loaded all extensions')

@@ -29,102 +29,21 @@ class Utils:
             return getattr(self.enum, item, default)
 
     class Traceback:
-        def __init__(self, exc):
-            self.exc = exc
+        def __init__(self, exc=None):
+            self.exc = exc if not None else sys.exc_info()
 
-        def formatted(self, tb):
-            new_frames = []  # old code https://stackoverflow.com/a/37059072
+        def formatted(self, tb): # dont worry about converting this back. it's too difficult and we can seed this just fine
+            new_frames = []
             for x in traceback.extract_tb(tb):
                 frame = list(x)
                 frame[0] = frame[0].replace(util.abspath(), '.')
                 new_frames.append(tuple(frame))
-
-            return traceback.StackSummary.from_list(new_frames)
+            return new_frames  # 
 
         def code(self):
-            exc = sys.exc_info()
-            print(exc)
-            formatted = self.formatted(sys.exc_info()[2])
-            random.seed(str(formatted))
-            number = random.randint(10000, 99999)
-
-            # test = traceback.walk_tb(formatted)
-            # print(test)
-            # test2 = traceback.StackSummary.extract(traceback.walk_tb())
-            # print(test2)
-            test3 = traceback.StackSummary.extract(traceback.walk_tb(exc[2]))
-            print(test3)
-
-            # test = traceback.format_exception(exc[0], exc[1], formatted)
-            # test = traceback.format_exception(exc[0], exc[1], formatted)
-            # print(test)
-            return {'msg': f'Code #{number}', 'exc_info': (exc[0], exc[1], test3)}
-
-        def trace(self):
-            return [x for x in sys.exc_info()]
-
-        def short(self):
-            err = self.trace()
-            return f"{err[0].__name__}: {err[1]}"
-
-    class switch:  # https://stackoverflow.com/a/6606540/14125122
-        def __init__(self, value):
-            self.value = value
-            self._entered = False
-            self._broken = False
-            self._prev = None
-
-        def __enter__(self):
-            return self
-
-        def __exit__(self, type, value, traceback):
-            return False  # Allows a traceback to occur
-
-        def __call__(self, *values):
-            if self._broken:
-                return False
-
-            if not self._entered:
-                if values and self.value not in values:
-                    return False
-                self._entered, self._prev = True, values
-                return True
-
-            if self._prev is None:
-                self._prev = values
-                return True
-
-            if self._prev != values:
-                self._broken = True
-                return False
-
-            if self._prev == values:
-                self._prev = None
-                return False
-
-        @property
-        def default(self):
-            return self()
-
-    # class switch(object):  # https://stackoverflow.com/a/6606540/14125122
-    #     def __init__(self, value):
-    #         self.value = value
-    #         self.fall = False
-
-    #     def __iter__(self):
-    #         """Return the match method once, then stop"""
-    #         yield self.match
-    #         raise StopIteration
-
-    #     def match(self, *args):
-    #         """Indicate whether or not to enter a case suite"""
-    #         if self.fall or not args:
-    #             return True
-    #         elif self.value in args:
-    #             self.fall = True
-    #             return True
-    #         else:
-    #             return False
+            random.seed(str(self.formatted(self.exc.__traceback__)))
+            number = random.randint(10000, 99999)  # i have no clue how useful these codes will actually be
+            return {'msg': f'Error! Code #{number}', 'exc_info': self.exc}
 
     def crypt(self, s):
         x = []

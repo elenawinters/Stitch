@@ -37,7 +37,7 @@ def permissions(level):  # 0 for manager, 1 for assistant
             log.exception(exc)
             return False
 
-    async def predicate(ctx):  # I really want switch/case/default in Python
+    async def predicate(ctx):
         user = data.base['permissions'].find_one(uuid=ctx.author.id, platform='discord')
         if user is not None and 'level' in user and user['level'] <= level:
             return True

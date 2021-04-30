@@ -27,6 +27,9 @@ class Initialize():  # Runtime debug
     #     sys.exit(0)
 
     def tests(self):
+        # for x in range(0, 5):
+        #     t = web.api('gating/ui').get().json()
+        #     log.debug(t)
         if interface := web.api('gating/ui').get().json():
             log.debug(f'API indicates that the UI is active! (gating/ui: {interface})')
         # log.debug('Nothing to test!')
