@@ -1,4 +1,5 @@
 from core.logger import log, trace, json
+import functools
 import inspect
 import httpx
 import os
