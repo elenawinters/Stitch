@@ -116,7 +116,7 @@ class Core(commands.Cog, command_attrs=dict(hidden=True)):
         for x in self.bot.walk_commands():
             com.append(x)
         pos = len(com)
-        com = remove_duplicates(com)
+        com = tls.remove_duplicates(com)
         for x in com:
             log.debug(x)
             # log(type(x))

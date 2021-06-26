@@ -23,8 +23,10 @@ class DiscordTools(utils.Utils):  # Discord utils
             return embed
 
         @classmethod
-        async def respond(cls, ctx, err, url=discord.Embed.Empty, content=None):
+        async def exception(cls, ctx, err, url=discord.Embed.Empty, content=None):
             await ctx.send(content=content, embed=cls.base(err, url=url))
+
+        respond = exception
 
         @classmethod
         async def modify(cls, msg, err, url=discord.Embed.Empty, content=None):

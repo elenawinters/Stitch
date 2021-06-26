@@ -11,10 +11,11 @@ import asyncio
 from core import json
 import subprocess
 from . import loader
-import time, os
+import time
 import sys
 import ast
 import re
+import os
 
 
 class Initialize():
@@ -34,7 +35,9 @@ class Initialize():
         intents.members = True
 
         client = commands.Bot(command_prefix=self.prefix, intents=intents)
-        loader.Load(client).load()
+        entry_cog = tls.split(os.path.join(tls.path(__file__), 'loader'), tls.abspath(), 1).replace('\\', '.')
+        client.load_extension(entry_cog)
+        # loader.Load(client).load()
 
         loop.run_until_complete(client.start(token))
         loop.close()

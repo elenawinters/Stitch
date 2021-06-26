@@ -22,13 +22,15 @@ def permissions(level):  # 0 for manager, 1 for assistant
         Level 1: Assistant (trusted)
         Level 2: Discord Bot Owner ()
         Level 3: Server/Guild Owner ()
+        Level 4: Server Admin ()
     """
     levels = {
         'manager': 0,
         'assistant': 1,
         'bot': 2,
         'server': 3,
-        'guild': 3
+        'guild': 3,
+        'admin': 4
     }
     if isinstance(level, str):
         try:
@@ -41,8 +43,11 @@ def permissions(level):  # 0 for manager, 1 for assistant
         user = data.base['permissions'].find_one(uuid=ctx.author.id, platform='discord')
         if user is not None and 'level' in user and user['level'] <= level:
             return True
-        elif ctx.author.id in ctx.bot.owner_ids and level == 2:
+        elif ctx.author.id in ctx.bot.owner_ids and level >= 2:
             return True
-        elif hasattr(ctx, 'guild') and ctx.guild.owner_id == ctx.author.id and level == 3:
+        elif hasattr(ctx, 'guild') and ctx.guild.owner_id == ctx.author.id and level >= 3:
             return True
+        elif hasattr(ctx, 'guild') and ctx.message.channel.permissions_for(ctx.message.author).administrator and level >= 4:
+            return True
+
     return commands.check(predicate)

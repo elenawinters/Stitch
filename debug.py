@@ -7,6 +7,7 @@ import string
 import random
 import time
 import sys
+import os
 # import ui
 
 
@@ -26,7 +27,7 @@ class Initialize():  # Runtime debug
     #     log.debug('Nothing to test!')
     #     sys.exit(0)
 
-    def tests(self):
+    def ui_gating(self):
         # for x in range(0, 5):
         #     t = web.api('gating/ui').get().json()
         #     log.debug(t)
@@ -35,6 +36,10 @@ class Initialize():  # Runtime debug
         # log.debug('Nothing to test!')
         # for x in trace.tracers:
         #     log.debug(f'{x}Hello world')
+
+    # def tests(self):
+    #     print(os.path.join(util.path(__file__), 'loader'))
+    #     sys.exit(0)
 
     # def test1(self):
     #     log.debug(f'{}Hello this is a test')

@@ -11,6 +11,7 @@ httpxcept = (httpx._exceptions.WriteError,
              ConnectionResetError,
              Exception)
 
+
 def retry(method):  # this implements the retry functionality in a better way
     @functools.wraps(method)
     def _retry(self, *args, **kwargs):
@@ -27,7 +28,7 @@ class Client:
     def __init__(self, url, **kwargs):
         self.limit = int(kwargs.get('limit', 3))
         self.url = url
-        
+
     def json(self):  # returns None if it fails to return anything in the retry
         return None  # this prevents a potentially fatal error from occuring
 
@@ -51,12 +52,13 @@ class Client:
         async with httpx.AsyncClient() as client:
             await client.post(url=self.url, **kwargs)
         return
-        
+
     @retry
     async def async_get(self, **kwargs):
         async with httpx.AsyncClient() as client:
             r = await client.get(url=self.url, **kwargs)
         return r
+
 
 class API(Client):
     def __init__(self, loc='', **kwargs):

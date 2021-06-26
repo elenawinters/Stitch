@@ -1,10 +1,12 @@
 from core.logger import log, trace
+from discord.ext import commands
 from .core.tools import tls
+import threading
 import time
 import os
 
 
-class Load:
+class CogLoader:
     def __init__(self, client):
         self.client = client
         self.exc = {}
@@ -37,3 +39,21 @@ class Load:
 
     def restart(self):
         pass
+
+
+class StitchEntryLoad(commands.Cog):
+    def __init__(self, bot):
+        self.bot = bot
+
+    @commands.Cog.listener()
+    async def on_ready(self):
+        old_name = threading.current_thread().name
+        new_name = f'({old_name}) {self.bot.user.name}'
+        threading.current_thread().name = new_name  # new thread name
+        log.debug(f'Thread "{old_name}" changed name to "{new_name}"')
+        log.debug(f'{self.bot.user.name} is ready! Loading extensions!')
+        CogLoader(self.bot).load()
+
+
+def setup(bot):
+    bot.add_cog(StitchEntryLoad(bot))

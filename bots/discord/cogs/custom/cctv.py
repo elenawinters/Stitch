@@ -178,8 +178,8 @@ async def do_update(self):
                 for x in past:  # Compare. If not in memory anymore, went offline
                     if x not in now:
                         await on_offline(self, x)
-        except Exception as exc:
-            log.exception(**tls.Traceback(exc).code())
+    except Exception as exc:
+        log.exception(**tls.Traceback(exc).code())
 
 
 # async def live_loop(self):  # FUCK THIS FUCKING LOOP YOU FUCKING CUNT

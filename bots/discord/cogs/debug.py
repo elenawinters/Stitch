@@ -27,4 +27,6 @@ class Debug(commands.Cog):
 
 
 def setup(bot):
+    # if bot.user.id == 849541560928567297:
+    # log.debug(bot.user.id)
     bot.add_cog(Debug(bot))

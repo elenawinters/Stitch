@@ -8,6 +8,7 @@ from flask import request
 data = {}
 
 
+# what is this supposed to do again?!?
 @app.route("/audit/<platform>/<gate>", methods=['GET', 'POST'])
 def audit(platform, gate):
     if request.method == 'POST':

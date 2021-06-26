@@ -1,15 +1,13 @@
 import discord
 from discord.ext import commands
 from data.data import data
-from core.bot.funcs import *
-from core.bot.tools import *
-from core.bot import perms
-import core.checks
+from ...core.tools import tls
+from ...core import decorators
 import ast
 
 
 def match(obj, find):  # Returns key, you can match the key with the dict to get the value
-    for k, v in d1.items():
+    for k, v in d1.items():  # lol what where is d1. no idea what this does anymore
         if isinstance(k, str):
             if find == k:
                 return k
@@ -25,15 +23,15 @@ class Ext(commands.Cog):
         self.bot = bot
 
     @commands.group(aliases=['ccom'])
-    @perms.is_admin()
-    @core.checks.is_banned()
+    @decorators.permissions('admin')
+    @decorators.banned()
     async def ccoms(self, ctx):
         pass
 
     @ccoms.command()
-    @perms.is_admin()
+    @decorators.permissions('admin')
     async def remove(self, ctx, name: str):
-        ccom = ast.literal_eval(data.base['ccom'].find_one(server=ctx.guild.id)['commands'])
+        ccom = dict(ast.literal_eval(data.base['ccom'].find_one(server=ctx.guild.id)['commands']))
         ccom.pop(name, None)
         ccom = dict(
             server=ctx.guild.id,
@@ -43,10 +41,10 @@ class Ext(commands.Cog):
         await ctx.send(f'Removed cCom `{name}`')
 
     @ccoms.command(aliases=['edit', 'overwrite', 'update', 'create'])
-    @perms.is_admin()
+    @decorators.permissions('admin')
     async def add(self, ctx, name: str, *, content: str):
         try:
-            ccom = ast.literal_eval(data.base['ccom'].find_one(server=ctx.guild.id)['commands'])
+            ccom = dict(ast.literal_eval(data.base['ccom'].find_one(server=ctx.guild.id)['commands']))
         except TypeError:
             ccom = {}
         com = {name: content}
@@ -59,7 +57,7 @@ class Ext(commands.Cog):
         await ctx.send(f'Updated cCom `{name}`')
 
     @ccoms.group()
-    @perms.is_admin()
+    @decorators.permissions('admin')
     async def alias(self):
         pass
 
@@ -69,10 +67,10 @@ class Ext(commands.Cog):
         if len(com_name) > 0:
             if com_name[0] == self.bot.command_prefix:
                 try:
-                    ccom = ast.literal_eval(data.base['ccom'].find_one(server=msg.guild.id)['commands'])
+                    ccom = dict(ast.literal_eval(data.base['ccom'].find_one(server=msg.guild.id)['commands']))
                 except TypeError:
                     ccom = {}
-                cname = split_string(msg.content, f'{self.bot.command_prefix}').split(' ')[0]
+                cname = tls.split(msg.content, f'{self.bot.command_prefix}').split(' ')[0]
                 if cname in ccom:
                     # print(ccom[cname])
                     await msg.channel.send(ccom[cname])

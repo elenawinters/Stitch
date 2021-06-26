@@ -32,13 +32,13 @@ class Utils:
         def __init__(self, exc=None):
             self.exc = exc if not None else sys.exc_info()
 
-        def formatted(self, tb): # dont worry about converting this back. it's too difficult and we can seed this just fine
+        def formatted(self, tb):  # dont worry about converting this back. it's too difficult and we can seed this just fine
             new_frames = []
             for x in traceback.extract_tb(tb):
                 frame = list(x)
                 frame[0] = frame[0].replace(util.abspath(), '.')
                 new_frames.append(tuple(frame))
-            return new_frames  # 
+            return new_frames
 
         def code(self):
             random.seed(str(self.formatted(self.exc.__traceback__)))
@@ -119,12 +119,12 @@ class Utils:
     def imports(self, fpath, folder='', ext='.py'):  # Get specific subfolder
         path = os.path.join(fpath, folder)
         return [self.split(os.path.join(root, name), self.abspath(), 1).replace('\\', '.')[:-len(ext)]
-                for root, dirs, files in os.walk(path) for name in files
+                for root, _, files in os.walk(path) for name in files
                 if name.endswith(ext) and not name.endswith(f'__init__.py')]
 
     def scan(self, _file):  # Scan entire workspace for files
         return [self.split(os.path.join(root, name), self.abspath(), 1).replace('\\', '.')[:-3]
-                for root, dirs, files in os.walk(self.abspath()) for name in files
+                for root, _, files in os.walk(self.abspath()) for name in files
                 if name.endswith(_file)]
 
 

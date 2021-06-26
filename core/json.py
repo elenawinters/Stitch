@@ -1,7 +1,13 @@
+# THIS IS GOING TO BE DEPRECIATED
+# CONFIGPARSER WILL REPLACE IT
+
 # https://codebeautify.org/json-generator
 from core.defaults.default import default
 import json as _json
-import collections
+try:
+    from collections.abc import Mapping
+except ImportError:  # backwards compat
+    from collections import Mapping
 import datetime
 import os
 
@@ -114,7 +120,7 @@ class Internal:
     @classmethod
     def merge(cls, dct, merge_dct):  # https://gist.github.com/angstwad/bf22d1822c38a92ec0a9
         for k, v in merge_dct.items():
-            if (k in dct and isinstance(dct[k], dict) and isinstance(merge_dct[k], collections.Mapping)):
+            if (k in dct and isinstance(dct[k], dict) and isinstance(merge_dct[k], Mapping)):
                 cls.merge(dct[k], merge_dct[k])
             else:
                 dct[k] = merge_dct[k]
