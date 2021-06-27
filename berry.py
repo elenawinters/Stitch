@@ -22,7 +22,7 @@ import os
 
 
 def berry(**kwargs):
-    log.debug(f"{util.crypt('weeeeee')}")
+    log.debug(f"{util.crypt('$64FC6')}")
 
     asyncio.set_event_loop(asyncio.new_event_loop())
 

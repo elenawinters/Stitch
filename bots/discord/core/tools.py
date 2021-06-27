@@ -62,6 +62,13 @@ class DiscordTools(utils.Utils):  # Discord utils
                     return _cog
             return None
 
+        @classmethod
+        def botSpecific(cls, snowflake, bot):
+            if bot.user.id == snowflake:
+                return True
+            else:
+                raise tls.Exceptions.BotSpecificCog
+
     class Voice:
         def __init__(self, ctx):
             self.ctx = ctx
@@ -96,11 +103,14 @@ class DiscordTools(utils.Utils):  # Discord utils
 
         @classmethod
         async def preset(cls, bot):
-            from core import json
-            status = json.orm['discord']['presence'].get(str(bot.user.id), 'default').get('status', json.orm['discord']['presence']['default']['status'])
-            activity = tls.Activity.from_dict(json.orm['discord']['presence'].get(str(bot.user.id), 'default').get('activity'))
-            await bot.change_presence(activity=activity, status=getattr(discord.Status, status, 'online'))
-            return activity, status
+            try:
+                from core import json
+                status = json.orm['discord']['presence'].get(str(bot.user.id), 'default').get('status', json.orm['discord']['presence']['default']['status'])
+                activity = tls.Activity.from_dict(json.orm['discord']['presence'].get(str(bot.user.id), 'default').get('activity'))
+                await bot.change_presence(activity=activity, status=getattr(discord.Status, status, 'online'))
+                return activity, status
+            except Exception:
+                pass
 
         @classmethod
         async def refresh(cls, bot):
@@ -250,6 +260,12 @@ class DiscordTools(utils.Utils):  # Discord utils
 
     class Exceptions:
         class GlobalBanException(commands.CheckFailure):
+            pass
+
+        class CogSetupException(Exception):
+            pass
+
+        class BotSpecificCog(CogSetupException):
             pass
 
     exceptions = Exceptions

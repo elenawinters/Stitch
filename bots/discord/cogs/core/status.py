@@ -101,7 +101,7 @@ class Core(commands.Cog):
     #     await update(self)
 
     @commands.Cog.listener()
-    async def on_ready(self):
+    async def on_cogs_ready(self):
         # await asyncio.sleep(2)
         await update(self)
 

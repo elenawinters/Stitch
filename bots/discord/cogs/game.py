@@ -48,7 +48,7 @@ class Core(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.Cog.listener()
-    async def on_ready(self):
+    async def on_cogs_ready(self):
         await tls.Activity.preset(self.bot)
 
     @commands.Cog.listener()

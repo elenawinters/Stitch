@@ -4,7 +4,7 @@ from core.color import trace
 # from core.bot.funcs import *
 from ...core.tools import tls
 from core.logger import log
-from ... import loader
+from ... import main
 import time
 
 
@@ -50,7 +50,7 @@ class Core(commands.Cog, command_attrs=dict(hidden=True)):
     async def reload(self, ctx):
         log.info(f'{trace.red.s}> Reloading Extensions')
         before = time.monotonic()
-        loader.CogLoader(self.bot).reload()
+        main.CogLoader(self.bot).reload()
         ping = round((time.monotonic() - before) * 1000)
         await ctx.send(f'Extensions reloaded. ({len(self.bot.extensions)}) (`{ping}ms`)')
         # warnings = []

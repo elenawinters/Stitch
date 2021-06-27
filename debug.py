@@ -1,3 +1,4 @@
+from bots.discord.core import tools
 from core.logger import log, trace
 from dateutil import parser
 from core import web, json
@@ -38,8 +39,36 @@ class Initialize():  # Runtime debug
         #     log.debug(f'{x}Hello world')
 
     # def tests(self):
-    #     print(os.path.join(util.path(__file__), 'loader'))
-    #     sys.exit(0)
+    #     try:
+    #         raise tools.tls.Exceptions.BotSpecificCog
+    #     except Exception as exc:
+    #         log.debug(type(exc))
+    #         log.debug(tools.tls.Exceptions.BotSpecificCog)
+    #         if isinstance(exc, tools.tls.Exceptions.BotSpecificCog):
+    #             log.debug('Success ' * 55)
+
+    #         # if type(exc) != tools.tls.Exceptions.BotSpecificCog:
+    #         #     log.debug('Success ' * 23)
+    #         # log.debug(type(exc))
+
+    #     return
+
+    #     # raise IndexError('lol')
+    #     try:
+    #         raise TypeError("'NoneType' object is not iterable")
+    #     except Exception as exc:
+    #         try:
+    #             exctype, value, tb = sys.exc_info()
+    #             log.debug(exctype)
+    #             log.debug(value)
+    #             log.debug(tb)
+    #             # IndexError()
+    #             log.debug(type(exc))
+    #             log.error(**util.Traceback(sys.exc_info()[1]).code())
+    #         except Exception as haha:
+    #             log.error(haha)
+
+        # sys.exit(0)
 
     # def test1(self):
     #     log.debug(f'{}Hello this is a test')

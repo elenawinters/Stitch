@@ -1,4 +1,5 @@
 from discord.ext import commands
+from ...core.tools import tls
 
 
 class Zaqistan(commands.Cog):
@@ -7,5 +8,5 @@ class Zaqistan(commands.Cog):
 
 
 def setup(bot):
-    if bot.user.id == 849541560928567297:
+    if tls.cog.botSpecific(849541560928567297, bot):
         bot.add_cog(Zaqistan(bot))

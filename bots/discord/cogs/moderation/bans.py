@@ -5,7 +5,8 @@ from ...core.tools import tls
 from core.logger import log
 from data.data import data
 from core import time
-import core.checks
+from core import web
+# import core.checks
 import core.json
 import datetime
 
@@ -54,7 +55,7 @@ class Moderation(commands.Cog):
     #     await ban_attempt(self, guild, user.id)
 
     @commands.Cog.listener()  # Initial sweep on ready
-    async def on_ready(self):
+    async def on_cogs_ready(self):
         await ban_sweep(self)
 
     @commands.Cog.listener()  # Sweep every 5 minutes based on member updates, which are quite frequent
@@ -131,9 +132,10 @@ async def ban_list():  # Use this to prevent sql errors
         global bl_rate
         global bl_first
         if time.misc.diff(bl_rate, datetime.datetime.utcnow()).seconds >= 10 or bl_first:
-            bl_list = (await core.api('bans/list').async_get()).json()
+            bl_list = (await web.api('bans').async_get()).json()
             bl_rate = datetime.datetime.utcnow()
             bl_first = False
         return bl_list
-    except Exception:
-        return None
+    except Exception as exc:
+        log.exception(exc)
+        return []

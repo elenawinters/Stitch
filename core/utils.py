@@ -16,6 +16,8 @@ import sys
 import re
 import os
 
+log = logging.getLogger('stitches')
+
 
 class Utils:
     def __init__(self):
@@ -45,6 +47,18 @@ class Utils:
             number = random.randint(10000, 99999)  # i have no clue how useful these codes will actually be
             return {'msg': f'Error! Code #{number}', 'exc_info': self.exc}
 
+    def excepthook(self, exctype, value, tb):
+        return
+        # log.error(**self.Traceback(value).code())
+        # log.error("Uncaught exception: {0}".format(str(value)))
+        # # print('here')
+        # try:
+        #     log.debug('here')
+        #     log.error(**self.Traceback(sys.exc_info()).code())
+        # except Exception as exc:
+        #     print(exc)
+        # print('finsihed')
+
     def crypt(self, s):
         x = []
         for i in range(len(s)):
@@ -54,10 +68,6 @@ class Utils:
             else:
                 x.append(s[i])
         return ''.join(x)
-
-    def excepthook(self, exctype, value, tb):
-        log = logging.getLogger('stitches')  # does this even work?
-        log.exception(**self.Traceback((exctype, value, tb)).code())
 
     def hack_the_planet(self, ignore: list = []):  # This is overly complicated.
         """ This returns every function from the class it was executed from """

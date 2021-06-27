@@ -10,7 +10,7 @@ import threading
 import asyncio
 from core import json
 import subprocess
-from . import loader
+from . import main
 import time
 import sys
 import ast
@@ -35,7 +35,7 @@ class Initialize():
         intents.members = True
 
         client = commands.Bot(command_prefix=self.prefix, intents=intents)
-        entry_cog = tls.split(os.path.join(tls.path(__file__), 'loader'), tls.abspath(), 1).replace('\\', '.')
+        entry_cog = tls.split(os.path.join(tls.path(__file__), 'main'), tls.abspath(), 1).replace('\\', '.')
         client.load_extension(entry_cog)
         # loader.Load(client).load()
 

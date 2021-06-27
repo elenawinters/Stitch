@@ -7,11 +7,16 @@ import sys
 import os
 
 
+def flask_working_dir():
+    return util.split(util.path(__file__), util.abspath(), 1)
+
+
 # https://gist.github.com/jerblack/735b9953ba1ab6234abb43174210d356
 sys.modules['flask.cli'].show_server_banner = lambda *x: None  # Hide warning message
 
 loop = asyncio.get_event_loop()  # Define loop so that things that require it can use it
-app = Flask('stitch-api')
+app = Flask('stitch-api', template_folder=os.path.join(flask_working_dir(), 'templates'),
+            static_folder=os.path.join(flask_working_dir(), 'static'))
 app.config.update(
     JSONIFY_PRETTYPRINT_REGULAR=False,  # This is handled by base() now, and not necessary
     ENV='production'

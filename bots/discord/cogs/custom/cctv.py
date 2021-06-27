@@ -110,7 +110,7 @@ class Custom(commands.Cog):
                             break
 
     @commands.Cog.listener()
-    async def on_ready(self):
+    async def on_cogs_ready(self):
         if not looping:
             await find_online_users(self)
             await live_loop(self)

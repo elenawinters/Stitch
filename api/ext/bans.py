@@ -10,7 +10,7 @@ first = True
 bans = {}
 
 
-@app.route("/bans")  # Use this to prevent the database blocking
+@app.route("/bans/")  # Use this to prevent the database blocking
 def bans():
     global rate
     global bans

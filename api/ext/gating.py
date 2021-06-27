@@ -14,7 +14,7 @@ def keywords():
     return base(data, request)
 
 
-@app.route("/gating/<gate>", methods=['GET', 'POST'])
+@app.route("/gating/<gate>/", methods=['GET', 'POST'])
 def specifics(gate):
     if request.method == 'POST':
         data.update({gate: request.json})

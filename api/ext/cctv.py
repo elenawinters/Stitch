@@ -51,7 +51,7 @@ def name_to_id(name):
     # return None
 
 
-@app.route("/cctv/online")
+@app.route("/cctv/online/")
 def ctv_online():
     global rate
     global is_online_data
