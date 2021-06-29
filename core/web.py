@@ -62,8 +62,8 @@ class Client:
 
 class API(Client):
     def __init__(self, loc='', **kwargs):
-        pre = f"http://{json.orm['api']['host']}:{json.orm['api']['port']}/{loc}"
-        super().__init__(pre, **kwargs)
+        pre = f"http://{json.orm['api']['host']}:{json.orm['api']['port']}/{loc + '/' if loc[-1] != '/' else loc}"
+        super().__init__(pre, **kwargs)  # the last ternery in the above tries to mitigate 308 redirects
 
 
 api = API

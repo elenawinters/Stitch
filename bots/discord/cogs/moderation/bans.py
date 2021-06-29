@@ -131,7 +131,7 @@ async def ban_list():  # Use this to prevent sql errors
         global bl_list
         global bl_rate
         global bl_first
-        if time.misc.diff(bl_rate, datetime.datetime.utcnow()).seconds >= 10 or bl_first:
+        if time.misc.diff(bl_rate, datetime.datetime.utcnow()).seconds >= 1800 or bl_first:
             bl_list = (await web.api('bans').async_get()).json()
             bl_rate = datetime.datetime.utcnow()
             bl_first = False

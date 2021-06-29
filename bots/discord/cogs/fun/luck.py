@@ -8,12 +8,12 @@ import random
 
 
 class Fun(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
 
     @commands.command(name='roll', aliases=['rolls', 'dice', 'rolldice', 'diceroll', 'rol'])
     @decorators.banned()
-    async def roll_dice(self, ctx, dice='1d6', extra=None):
+    async def roll_dice(self, ctx: commands.Context, dice: str = '1d6', extra=None):
         """Roll a dice!
         `.roll [type]`
         Type:
@@ -49,18 +49,17 @@ class Fun(commands.Cog):
 
     @commands.command(name='coin', aliases=['flip', 'flipcoin', 'coinflip'])
     @decorators.banned()
-    async def flip_coin(self, ctx):
-        flip = random.randint(1, 2)
+    async def flip_coin(self, ctx: commands.Context):
+        flip = random.choice(['heads', 'tails'])
         embed = tls.Embed(ctx, description=f'You flipped a coin!', timestamp=True)
-        log.debug(assets.Misc.coin.heads)
 
-        embed.set_thumbnail(url=f'{assets.Misc.coin.heads if flip == 1 else assets.Misc.coin.tails}')
-        embed.set_footer(text=f"It landed on {'Heads' if flip == 1 else 'Tails'}!")
+        embed.set_thumbnail(url=getattr(assets.Misc.coin, flip))
+        embed.set_footer(text=f"It landed on {flip.capitalize()}!")
         await ctx.send(embed=embed)
 
     @commands.command(name='number', aliases=['random', 'rand', 'num', 'randomnumber', 'rando'])
     @decorators.banned()
-    async def number_generator(self, ctx, number='1-100', *, seed=None):
+    async def number_generator(self, ctx: commands.Context, number: str = '1-100', *, seed=None):
         """Pseudorandom number generator.
         `.number [range] [seed]`
         Examples:
@@ -93,5 +92,5 @@ class Fun(commands.Cog):
         await ctx.send(embed=embed)
 
 
-def setup(bot):
+def setup(bot: commands.Bot):
     bot.add_cog(Fun(bot))
