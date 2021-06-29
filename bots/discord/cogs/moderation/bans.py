@@ -15,12 +15,12 @@ bDebug = True
 
 
 class Moderation(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
 
     @commands.command(aliases=['ban', 'hban'])
     @commands.check_any(decorators.permissions(3), commands.has_permissions(ban_members=True), decorators.banned())
-    async def hackban(self, ctx, snowflake, *, reason='User was hackbanned'):
+    async def hackban(self, ctx: commands.Context, snowflake: int, *, reason: str = 'User was hackbanned'):
         try:
             await ctx.guild.ban(discord.Object(snowflake), delete_message_days=0, reason=reason)
             await ctx.send(f'Hackbanned <@!{snowflake}> with reason `{reason}`.')
@@ -31,7 +31,7 @@ class Moderation(commands.Cog):
 
     @commands.command(aliases=['gban'])
     @commands.check_any(decorators.permissions(1), decorators.banned())
-    async def globalban(self, ctx, snowflake, *, reason='User was globally banned'):
+    async def globalban(self, ctx: commands.Context, snowflake: int, *, reason: str = 'User was globally banned'):
         ban = data.base['bans'].find_one(id=snowflake)
         if not ban:  # If None, ban
             gban = dict(
@@ -47,7 +47,7 @@ class Moderation(commands.Cog):
             await ctx.send(f"<@!{snowflake}> was already globally banned by <@!{ban['by']}> with reason `{ban['reason']}` at `{ban['date']} (UTC)`")
 
     @commands.Cog.listener()  # Attempt kickban on join
-    async def on_member_join(self, member):
+    async def on_member_join(self, member: discord.Member):
         await ban_attempt(self, member.guild, member.id)
 
     # @commands.Cog.listener()  # Reban if unbanned
@@ -59,18 +59,18 @@ class Moderation(commands.Cog):
         await ban_sweep(self)
 
     @commands.Cog.listener()  # Sweep every 5 minutes based on member updates, which are quite frequent
-    async def on_member_update(self, before, after):  # This should be called constantly, hopefully. At least once a minute
+    async def on_member_update(self, before: discord.Member, after: discord.Member):  # This should be called constantly, hopefully. At least once a minute
         global rate
         if time.misc.diff(rate, datetime.datetime.utcnow()).seconds >= 300:  # 5 minute rate limit
             rate = datetime.datetime.utcnow()
             await ban_sweep(self)
 
 
-def setup(bot):
+def setup(bot: commands.Bot):
     bot.add_cog(Moderation(bot))
 
 
-async def ban_attempt(self, guild, snowflake):
+async def ban_attempt(self, guild: discord.Guild, snowflake: int):
     ban = await ban_list()
     if str(snowflake) in ban:
         if bDebug:
@@ -109,7 +109,7 @@ async def ban_attempt(self, guild, snowflake):
             log.debug(f'All attempts failed on {snowflake}')
 
 
-async def ban_sweep(self):
+async def ban_sweep(self: Moderation):
     ban = await ban_list()
     for guild in self.bot.guilds:
         for snowflake in ban:

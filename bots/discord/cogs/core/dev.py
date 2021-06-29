@@ -7,12 +7,12 @@ from core.logger import log
 
 
 class Core(commands.Cog, command_attrs=dict(hidden=True)):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
 
     @commands.group(aliases=['int', 'internal', 'bot', 'system', 'info', 'debug', 'dbg', 'admin'])
     @commands.is_owner()  # OWNER ONLY FOR ENTIRE GROUP
-    async def dev(self, ctx):
+    async def dev(self, ctx: commands.Context):
         if not ctx.invoked_subcommand:
             com = [x for x in self.bot.walk_commands()]
             pos = len(com)
@@ -26,32 +26,32 @@ class Core(commands.Cog, command_attrs=dict(hidden=True)):
                 log.info(x)
 
     @dev.command(name='cog')
-    async def get_cog(self, ctx, name):
+    async def get_cog(self, ctx: commands.Context, name: str):
         cog = tls.Cog.fetch(self, name)
         log.info(cog.qualified_name)  # print(cog)
 
     @dev.command(aliases=['servers'])
-    async def guilds(self, ctx):  # LIST ALL GUILDS
+    async def guilds(self, ctx: commands.Context):  # LIST ALL GUILDS
         log.info(f'Number of Guilds that this bot is in: {len(self.bot.guilds)}')
         for x in self.bot.guilds:
             log.info(f'{x.id}: {x.name}')
 
     @dev.group(aliases=['members'])
-    async def users(self, ctx):  # LIST ALL USERS
+    async def users(self, ctx: commands.Context):  # LIST ALL USERS
         if not ctx.invoked_subcommand:
             log.info(f'Number of Users that this bot can see: {len(self.bot.users)}')
             for x in self.bot.users:
                 log.info(f'{x.id}: {x}')
 
     @users.command(aliases=['search', 'match'])
-    async def find(self, ctx, *, user):
+    async def find(self, ctx: commands.Context, *, user: str):
         matches = tls.search(user, self.bot.users)
         log.info(f'Found {len(matches)} users that match "{user}"')
         for x in matches:
             log.info(f'{x.id}: {x.name}#{x.discriminator}')
 
     @dev.command(aliases=['member'])
-    async def user(self, ctx, *, arg):  # LIST ALL USERS
+    async def user(self, ctx: commands.Context, *, arg):  # LIST ALL USERS
         user = await commands.UserConverter().convert(ctx=ctx, argument=arg)
         log.info(f'Viewing user: {user.id}: {user}')
         log.info(f'Joined: {user.created_at}')
@@ -64,7 +64,7 @@ class Core(commands.Cog, command_attrs=dict(hidden=True)):
             log.info(f'{x.id}: {x.name}')
 
     @dev.command(aliases=['server'])
-    async def guild(self, ctx, guild_id):  # LIST GUILD INFO
+    async def guild(self, ctx: commands.Context, guild_id: int):  # LIST GUILD INFO
         guild = await self.bot.fetch_guild(guild_id)
         log.info(f'Viewing guild: {guild.id}: {guild}')
         owner = await commands.UserConverter().convert(ctx=ctx, argument=str(guild.owner_id))
@@ -85,12 +85,12 @@ class Core(commands.Cog, command_attrs=dict(hidden=True)):
         log.info(f'Created at: {guild.created_at}')
 
     @guild.error
-    async def guild_error(self, ctx, err):
+    async def guild_error(self, ctx: commands.Context, err: Exception):
         if isinstance(err, commands.CommandInvokeError):
             log.warn(f'Could not find guild in cache. Error message to follow.')
 
     @dev.command(aliases=['createinvite'])
-    async def invite(self, ctx, guild_id):  # LIST ALL USERS
+    async def invite(self, ctx: commands.Context, guild_id: int):  # LIST ALL USERS
         guild = await self.bot.fetch_guild(guild_id)
         log.info(f'Getting invite for guild: {guild.id}: {guild}')
         channels = await guild.fetch_channels()
@@ -103,7 +103,7 @@ class Core(commands.Cog, command_attrs=dict(hidden=True)):
         log.info(f'Invite for guild {guild.id}: {invite}')
 
     @invite.error
-    async def invite_error(self, ctx, err):
+    async def invite_error(self, ctx: commands.Context, err: Exception):
         if isinstance(err, commands.CommandInvokeError):
             if '50001' in str(err):
                 log.warn(f'Could not find guild in cache. Error message to follow.')
@@ -111,7 +111,7 @@ class Core(commands.Cog, command_attrs=dict(hidden=True)):
                 log.warn(f'Failed to create invite for guild. Error message to follow.')
 
     @dev.command()
-    async def commands(self, ctx):
+    async def commands(self, ctx: commands.Context):
         com = []
         for x in self.bot.walk_commands():
             com.append(x)
@@ -146,5 +146,5 @@ class Core(commands.Cog, command_attrs=dict(hidden=True)):
     #     # # print('here')
 
 
-def setup(bot):
+def setup(bot: commands.Bot):
     bot.add_cog(Core(bot))

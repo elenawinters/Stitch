@@ -4,12 +4,12 @@ from ...core import decorators
 
 
 class Moderation(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
 
     @commands.command(aliases=['purge', 'claer'])
     @decorators.banned()
-    async def clear(self, ctx, arg='1'):
+    async def clear(self, ctx: commands.Context, arg: int = 1):  # arg used to be a str
         """Clears up to 250 messages
         .clear [number of messages]"""
         try:
@@ -34,5 +34,5 @@ class Moderation(commands.Cog):
     #     pass
 
 
-def setup(bot):
+def setup(bot: commands.Bot):
     bot.add_cog(Moderation(bot))

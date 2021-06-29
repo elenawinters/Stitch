@@ -2,6 +2,12 @@
 from enum import Enum, auto
 
 
+class Misc:
+    class coin:
+        heads = 'https://i.imgur.com/U5gILVc.png'
+        tails = 'https://i.imgur.com/Eiqskz0.png'
+
+
 class Discord:
     class Avatars:  # Discord
         default = 'https://cdn.discordapp.com/embed/avatars/0.png'
@@ -16,14 +22,14 @@ class Discord:
         two = green
         three = yellow
         four = red
-    error = 'https://www.mediafire.com/convkey/e259/b3pnjzoktk8vcszzg.jpg'
+    error = 'https://i.imgur.com/HvT5TLd.png'
     default = error
 
     class Emotes:
         red_circle = 'http://www.mediafire.com/convkey/c36d/el585pkua4ff6i8zg.jpg'
         check = 'http://www.mediafire.com/convkey/92fc/mrsv5k8fs35e2ekzg.jpg'
 
-    progress = {
+    progress = {  # these assets go unused. as such they will not be ported to imgur
         0: 'https://www.mediafire.com/convkey/a18d/5bnas7m3l9mpjyx6g.jpg',
         15: 'https://www.mediafire.com/convkey/bcca/hz7jlui2u6gq2ml6g.jpg',
         30: 'https://www.mediafire.com/convkey/f2f0/n1bw6tmaj6tb8vt6g.jpg',

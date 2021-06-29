@@ -265,6 +265,9 @@ class DiscordTools(utils.Utils):  # Discord utils
         class CogSetupException(Exception):
             pass
 
+        class CogNotImplemented(CogSetupException):
+            pass
+
         class BotSpecificCog(CogSetupException):
             pass
 

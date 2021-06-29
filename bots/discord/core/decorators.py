@@ -1,3 +1,4 @@
+from typing import Union
 from core.logger import log, trace, json
 from discord.ext import commands
 from data.data import data
@@ -9,14 +10,14 @@ def banned():
     """
         Is the user executing the command globally banned?
     """
-    async def predicate(ctx):
+    async def predicate(ctx: commands.Context):
         if data.base['bans'].find_one(id=ctx.author.id):
             raise tls.Exceptions.GlobalBanException
         return True  # Return True so that the program can continue if not banned
     return commands.check(predicate)
 
 
-def permissions(level):  # 0 for manager, 1 for assistant
+def permissions(level: Union[str, int]):  # 0 for manager, 1 for assistant
     """
         Level 0: Manager (root)
         Level 1: Assistant (trusted)
@@ -39,7 +40,7 @@ def permissions(level):  # 0 for manager, 1 for assistant
             log.exception(exc)
             return False
 
-    async def predicate(ctx):
+    async def predicate(ctx: commands.Context):
         user = data.base['permissions'].find_one(uuid=ctx.author.id, platform='discord')
         if user is not None and 'level' in user and user['level'] <= level:
             return True

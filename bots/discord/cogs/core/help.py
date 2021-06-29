@@ -8,17 +8,17 @@ import datetime
 
 
 class Core(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
 
     @commands.command()
-    async def support(self, ctx):
+    async def support(self, ctx: commands.Context):
         support = json.orm['discord']['support']
         embed = tls.Embed(ctx, description=f"Join the [{support['name']}]({support['url']}) Discord server!")
         await ctx.send(embed=embed)
 
     @commands.command(aliases=['userinfo'])
-    async def whois(self, ctx, *, user):
+    async def whois(self, ctx: commands.Context, *, user: str):
         try:
             user = await commands.MemberConverter().convert(ctx=ctx, argument=user)
         except commands.BadArgument:
@@ -55,9 +55,9 @@ class Core(commands.Cog):
 
     @commands.command(hidden=True)
     @commands.is_owner()
-    async def cogs(self, ctx):
+    async def cogs(self, ctx: commands.Context):
         """Display all loaded cogs"""
-        color = get_color(ctx)
+        color = tls.Color.get_color(ctx)
         unique_cogs = set({})
         for x in self.bot.commands:
             unique_cogs.add(x.cog_name)
@@ -80,7 +80,7 @@ class Core(commands.Cog):
 
     @commands.command(name='command', aliases=['comm', 'commands', 'com'], hidden=True)
     @commands.is_owner()
-    async def comm(self, ctx, name=None):
+    async def comm(self, ctx: commands.Context, name: str = None):
         if name is not None:
             x = tls.Command.fetch(self, name)
             if x:
@@ -107,7 +107,7 @@ class Core(commands.Cog):
             await tls.Command.execute(self, ctx, 'status')
 
     @commands.command(aliases=['aliases', 'al'], hidden=True)
-    async def alias(self, ctx, name=None):
+    async def alias(self, ctx: commands.Context, name: str = None):
         if name is not None:
             x = tls.Command.fetch(self, name)
             if x:
@@ -122,9 +122,9 @@ class Core(commands.Cog):
 
     @commands.command()
     @commands.is_owner()
-    async def dump(self, ctx):  # Dump every command available
+    async def dump(self, ctx: commands.Context):  # Dump every command available
         await ctx.send("**Commands:**\n" + ''.join([str(x) + '\n' for x in tls.remove_duplicates([y for y in self.bot.walk_commands()])]))
 
 
-def setup(bot):
+def setup(bot: commands.Bot):
     bot.add_cog(Core(bot))

@@ -5,28 +5,28 @@ from ...core.tools import tls
 
 
 class Core(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
 
     @commands.command(name='say', aliases=['me'], hidden=True)
     @decorators.permissions(3)
     @decorators.banned()
-    async def say(self, ctx, *, arg=''):
+    async def say(self, ctx: commands.Context, *, arg: str = ''):
         """Make the bot say something!
         `.say [text]`"""
         if len(arg) > 0:
-            embed = tls.Embed(ctx, description=arg, colour=get_color(ctx))
+            embed = tls.Embed(ctx, description=arg, colour=tls.Color.get_color(ctx))
             await ctx.send(embed=embed)
 
     @commands.command(name='sudo', aliases=['echo'], hidden=True)
     @decorators.permissions(3)
     @decorators.banned()
-    async def sudo(self, ctx, *, arg=''):
+    async def sudo(self, ctx: commands.Context, *, arg: str = ''):
         """Make the bot say something!
         `.sudo [text]`"""
         if len(arg) > 0:
             await ctx.send(arg)
 
 
-def setup(bot):
+def setup(bot: commands.Bot):
     bot.add_cog(Core(bot))

@@ -26,21 +26,21 @@ class data:
             jdb['address'] = '/' + str(os.path.abspath('data\\data.sqlite'))
             json.orm['settings'] = {'database': jdb}  # Merge updates
 
-        # We have to do check_same_thread=false, otherwise it'll complain about how we're multithreading.
+        # We have to do check_same_thread=false, otherwise it'll complain about how we're multithreading badly.
         db = dataset.connect(f"{jdb['engine']}://{jdb['address']}?check_same_thread=false", engine_kwargs={
             'pool_recycle': 3600,
         })
         cls.engine = jdb['engine']
         cls.base = db
 
-    @classmethod
-    def engine(cls):
-        log.debug(cls.engine)
-        return cls.engine
+    # @classmethod
+    # def engine(cls):
+    #     log.debug(cls.engine)
+    #     return cls.engine
 
-    @classmethod
-    def base(cls):
-        return cls.base
+    # @classmethod
+    # def base(cls):
+    #     return cls.base
 
 
 class create:  # Create database/tables if not existant

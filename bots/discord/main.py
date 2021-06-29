@@ -15,7 +15,9 @@ import os
 
 
 class CogLoader:
-    def __init__(self, client):
+    def __init__(self, client: commands.Bot):
+        if not isinstance(client, commands.Bot):
+            raise TypeError(f"Expected 'commands.Bot' but received {type(client)}! Unable to continue!")
         self.client = client
         self.exc = {}
 
@@ -45,7 +47,8 @@ class CogLoader:
 
         count = len(self.exc)
 
-        log.error(f"> Failed to load {trace.yellow.s}{count}{trace.cyan} extension{'' if count == 1 else 's'}.")
+        if count >= 1:
+            log.error(f"> Failed to load {trace.yellow.s}{count}{trace.cyan} extension{'' if count == 1 else 's'}.")
 
         log.info(f"{trace.cyan}> Loaded {trace.yellow.s}{len(self.client.extensions)}{trace.cyan} extension"
                  f"{'' if len(self.client.extensions) == 1 else 's'}!")
@@ -57,7 +60,7 @@ class CogLoader:
 
 
 class StitchEntryLoad(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
 
     @commands.Cog.listener()
@@ -72,7 +75,7 @@ class StitchEntryLoad(commands.Cog):
         log.info(f'{trace.cyan}> Logged in: {trace.yellow.s}{self.bot.user.name}, {trace.cyan.s}{self.bot.user.id}, {trace.magenta.s}Initiated.')
 
     @commands.Cog.listener()
-    async def on_command(self, ctx):
+    async def on_command(self, ctx: commands.Context):
         try:
             await ctx.message.delete()
         except Exception:
@@ -86,7 +89,7 @@ class StitchEntryLoad(commands.Cog):
             log.debug(f'{trace.cyan}> Connection with {trace.white}Discord{trace.cyan} achieved.')
 
     @commands.Cog.listener()
-    async def on_command_error(self, ctx, exc):  # COMMAND ERROR HANDLER
+    async def on_command_error(self, ctx: commands.Context, exc: Exception):  # COMMAND ERROR HANDLER
         if hasattr(ctx.command, 'on_error'):
             return
 
@@ -137,7 +140,7 @@ class StitchEntryLoad(commands.Cog):
                       f'{trace.alert} while running {trace.red}{ctx.prefix}{ctx.command}{trace.alert} with error {trace.red}{exc}')
 
     @commands.Cog.listener()
-    async def on_error(self, event, *args, **kwargs):  # GENERAL ERROR HANDLER
+    async def on_error(self, event: str, *args, **kwargs):  # GENERAL ERROR HANDLER
         exc = sys.exc_info()
         log.error(f'> {trace.red}{event.capitalize()}{trace.alert} encountered {trace.red}'
                   f'{exc[0].__name__}{trace.alert} with message {trace.red}{exc[1]}')
@@ -146,7 +149,7 @@ class StitchEntryLoad(commands.Cog):
     @commands.command()
     @commands.guild_only()
     @decorators.permissions(3)
-    async def prefix(self, ctx, prefix):
+    async def prefix(self, ctx: commands.Context, prefix: str):
         form = dict(platform='discord', type='prefix', id=ctx.guild.id)
         if self.bot.command_prefix(self.bot, ctx.message) == prefix: return
         if json.orm['discord']['prefixes']['default'] == prefix:
@@ -160,5 +163,5 @@ class StitchEntryLoad(commands.Cog):
         await ctx.send(embed=embed)
 
 
-def setup(bot):
+def setup(bot: commands.Bot):
     bot.add_cog(StitchEntryLoad(bot))

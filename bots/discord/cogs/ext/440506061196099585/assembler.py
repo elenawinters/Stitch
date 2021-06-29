@@ -8,20 +8,21 @@
 from discord.ext import commands
 from ....core import decorators
 from ....core.tools import tls
+import discord
 
 
 class Ext(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
 
     @commands.group()
     @decorators.banned()
-    async def asm(self, ctx):
+    async def asm(self, ctx: commands.Context):
         pass
 
     @commands.command()
     @decorators.banned()
-    async def assemble(self, ctx, limit=4):
+    async def assemble(self, ctx: commands.Context, limit: int = 4):
         assembler = []
         async with ctx.typing():
             async for x in ctx.message.channel.history(limit=500):
@@ -38,5 +39,5 @@ class Ext(commands.Cog):
                 await ctx.send(f"There's nothing to {ctx.command.name}!")
 
 
-def setup(bot):
+def setup(bot: commands.Bot):
     bot.add_cog(Ext(bot))

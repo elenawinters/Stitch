@@ -19,7 +19,7 @@ def match(obj, find):  # Returns key, you can match the key with the dict to get
 
 
 class Ext(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
 
     @commands.group(aliases=['ccom'])
@@ -30,7 +30,7 @@ class Ext(commands.Cog):
 
     @ccoms.command()
     @decorators.permissions('admin')
-    async def remove(self, ctx, name: str):
+    async def remove(self, ctx: commands.Context, name: str):
         ccom = dict(ast.literal_eval(data.base['ccom'].find_one(server=ctx.guild.id)['commands']))
         ccom.pop(name, None)
         ccom = dict(
@@ -42,7 +42,7 @@ class Ext(commands.Cog):
 
     @ccoms.command(aliases=['edit', 'overwrite', 'update', 'create'])
     @decorators.permissions('admin')
-    async def add(self, ctx, name: str, *, content: str):
+    async def add(self, ctx: commands.Context, name: str, *, content: str):
         try:
             ccom = dict(ast.literal_eval(data.base['ccom'].find_one(server=ctx.guild.id)['commands']))
         except TypeError:
@@ -62,7 +62,7 @@ class Ext(commands.Cog):
         pass
 
     @commands.Cog.listener()
-    async def on_message(self, msg):
+    async def on_message(self, msg: discord.Message):
         com_name = list(msg.content)
         if len(com_name) > 0:
             if com_name[0] == self.bot.command_prefix:
@@ -76,5 +76,5 @@ class Ext(commands.Cog):
                     await msg.channel.send(ccom[cname])
 
 
-def setup(bot):
+def setup(bot: commands.Bot):
     bot.add_cog(Ext(bot))

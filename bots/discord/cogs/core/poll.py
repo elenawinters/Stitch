@@ -6,12 +6,12 @@ color = discord.Colour.from_rgb(r=59, g=136, b=195)
 
 
 class Core(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
 
     @commands.command(name='vote')
     @decorators.banned()
-    async def vote(self, ctx, *, msg=''):
+    async def vote(self, ctx: commands.Context, *, msg: str = ''):
         """Command to open vote
         `.vote [text]`"""
         try:
@@ -27,7 +27,7 @@ class Core(commands.Cog):
 
     @commands.command(name='poll')
     @decorators.banned()
-    async def poll(self, ctx, amount, *, msg=''):
+    async def poll(self, ctx: commands.Context, amount: float, *, msg: str = ''):
         """Command to open poll
         `.poll [number of options] [text]`"""
         base = ord(u"\U0001F1E6")  # INDICATOR A
@@ -52,7 +52,7 @@ class Core(commands.Cog):
 
     @commands.command(name='ask', aliases=['question', 'questions'])
     @decorators.banned()
-    async def ask(self, ctx, *, msg):
+    async def ask(self, ctx: commands.Context, *, msg: str):
         """Command to ask question
         `.ask [text]`"""
         try:
@@ -67,5 +67,5 @@ class Core(commands.Cog):
             await ctx.send(f'Something went wrong. {e}')
 
 
-def setup(bot):
+def setup(bot: commands.Bot):
     bot.add_cog(Core(bot))

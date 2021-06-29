@@ -9,16 +9,16 @@ import datetime
 
 
 class Core(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
 
     @commands.group()
     @decorators.permissions(2)
-    async def presence(self, ctx):
+    async def presence(self, ctx: commands.Context):
         pass
 
     @presence.command(aliases=['activity'])
-    async def game(self, ctx, _type: int, *, _game):
+    async def game(self, ctx: commands.Context, _type: int, *, _game: str):
         try:
             # parse = _game.split(' -s ', 1)
             # if len(parse) > 1:
@@ -37,7 +37,7 @@ class Core(commands.Cog):
             await tls.Message.respond(ctx, exc)
 
     @presence.command()
-    async def status(self, ctx, stat):
+    async def status(self, ctx: commands.Context, stat: str):
         if hasattr(discord.Status, stat):
             json.orm['discord'] = {'presence': {str(self.bot.user.id): {'status': stat}}}
             await tls.Activity.refresh(self.bot)
@@ -56,5 +56,5 @@ class Core(commands.Cog):
         await tls.Activity.preset(self.bot)
 
 
-def setup(bot):
+def setup(bot: commands.Bot):
     bot.add_cog(Core(bot))

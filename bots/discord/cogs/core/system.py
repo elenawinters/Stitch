@@ -9,7 +9,7 @@ import time
 
 
 class Core(commands.Cog, command_attrs=dict(hidden=True)):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
 
     # @commands.command()
@@ -47,7 +47,7 @@ class Core(commands.Cog, command_attrs=dict(hidden=True)):
 
     @commands.command(aliases=['refresh'])
     @commands.is_owner()  # I hate this command.
-    async def reload(self, ctx):
+    async def reload(self, ctx: commands.Context):
         log.info(f'{trace.red.s}> Reloading Extensions')
         before = time.monotonic()
         main.CogLoader(self.bot).reload()
@@ -112,7 +112,7 @@ class Core(commands.Cog, command_attrs=dict(hidden=True)):
 
     @commands.command()
     @commands.is_owner()
-    async def restart(self, ctx, *, message=None):
+    async def restart(self, ctx: commands.Context, *, message: str = None):
         if message is None:
             await ctx.send(f'{self.bot.user.name} is restarting.')
         else:
@@ -123,7 +123,7 @@ class Core(commands.Cog, command_attrs=dict(hidden=True)):
 
     @commands.command(aliases=['lockdown', 'lock', 'halt', 'quarantine'])
     @commands.is_owner()
-    async def quit(self, ctx):
+    async def quit(self, ctx: commands.Context):
         for x in self.bot.commands:
             if x.name not in exceptions:
                 x.enabled = False
@@ -134,7 +134,7 @@ class Core(commands.Cog, command_attrs=dict(hidden=True)):
 
     @commands.command()
     @commands.is_owner()
-    async def disable(self, ctx, arg=''):
+    async def disable(self, ctx: commands.Context, arg: str = ''):
         for x in self.bot.commands:
             if x.name == arg:
                 if x.name not in exceptions:
@@ -146,7 +146,7 @@ class Core(commands.Cog, command_attrs=dict(hidden=True)):
 
     @commands.command()
     @commands.is_owner()
-    async def enable(self, ctx, arg=''):
+    async def enable(self, ctx: commands.Context, arg: str = ''):
         for x in self.bot.commands:
             if x.name == arg:
                 if not x.enabled:
@@ -155,5 +155,5 @@ class Core(commands.Cog, command_attrs=dict(hidden=True)):
                 break
 
 
-def setup(bot):
+def setup(bot: commands.Bot):
     bot.add_cog(Core(bot))

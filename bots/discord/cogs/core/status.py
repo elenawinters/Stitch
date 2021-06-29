@@ -10,7 +10,7 @@ import httpx
 
 
 class Core(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
 
     @commands.group(aliases=[
@@ -21,7 +21,7 @@ class Core(commands.Cog):
         'latency', 'lat', 'late', 'wump',
         'uptime', 'time'
     ])
-    async def status(self, ctx):
+    async def status(self, ctx: commands.Context):
         """Reveal stats about the Discord and the bot"""
         if ctx.invoked_subcommand is None:
             async with ctx.typing():
@@ -81,19 +81,19 @@ class Core(commands.Cog):
                     log.exception(exc)
 
     @commands.Cog.listener()
-    async def on_member_join(self, member):
+    async def on_member_join(self, member: discord.Member):
         await update(self)
 
     @commands.Cog.listener()
-    async def on_member_leave(self, member):
+    async def on_member_leave(self, member: discord.Member):
         await update(self)
 
     @commands.Cog.listener()
-    async def on_guild_join(self, guild):
+    async def on_guild_join(self, guild: discord.Guild):
         await update(self)
 
     @commands.Cog.listener()
-    async def on_guild_remove(self, guild):
+    async def on_guild_remove(self, guild: discord.Guild):
         await update(self)
 
     # @commands.Cog.listener()
@@ -106,11 +106,11 @@ class Core(commands.Cog):
         await update(self)
 
 
-def setup(bot):
+def setup(bot: commands.Bot):
     bot.add_cog(Core(bot))
 
 
-async def update(self):
+async def update(self: Core):
     users = [x.id for x in self.bot.users]
     guilds = [x.id for x in self.bot.guilds]
     voices = len([x.voice_client for x in self.bot.guilds if x.voice_client is not None])

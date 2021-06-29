@@ -21,4 +21,5 @@ class Settings(commands.Cog):
 
 
 def setup(bot):
+    raise tls.Exceptions.CogNotImplemented
     bot.add_cog(Settings(bot))

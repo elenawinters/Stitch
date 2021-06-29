@@ -1,3 +1,4 @@
+from typing import Union
 import discord
 from discord.ext import commands
 # from core.bot.tools import tls
@@ -16,11 +17,11 @@ import random
 
 
 class Music(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
 
     @commands.command()
-    async def play(self, ctx, url=None):
+    async def play(self, ctx: commands.Context, url: str = None):
         if await Player.can_connect(ctx, False):
             await Player.join(ctx.message.author)
         if Player.is_connected(ctx):
@@ -67,7 +68,7 @@ class Music(commands.Cog):
                 log.exception(**r)
 
     @commands.group(aliases=['q'])
-    async def queue(self, ctx):
+    async def queue(self, ctx: commands.Context):
         if ctx.invoked_subcommand is None:
             try:
                 if queue[ctx.guild.id]['playing']:  # If object exists in here, we show the queue
@@ -99,7 +100,7 @@ class Music(commands.Cog):
 
     @queue.command()
     @commands.is_owner()
-    async def backend(self, ctx):
+    async def backend(self, ctx: commands.Context):
         try:
             log.debug(queue[ctx.guild.id]['playing'][0])
         except Exception:
@@ -107,14 +108,14 @@ class Music(commands.Cog):
         log.debug(queue[ctx.guild.id]['q'])
 
     @queue.command()
-    async def clear(self, ctx):
+    async def clear(self, ctx: commands.Context):
         if Player.is_connected(ctx):
             queue[ctx.guild.id]['q'].clear()
         else:
             await ctx.send('Not connected to voice')
 
     @queue.command()
-    async def remove(self, ctx, loc: int):
+    async def remove(self, ctx: commands.Context, loc: int):
         if Player.is_connected(ctx):
             embed = tls.Embed(ctx, description=f"Removed {queue[ctx.guild.id]['q'][loc - 2]['title']} from the queue.")
             try:
@@ -124,17 +125,17 @@ class Music(commands.Cog):
                 await ctx.send(f'Nothing at index location {loc} exists!')
 
     @queue.command(aliases=['shuff'])
-    async def shuffle(self, ctx):
+    async def shuffle(self, ctx: commands.Context):
         if Player.is_connected(ctx):
             random.shuffle(queue[ctx.guild.id]['q'])
             await ctx.send(f"Shuffled {len(queue[ctx.guild.id]['q'])} tracks")
 
     @queue.command(aliases=['len'])
-    async def length(self, ctx):
+    async def length(self, ctx: commands.Context):
         await ctx.send(f"Queue currently contains {len(queue[ctx.guild.id]['q'])} tracks")
 
     @commands.command(aliases=['now_playing', 'nowplaying', 'now-playing', 'now', 'np'])
-    async def playing(self, ctx):
+    async def playing(self, ctx: commands.Context):
         if Player.is_connected(ctx):
             curr = queue[ctx.guild.id]['playing'][0]
             # import math
@@ -175,40 +176,40 @@ class Music(commands.Cog):
     #             await respond(ctx, err)
 
     @commands.command(aliases=['next'])
-    async def skip(self, ctx):
+    async def skip(self, ctx: commands.Context):
         if Player.is_connected(ctx):
             Player.skip(ctx)
             await ctx.send('Skipping the current item')
 
     @commands.command(aliases=['stop'])
-    async def pause(self, ctx):
+    async def pause(self, ctx: commands.Context):
         if Player.is_connected(ctx):
             await ctx.send('Pausing the player')
             Player.pause(ctx)
 
     @commands.command()
-    async def resume(self, ctx):
+    async def resume(self, ctx: commands.Context):
         if Player.is_connected(ctx):
             await ctx.send('Resuming the player')
             Player.resume(ctx)
 
     @commands.command(aliases=['rejoin'])
-    async def reconnect(self, ctx):
+    async def reconnect(self, ctx: commands.Context):
         if await Player.can_connect(ctx):
             await Player.join(ctx.message.author)
             await Player.loop(self, ctx)
 
     @commands.command(aliases=['connect'])
-    async def join(self, ctx):
+    async def join(self, ctx: commands.Context):
         if await Player.can_connect(ctx):
             await Player.join(ctx.message.author)
 
     @commands.command(aliases=['disconnect'])
-    async def leave(self, ctx):
+    async def leave(self, ctx: commands.Context):
         await Player.disconnect(ctx.me)
 
     @commands.Cog.listener()
-    async def on_voice_state_update(self, member_updated, before, after):
+    async def on_voice_state_update(self, member_updated: discord.Member, before: discord.VoiceState, after: discord.VoiceState):
         member = Player.self(self, member_updated)
         if member.voice is not None:
             if len(member.voice.channel.members) == 1:
@@ -216,20 +217,20 @@ class Music(commands.Cog):
                     await Player.disconnect(member)
 
 
-def setup(bot):
+def setup(bot: commands.Bot):
     bot.add_cog(Music(bot))
 
 
 class Player:
     @classmethod
-    async def connect(cls, member):
+    async def connect(cls, member: discord.Member):
         try:
             await member.voice.channel.connect()
         except Exception:
             pass
 
     @classmethod
-    async def disconnect(cls, member, clear=False):
+    async def disconnect(cls, member: discord.Member, clear: bool = False):
         try:
             await member.guild.voice_client.disconnect()
         except Exception:
@@ -239,11 +240,11 @@ class Player:
         # del queue[member.guild.id]
 
     class Play:
-        def __new__(cls, ctx, stream):
+        def __new__(cls, ctx: commands.Context, stream: discord.FFmpegAudio):
             ctx.voice_client.play(stream)
 
         @classmethod
-        async def file(cls, sound, member):
+        async def file(cls, sound: str, member: discord.Member):
             import os
             abspath = os.path.abspath('.')
             try:
@@ -276,25 +277,25 @@ class Player:
     play = Play
 
     @classmethod
-    async def join(cls, member):
+    async def join(cls, member: discord.Member):
         await Player.connect(member)
         # TODO: Find a less annoying sound
         # player.play.file(SoundFiles.connect, member)
 
     @classmethod
-    def pause(cls, member):
+    def pause(cls, member: discord.Member):
         member.guild.voice_client.pause()
 
     @classmethod
-    def resume(cls, member):
+    def resume(cls, member: discord.Member):
         member.guild.voice_client.resume()
 
     @classmethod
-    def skip(cls, member):
+    def skip(cls, member: discord.Member):
         member.guild.voice_client.stop()
 
     @classmethod
-    async def loop(cls, self, ctx):
+    async def loop(cls, self: Music, ctx: commands.Context):
         if not Player.is_playing(ctx) and not Player.is_paused(ctx) and len(queue[ctx.guild.id]['q']) > 0:
             while Player.has_queue(ctx):
                 if not Player.is_playing(ctx) and not Player.is_paused(ctx):
@@ -334,7 +335,7 @@ class Player:
                 await asyncio.sleep(4)
 
     @classmethod
-    async def can_connect(cls, ctx, response=True):  # Includes responses if fail
+    async def can_connect(cls, ctx: commands.Context, response: bool = True):  # Includes responses if fail
         if not Player.is_connected(ctx):
             if ctx.message.author.voice is not None:
                 return True
@@ -347,7 +348,7 @@ class Player:
         return False
 
     @classmethod
-    def has_queue(cls, ctx):
+    def has_queue(cls, ctx: commands.Context):
         if ctx.me.voice is not None:
             if Player.is_connected(ctx):
                 if ctx.guild.voice_client.is_paused() or ctx.guild.voice_client.is_playing() or len(queue[ctx.guild.id]['q']) > 0:
@@ -355,11 +356,11 @@ class Player:
         return False
 
     @classmethod
-    def self(cls, self, member):  # Returns member object of bot.
+    def self(cls, self: Music, member: discord.Member):  # Returns member object of bot.
         return member.guild.get_member(self.bot.user.id)
 
     @classmethod
-    def is_connected(cls, ctx):  # Is the bot connected to v7ice?
+    def is_connected(cls, ctx: commands.Context):  # Is the bot connected to v7ice?
         if Player.voice(ctx) is not None:
             try:
                 return ctx.guild.voice_client.is_connected()
@@ -369,28 +370,28 @@ class Player:
             return False
 
     @classmethod
-    def is_playing(cls, ctx):
+    def is_playing(cls, ctx: commands.Context):
         if Player.voice(ctx) is not None:
             return ctx.guild.voice_client.is_playing()
         else:
             return False
 
     @classmethod
-    def is_paused(cls, ctx):
+    def is_paused(cls, ctx: commands.Context):
         if Player.voice(ctx) is not None:
             return ctx.guild.voice_client.is_paused()
         else:
             return False
 
     @classmethod
-    def voice(cls, obj):
+    def voice(cls, obj: Union[commands.Context, discord.Member]):
         try:
             return obj.me.voice
         except AttributeError:
             return obj.voice
 
     @classmethod
-    async def info(cls, inurl, **kwargs):  # VIDEO INFO
+    async def info(cls, inurl: str, **kwargs):  # VIDEO INFO
         loop = kwargs.get('loop', asyncio.get_event_loop())
         do_log = kwargs.get('log', False)
         ctx = kwargs.get('ctx', None)
@@ -428,7 +429,7 @@ class Player:
             return None, None
 
     @classmethod
-    async def process_picture(cls, _dict, platform):
+    async def process_picture(cls, _dict: dict, platform: str):
         # log.debug(platform)
         try:
             if 'channel_id' in _dict:  # Get profile picture
@@ -441,7 +442,7 @@ class Player:
         return _dict
 
     @classmethod
-    async def profile_picture(cls, _id, extractor='youtube'):
+    async def profile_picture(cls, _id: int, extractor: str = 'youtube'):
         return assets.Discord.error
         # print(_id)
         # print(extractor)
@@ -483,7 +484,7 @@ class Player:
 
     class Extractor:
         @classmethod
-        def fetch(cls, data):
+        def fetch(cls, data: dict):
             if 'extractor' in data:
                 keys = data['extractor'].split(':')
                 extractor = keys[0].lower()
@@ -503,22 +504,22 @@ class Player:
 
 
 class Queue(dict):  # Queue system
-    def __getitem__(self, key):
+    def __getitem__(self, key: str):
         if key not in self.__dict__:
             self.__dict__[key] = {'player': None, 'q': [], 'playing': []}
         return self.__dict__[key]
 
 
 class LoggerHook(object):
-    def debug(self, msg):
+    def debug(self, msg: str):
         # log.debug(msg)
         pass
 
-    def warning(self, msg):
+    def warning(self, msg: str):
         # log.warning(msg)
         pass
 
-    def error(self, msg):
+    def error(self, msg: str):
         log.error(msg)
 
 
@@ -538,7 +539,7 @@ ytdl = youtube_dl.YoutubeDL(options)  # The following is taken from the basic_vo
 
 
 class YTDLSource(discord.PCMVolumeTransformer):
-    def __init__(self, source, *, data, volume=0.5):
+    def __init__(self, source: discord.FFmpegAudio, *, data: dict, volume: float = 0.5):
         super().__init__(source, volume)
 
         self.data = data
@@ -547,7 +548,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
         self.url = data.get('url')
 
     @classmethod
-    async def create_source(cls, url, *, loop, download=False):
+    async def create_source(cls, url: str, *, loop: asyncio.BaseEventLoop, download: bool = False):
         loop = loop or asyncio.get_event_loop()
 
         func = functools.partial(ytdl.extract_info, url, download=download)
