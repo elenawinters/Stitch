@@ -5,8 +5,8 @@ import datetime
 
 class Misc:
     @classmethod
-    def uptime(cls, launched):
-        return readable.timedelta(self.diff(launched, datetime.datetime.utcnow()))
+    def uptime(cls, launched: datetime.datetime):
+        return readable.timedelta(cls.diff(launched, datetime.datetime.utcnow()))
 
     @classmethod
     def diff(cls, before: datetime.datetime, after: datetime.datetime):
@@ -37,7 +37,7 @@ class Parse:  # This is meant primarily for the discord bot's .embed command
 
 class Readable:
     @classmethod
-    def at(cls, color=trace.cyan):
+    def at(cls, color: str = trace.cyan):
         if color:
             date = cls.date().replace(',', f'{color},{trace.time}')
             return f'{trace.time}{cls.time()}{color} on {trace.time}{date}{color}'
@@ -45,7 +45,7 @@ class Readable:
             return f'{cls.time()} on {cls.date()}'
 
     @classmethod
-    def on(cls, color=trace.cyan):
+    def on(cls, color: str = trace.cyan):
         if color:
             date = cls.date().replace(',', f'{color},{trace.time}')
             return f'{trace.time}{date}{color} at {trace.time}{cls.time()}{color}'
@@ -65,7 +65,7 @@ class Readable:
         return _time.strftime("%R", _time.localtime(_time.time()))
 
     class Timedelta:
-        def __new__(cls, r: datetime.timedelta, micro=False):
+        def __new__(cls, r: datetime.timedelta, micro: bool = False):
             hours = r.seconds // 3600
             minutes = (r.seconds // 60) % 60
             seconds = r.seconds % 60
@@ -79,22 +79,26 @@ class Readable:
             if minutes > 0:
                 o.append(f'{minutes} minutes')
 
-            if len(o) > 0:
-                if micro:  # Microseconds
-                    o.append(f'and {seconds}.{r.microseconds} seconds')
-                else:
-                    if seconds > 0:
-                        o.append(f'and {seconds} seconds')
-            else:
-                if micro:  # Microseconds
-                    o.append(f'{seconds}.{r.microseconds} seconds')
-                else:
-                    o.append(f'{seconds} seconds')
+            o.append(f"{'and ' if len(o) > 0 else ''}{seconds}{'.' + r.microseconds if micro else ''} seconds")
 
-            if len(o) > 2:
-                return ', '.join(o)
-            else:
-                return ' '.join(o)
+            # if len(o) > 0:
+            #     if micro:  # Microseconds
+            #         o.append(f'and {seconds}.{r.microseconds} seconds')
+            #     else:
+            #         if seconds > 0:
+            #             o.append(f'and {seconds} seconds')
+            # else:
+            #     if micro:  # Microseconds
+            #         o.append(f'{seconds}.{r.microseconds} seconds')
+            #     else:
+            #         o.append(f'{seconds} seconds')
+
+            return ', '.join(o) if len(o) > 2 else ' '.join(o)
+
+            # if len(o) > 2:
+            #     return ', '.join(o)
+            # else:
+            #     return ' '.join(o)
 
     timedelta = Timedelta
 

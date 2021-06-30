@@ -31,7 +31,7 @@ class Utils:
             return getattr(self.enum, item, default)
 
     class Traceback:
-        def __init__(self, exc=None):
+        def __init__(self, exc: Exception = None):
             self.exc = exc if not None else sys.exc_info()
 
         def formatted(self, tb):  # dont worry about converting this back. it's too difficult and we can seed this just fine
@@ -59,7 +59,7 @@ class Utils:
         #     print(exc)
         # print('finsihed')
 
-    def crypt(self, s):
+    def crypt(self, s: str):
         x = []
         for i in range(len(s)):
             j = ord(s[i])
@@ -97,7 +97,7 @@ class Utils:
     def random_string(self, **kwargs):
         return ''.join(random.choice(string.ascii_letters + string.digits) for i in range(random.randint(kwargs.get('min', 1), kwargs.get('max', 25))))
 
-    def split(self, string, remove, offset=0):
+    def split(self, string: str, remove: str, offset: int = 0):
         return string[len(f'{remove}') + offset:]
 
     def items(self, r, s):
@@ -106,18 +106,18 @@ class Utils:
     def remove_duplicates(self, x: list):
         return list(dict.fromkeys(x))
 
-    def search(self, find, data):
+    def search(self, find: str, data):
         return [x for x in data if find.lower() in str(x).lower()]
 
-    def convert(self, text):
+    def convert(self, text: str):
         return ''.join(i for i in text if ord(i) < 128)
 
-    def remove(self, text):
+    def remove(self, text: str):
         for x in trace.tracers:
             text = text.replace(str(x), '')
         return text
 
-    def clean(self, text):  # Shorthand for self.convert and self.remove
+    def clean(self, text: str):  # Shorthand for self.convert and self.remove
         return self.convert(self.remove(text))
 
     def path(self, files):

@@ -14,16 +14,16 @@ import os
 
 class memory:
     @classmethod
-    def merge(cls, file):
+    def merge(cls, file: str):
         internal.merge(cls.memory[file], external.loads(file=file))
 
     @classmethod
-    def loads(cls, files: list = [default]):
+    def loads(cls, files: list[str] = [default]):
         for file in files:
             cls.load(file)
 
     @classmethod
-    def load(cls, file=default):
+    def load(cls, file: str = default):
         cls.exists()
         if file not in cls.memory.keys():
             cls.memory[file] = {}
@@ -36,19 +36,19 @@ class memory:
             cls.reload(x)
 
     @classmethod
-    def reload(cls, file=default):  # Yuck
+    def reload(cls, file: str = default):  # Yuck
         cls.exists()
         cls.merge(file)
         return cls.memory
 
     @classmethod
-    def update(cls, file=default):
+    def update(cls, file: str = default):
         cls.exists()
         cls.memory[file] = {}
         cls.merge(file)
 
     @classmethod
-    def refresh(cls, file=default):
+    def refresh(cls, file: str = default):
         cls.reload(file)
 
     @classmethod
@@ -63,7 +63,7 @@ class memory:
 
 
 class ORMFile(object):  # Why does this fucking work?
-    def __init__(self, file=default):
+    def __init__(self, file: str = default):
         return file
 
     def file(self):
@@ -71,10 +71,10 @@ class ORMFile(object):  # Why does this fucking work?
 
 
 class ORM(dict, ORMFile):  # This is a huge mess
-    def __init__(self, file=default):
+    def __init__(self, file: str = default):
         super().__init__(file=file)
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: str):
         file = self.file()
         self.__dict__[file] = memory.load(file)
 
@@ -85,10 +85,10 @@ class ORM(dict, ORMFile):  # This is a huge mess
 
         return self.__dict__[file][key]
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, key: str, value: str):
         self.update(key, value)
 
-    def update(self, key, value):
+    def update(self, key: str, value: str):
         file = self.file()
         self.__dict__[file] = memory.load(file)
 
@@ -118,7 +118,7 @@ decode = Decode()
 
 class Internal:
     @classmethod
-    def merge(cls, dct, merge_dct):  # https://gist.github.com/angstwad/bf22d1822c38a92ec0a9
+    def merge(cls, dct: dict, merge_dct: dict):  # https://gist.github.com/angstwad/bf22d1822c38a92ec0a9
         for k, v in merge_dct.items():
             if (k in dct and isinstance(dct[k], dict) and isinstance(merge_dct[k], Mapping)):
                 cls.merge(dct[k], merge_dct[k])
@@ -127,11 +127,11 @@ class Internal:
         return dct
 
     @classmethod
-    def loads(cls, data):
+    def loads(cls, data: str):
         return _json.loads(data)
 
     @classmethod
-    def dumps(cls, data, pretty=False):
+    def dumps(cls, data: dict, pretty: bool = False):
         if pretty: return _json.dumps(data, indent=2, separators=(", ", ": "), default=str)
         else: return _json.dumps(data)
 
@@ -150,7 +150,7 @@ class External:
         return {}  # File does not exist.
 
     @classmethod
-    def write(cls, data, file: str = default, mode='w'):
+    def write(cls, data: dict, file: str = default, mode: str = 'w'):
         with open(file, mode) as json_file:
             _json.dump(data, json_file, indent=4)
 

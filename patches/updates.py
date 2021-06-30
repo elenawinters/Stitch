@@ -36,7 +36,7 @@ class patch():
         letters = {l: i for i, l in enumerate(string.ascii_lowercase, start=1)}
         versions = [x.split('.')[-1] for x in util.imports(util.path(__file__), 'versions')]
 
-        def numeric(i):
+        def numeric(i: str):
             s = list(i.split('_'))
             if (l := s[-1][-1]) in letters:
                 s.append(s.pop(2)[:-1])

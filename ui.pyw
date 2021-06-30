@@ -8,6 +8,7 @@
 
 """
 
+from dataclasses import dataclass
 from core.color import trace
 from core import logger, util
 import subprocess as sub
@@ -24,8 +25,15 @@ import re
 import os
 
 
+@dataclass
+class ScrollbarPosition:
+    hi: int = 0
+    lo: int = 0
+
+
 # https://stackoverflow.com/a/47947223/14125122 (potential thread communication)
 tkpattern = re.compile(r'.+?(?=\[|$)')
+scroll_pos = ScrollbarPosition(0, 0)
 tkmatch = re.compile(r'\[.*?m')
 name = json.orm['name']
 
@@ -58,11 +66,11 @@ colvar = {tuple([str(x) for x in k]): v for k, v in colvar.items()}
 
 
 class tkhandler(logger.logging.Handler):
-    def __init__(self, widget):
+    def __init__(self, widget: tk.Text):
         logger.logging.Handler.__init__(self)
         self.widget = widget
 
-    def emit(self, record):
+    def emit(self, record: logger.logging.LogRecord):
         # Create list for temporary use
         tags = []
 
@@ -92,18 +100,38 @@ class tkhandler(logger.logging.Handler):
                 # Append a tuple with the information for the tag to the list
                 tags.append((col, f'{line}.{start_pos}', f'{line}.{end_pos}'))
 
-        # Append message (record) to the end of the widget
-        self.widget.insert(END, record.message + '\n')
+        global scroll_pos
+        old_pos = scroll_pos.lo
 
-        # Set our cursor position in the widget to the end of the widget
-        self.widget.see(END)
+        self.widget.configure(state='normal')
+        self.widget.insert(tk.END, record.message + '\n')
+
+        limit = 500
+        del_line = 0
+        currline = int(self.widget.index('end-1c').split('.')[0])
+        if int(currline > limit):
+            del_line = currline - limit
+            self.widget.delete(f'{del_line}.0', f'{del_line + 1}.0')
+
+        self.widget.configure(state='disabled')
+
+        line_count = currline - del_line
+        scroll_line = old_pos * line_count
+        if line_count - scroll_line <= 3:
+            self.widget.see(tk.END)
+
+        # # Append message (record) to the end of the widget
+        # self.widget.insert(END, record.message + '\n')
+
+        # # Set our cursor position in the widget to the end of the widget
+        # self.widget.see(END)
 
         # Iterate over our `tags` list and add tags for the selections
         [self.widget.tag_add(x[0], x[1], x[2]) for x in tags if x[1] != x[2]]
 
 
 class tkfilter(logger.logging.Filter):
-    def filter(self, record):  # This is only because of how our logging is set up.
+    def filter(self, record: logger.logging.LogRecord):  # This is only because of how our logging is set up.
         if record.levelno >= 40:  # If error/critical
             record.message = trace.alert + record.message
         elif record.levelno >= 30:  # If warning
@@ -125,7 +153,12 @@ class stitches():
         self.cscroll = Scrollbar(self.frame_right, orient="vertical", command=self.console.yview)
         self.cscroll.pack(side="right", expand=True, fill="y")
 
-        self.console.configure(yscrollcommand=self.cscroll.set)
+        def scrollpos(y0, y1):
+            global scroll_pos
+            self.cscroll.set(y0, y1)
+            scroll_pos = ScrollbarPosition(float(y0), float(y1))
+
+        self.console.configure(yscrollcommand=scrollpos)
         # self.console.tag_configure('default', background='yellow')
         # self.console.tag_config()
 

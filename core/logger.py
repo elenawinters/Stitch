@@ -20,7 +20,7 @@ class LogLevel(enum.Enum):
 
 
 class StreamRecords(logging.Filter):
-    def filter(self, record):
+    def filter(self, record: logging.LogRecord):
         # Special cases for all of the different log levels after this
         # This is a huge mess and I hate everything about it
         record.time = f'{trace.reset}[{trace.time}{core.time.misc.Now.unix()}{trace.reset}]'
@@ -43,7 +43,7 @@ class StreamRecords(logging.Filter):
 
 
 class FileRecords(logging.Filter):
-    def filter(self, record):
+    def filter(self, record: logging.LogRecord):
         record.clean_msg = util.clean(record.message)
         return True
 

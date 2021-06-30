@@ -4,7 +4,7 @@ from core import logger, json
 class patch():
     def __init__(self):
         class flaskfilter(logger.logging.Filter):
-            def filter(self, record):  # This shifts info to debug
+            def filter(self, record: logger.logging.LogRecord):  # This shifts info to debug
                 record.threadName = 'Werkzeug'
 
                 if record.levelno <= logger.LogLevel.info.value:

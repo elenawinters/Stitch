@@ -22,7 +22,7 @@ def prefix(ident=None):
     return base(prefixes.get(ident, json.orm['discord']['prefixes']['default']), request)
 
 
-def refresh_prefixes(force=False):
+def refresh_prefixes(force: bool = False):
     global rate, prefixes
     if force or time.misc.diff(rate, datetime.datetime.utcnow()).seconds >= 1800 or len(prefixes) == 0:
         [prefixes.update({x['id']: x['data']}) for x in data.base['cache'].find(platform='discord', type='prefix')]

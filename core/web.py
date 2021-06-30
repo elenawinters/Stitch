@@ -1,3 +1,4 @@
+from typing import Callable
 from core.logger import log, trace, json
 import functools
 import inspect
@@ -12,7 +13,7 @@ httpxcept = (httpx._exceptions.WriteError,
              Exception)
 
 
-def retry(method):  # this implements the retry functionality in a better way
+def retry(method: Callable):  # this implements the retry functionality in a better way
     @functools.wraps(method)
     def _retry(self, *args, **kwargs):
         for x in range(1, self.limit + 1):
@@ -25,14 +26,14 @@ def retry(method):  # this implements the retry functionality in a better way
 
 
 class Client:
-    def __init__(self, url, **kwargs):
+    def __init__(self, url: str, **kwargs):
         self.limit = int(kwargs.get('limit', 3))
         self.url = url
 
     def json(self):  # returns None if it fails to return anything in the retry
         return None  # this prevents a potentially fatal error from occuring
 
-    def process(self, exc):
+    def process(self, exc: Exception):
         log.warn(exc)
 
     @retry
@@ -61,7 +62,7 @@ class Client:
 
 
 class API(Client):
-    def __init__(self, loc='', **kwargs):
+    def __init__(self, loc: str = '', **kwargs):
         pre = f"http://{json.orm['api']['host']}:{json.orm['api']['port']}/{loc + '/' if loc[-1] != '/' else loc}"
         super().__init__(pre, **kwargs)  # the last ternery in the above tries to mitigate 308 redirects
 

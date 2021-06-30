@@ -4,7 +4,7 @@ from core import logger
 class patch():
     def __init__(self):
         class asyncfilter(logger.logging.Filter):
-            def filter(self, record):
+            def filter(self, record: logger.logging.LogRecord):
                 record.threadName = 'Asyncio'
 
                 """
