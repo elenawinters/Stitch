@@ -1,4 +1,12 @@
 """
+    AMBITION REWRITE
+
+    This will be seperated into multiple locations and such.
+    Ambition rewrite will primarily be a UI application unless disabled.
+
+
+    OLD STRING
+
     This is a user interface wrapper for the Stitch framework.
 
     This emulates a console window, a command line interface,

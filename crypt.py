@@ -1,3 +1,5 @@
+# This is a standalone script to ROT47 incoming text
+
 import json
 import ast
 
