@@ -146,5 +146,11 @@ class Trace:
                cyan, cyan.s, cyan.b, cyan.b.s,
                white, white.s, white.b, white.b.s)
 
+    @classmethod
+    def clean(cls, text: str):  # removes all color codes and converts to ascii
+        for x in cls.tracers:
+            text = text.replace(str(x), '')
+        return ''.join(i for i in text if ord(i) < 128)
+
 
 trace = Trace

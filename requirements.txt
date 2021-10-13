@@ -1,8 +1,6 @@
-discord.py>=1.1.1
+fusion.py>=1.7.3
 dataset>=1.1.2
-youtube-dl
 colorama
-PyNaCl
 flask
 httpx
 python-fity3

@@ -1,8 +1,6 @@
-from core.color import trace
-from core import json
+from core.common.color import trace
 from core import util
-import core.defaults
-import core.time
+# import core.time
 import logging
 import enum
 import sys
@@ -56,6 +54,7 @@ class Logger():  # Define internal functions
                 self.create()  # Create file
 
         def create(self):
+            raise NotImplementedError
             json.external.write(core.defaults.default.settings)
             json.json()
             token = input(f"[{core.time.misc.Now.unix()}] What is the main Discord bot's login token? ")
