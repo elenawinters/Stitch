@@ -32,9 +32,10 @@ class Core(commands.Cog):
                     msg = await ctx.send(embed=msg_embed)
                     ping = round((time._time.monotonic() - before) * 1000)
 
-                    host = json.orm['api']
+                    # host = json.orm['api']
                     api_before = time._time.monotonic()
-                    r = await web.Client(f"http://{host['host']}:{host['port']}/stat/").async_get()
+                    r = await web.api('stat').async_get()
+                    # r = await web.Client(f"http://{host['host']}:{host['port']}/stat/").async_get()
                     api_ping = round((time._time.monotonic() - api_before) * 1000)
                     # log.debug(r.content)
 
@@ -110,7 +111,7 @@ def setup(bot: commands.Bot):
     bot.add_cog(Core(bot))
 
 
-async def update(self: Core):
+async def update(self: tls.Cog.pseudo):
     users = [x.id for x in self.bot.users]
     guilds = [x.id for x in self.bot.guilds]
     voices = len([x.voice_client for x in self.bot.guilds if x.voice_client is not None])

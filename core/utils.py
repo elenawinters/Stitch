@@ -5,6 +5,7 @@
 
 """
 
+from typing import Any
 from core.color import trace
 import traceback
 import inspect
@@ -79,6 +80,21 @@ class Utils:
                 if name not in ignores and not name.startswith('__') and not name.endswith('__'):
                     funcs.append(run)
         return funcs
+
+    class Types:  # saw this in an mCoding video. Useful for attempt() I think.
+        NoReturn = object()
+
+    async def attempt(self, func, *args, **kwargs) -> Any:
+        try:
+            return await func(*args, **kwargs)
+        except Exception:
+            return util.Types.NoReturn
+
+    def attempt(self, func, *args, **kwargs) -> Any:
+        try:
+            return func(*args, **kwargs)
+        except Exception:
+            return util.Types.NoReturn
 
     def match(self, obj, key):
         """This is mainly meant for dicts with tuples as the key, to find the value"""

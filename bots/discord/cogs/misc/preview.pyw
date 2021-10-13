@@ -14,7 +14,7 @@ class Preview(commands.Cog, command_attrs=dict(hidden=True)):
     async def embed(self, ctx, *, data=None):
         try:
             if data is None:
-                embed = tls.Embed(ctx, description='Preview embeds using the [Embed Visualizer](https://leovoel.github.io/embed-visualizer/)!')
+                embed = tls.Embed(ctx, description='Preview embeds using one of two [Embed Visualizers](https://leovoel.github.io/embed-visualizer/)!')
                 await ctx.send(embed=embed)
             else:
                 embed, message = tls.Embed.parse(ctx, data, self.bot)

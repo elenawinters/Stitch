@@ -37,25 +37,25 @@ class Client:
         log.warn(exc)
 
     @retry
-    def post(self, **kwargs):
+    def post(self, **kwargs) -> httpx.Response:
         with httpx.Client() as client:
             client.post(url=self.url, **kwargs)
         return
 
     @retry
-    def get(self, **kwargs):
+    def get(self, **kwargs) -> httpx.Response:
         with httpx.Client() as client:
             r = client.get(url=self.url, **kwargs)
         return r
 
     @retry
-    async def async_post(self, **kwargs):
+    async def async_post(self, **kwargs) -> httpx.Response:
         async with httpx.AsyncClient() as client:
             await client.post(url=self.url, **kwargs)
         return
 
     @retry
-    async def async_get(self, **kwargs):
+    async def async_get(self, **kwargs) -> httpx.Response:
         async with httpx.AsyncClient() as client:
             r = await client.get(url=self.url, **kwargs)
         return r

@@ -11,7 +11,6 @@ import core.json
 import datetime
 
 rate = datetime.datetime.utcnow()
-bDebug = True
 
 
 class Moderation(commands.Cog):
@@ -70,46 +69,26 @@ def setup(bot: commands.Bot):
     bot.add_cog(Moderation(bot))
 
 
-async def ban_attempt(self, guild: discord.Guild, snowflake: int):
+async def ban_attempt(self: tls.Cog.pseudo, guild: discord.Guild, snowflake: int):  # this code needs to be re-tested
     ban = await ban_list()
     if str(snowflake) in ban:
-        if bDebug:
-            log.debug(f'{snowflake} is flagged as globally banned')
-        try:  # Try ban
-            if bDebug:
-                log.debug(f'Attempting ban on {snowflake}')
-
-            # Attempt ban
+        # if tls.attempt()
+        # log.debug('ban attempting')
+        # if await tls.attempt(guild.ban, discord.Object(snowflake), delete_message_days=0, reason=ban[str(snowflake)]['reason']) is tls.Types.NoReturn:
+        #     await tls.attempt(guild.kick, discord.Object(snowflake), reason=ban[str(snowflake)]['reason'])
+        try:
             await guild.ban(discord.Object(snowflake), delete_message_days=0, reason=ban[str(snowflake)]['reason'])
-
-            if bDebug:  # reee cant make it 1 line
-                log.debug(f'Ban success on {snowflake}')
-
             return
-        except Exception:  # Missing permissions/unable
-            if bDebug:
-                log.debug(f'Unable to ban {snowflake}')
-
-        try:  # Try kick
-            if bDebug:
-                log.debug(f'Attempting kick on {snowflake}')
-
-            # Attempt kick
+        except Exception:
+            pass
+        try:
             await guild.kick(discord.Object(snowflake), reason=ban[str(snowflake)]['reason'])
-
-            if bDebug:
-                log.debug(f'Kick success on {snowflake}')
-
             return
-        except Exception:  # Missing permissions/unable
-            if bDebug:
-                log.debug(f'Unable to kick {snowflake}')
-
-        if bDebug:
-            log.debug(f'All attempts failed on {snowflake}')
+        except Exception:
+            pass
 
 
-async def ban_sweep(self: Moderation):
+async def ban_sweep(self: tls.Cog.pseudo):
     ban = await ban_list()
     for guild in self.bot.guilds:
         for snowflake in ban:

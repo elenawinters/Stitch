@@ -1,3 +1,5 @@
+from types import NoneType
+from typing import Union
 from discord.ext import commands
 from core import utils, assets
 import traceback
@@ -11,42 +13,47 @@ import re
 import os
 
 
+class _PseudoCog(commands.Cog):  # this represents a basic bot cog. We can use this for type hinting
+    def __init__(self, bot: commands.Bot):
+        self.bot = bot
+
+
 class DiscordTools(utils.Utils):  # Discord utils
     def __init__(cls):  # inherit core.utils
         super().__init__()
 
     class Message:
         @classmethod
-        def base(cls, err, url=discord.Embed.Empty):
+        def base(cls, err: Exception, url=discord.Embed.Empty) -> discord.Embed:
             embed = tls.Embed(description=f'{err}', colour=discord.Colour.dark_red(), timestamp=True)
             embed.set_author(name=f'{type(err).__name__}', url=url, icon_url=assets.Discord.error)
             return embed
 
         @classmethod
-        async def exception(cls, ctx, err, url=discord.Embed.Empty, content=None):
+        async def exception(cls, ctx: commands.Context, err: Exception, url=discord.Embed.Empty, content=None):
             await ctx.send(content=content, embed=cls.base(err, url=url))
 
         respond = exception
 
         @classmethod
-        async def modify(cls, msg, err, url=discord.Embed.Empty, content=None):
+        async def modify(cls, msg: str, err: Exception, url=discord.Embed.Empty, content: str = None):
             await msg.edit(content=content, embed=cls.base(err, url=url))
 
         @classmethod
-        def not_ready(cls):
+        def not_ready(cls) -> discord.Embed:
             return tls.Embed(description='This action could not be completed because the bot is not ready.',
                              colour=discord.Colour.dark_grey())
 
     class Command:
         @classmethod
-        async def execute(cls, self, ctx, name):
+        async def execute(cls, self: _PseudoCog, ctx: commands.Context, name: str):
             for x in self.bot.commands:
                 if x.name.lower() == name.lower():
                     await x.callback(self, ctx)
                     break
 
         @classmethod
-        def fetch(cls, self, name):
+        def fetch(cls, self: _PseudoCog, name: str) -> Union[commands.Command, NoneType]:
             for x in self.bot.commands:
                 if x.name.lower() == name.lower():
                     return x
@@ -55,25 +62,31 @@ class DiscordTools(utils.Utils):  # Discord utils
             return None
 
     class Cog:
+        PseudoCog = _PseudoCog
+        default = _PseudoCog
+        pseudo = _PseudoCog
+        stock = _PseudoCog
+        hint = _PseudoCog
+
         @classmethod
-        def fetch(cls, self, name):
+        def fetch(cls, self: _PseudoCog, name: str) -> Union[commands.Cog, NoneType]:
             for _name, _cog in self.bot.cogs.items():
                 if _name.lower() == name.lower():
                     return _cog
             return None
 
         @classmethod
-        def botSpecific(cls, snowflake, bot):
+        def botSpecific(cls, snowflake: int, bot: commands.Bot) -> bool:
             if bot.user.id == snowflake:
                 return True
             else:
                 raise tls.Exceptions.BotSpecificCog
 
     class Voice:
-        def __init__(self, ctx):
+        def __init__(self, ctx: commands.Context):
             self.ctx = ctx
 
-        def clients(self):
+        def clients(self) -> list[discord.VoiceClient]:
             return [x.voice_client for x in self.ctx.bot.guilds if x.voice_client is not None]
 
         async def disconnect(self):
@@ -85,7 +98,7 @@ class DiscordTools(utils.Utils):  # Discord utils
 
     class Activity:
         @classmethod
-        def from_dict(cls, data):
+        def from_dict(cls, data: dict) -> discord.Activity:
             activity = discord.Activity()
             activity.url = data.get('url', None)
             activity.application_id = data.get('application_id', None)
@@ -102,7 +115,7 @@ class DiscordTools(utils.Utils):  # Discord utils
             return activity
 
         @classmethod
-        async def preset(cls, bot):
+        async def preset(cls, bot: commands.Bot) -> tuple[discord.Activity, str]:
             try:
                 from core import json
                 status = json.orm['discord']['presence'].get(str(bot.user.id), 'default').get('status', json.orm['discord']['presence']['default']['status'])
@@ -113,12 +126,12 @@ class DiscordTools(utils.Utils):  # Discord utils
                 pass
 
         @classmethod
-        async def refresh(cls, bot):
+        async def refresh(cls, bot: commands.Bot):
             return await cls.preset(bot)
 
     class Users:
         @classmethod
-        def nicknames(cls, self):
+        def nicknames(cls, self: _PseudoCog) -> dict:
             nicknames = {}
             for x in self.bot.users:
                 nicknames[x.id] = []
@@ -137,8 +150,8 @@ class DiscordTools(utils.Utils):  # Discord utils
             # print(nicknames)
             return nicknames
 
-    class Embed:
-        def __new__(cls, ctx=None, **kwargs):
+    class Embed:  # this code is like, 2+ years old.
+        def __new__(cls, ctx: commands.Context = None, **kwargs) -> discord.Embed:
             color = kwargs.get('colour', DiscordTools().Color.get_color(ctx))
             title = kwargs.get('title', discord.Embed.Empty)
             _type = kwargs.get('type', 'rich')
@@ -218,23 +231,11 @@ class DiscordTools(utils.Utils):  # Discord utils
 
     class Color:
         @classmethod
-        def from_hsv(cls, h, s=100, v=100):  # Manually parse
-            # The builtin method is actually broken.
-            rgb = colorsys.hsv_to_rgb(h / 360, s / 100, v / 100)
-            r = int(round(rgb[0] * 255))
-            g = int(round(rgb[1] * 255))
-            b = int(round(rgb[2] * 255))
-            if r < 0:
-                r = 0
-            if g < 0:
-                g = 0
-            if b < 0:
-                b = 0
-            color = discord.Color.from_rgb(r, g, b)
-            return color
+        def from_hsv(cls, h: int, s: int = 100, v: int = 100) -> discord.Color:  # The discord builtin method is actually broken.
+            return discord.Color.from_rgb(*tuple(j if j > 0 else 0 for j in (round(i * 255) for i in colorsys.hsv_to_rgb(h / 360, s / 100, v / 100))))
 
         @classmethod
-        def get_color(ctx=None, other=None):  # Dumb code
+        def get_color(ctx: commands.Context = None, other=None):  # Dumb code
             if ctx is None:
                 return discord.Colour.blurple()
             else:

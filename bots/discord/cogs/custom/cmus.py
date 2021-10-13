@@ -295,7 +295,7 @@ class Player:
         member.guild.voice_client.stop()
 
     @classmethod
-    async def loop(cls, self: Music, ctx: commands.Context):
+    async def loop(cls, self: tls.Cog.pseudo, ctx: commands.Context):
         if not Player.is_playing(ctx) and not Player.is_paused(ctx) and len(queue[ctx.guild.id]['q']) > 0:
             while Player.has_queue(ctx):
                 if not Player.is_playing(ctx) and not Player.is_paused(ctx):
@@ -356,7 +356,7 @@ class Player:
         return False
 
     @classmethod
-    def self(cls, self: Music, member: discord.Member):  # Returns member object of bot.
+    def self(cls, self: tls.Cog.pseudo, member: discord.Member):  # Returns member object of bot.
         return member.guild.get_member(self.bot.user.id)
 
     @classmethod
