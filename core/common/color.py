@@ -1,15 +1,39 @@
+"""
+    Written by Elena Winters.
+    Copyright 2018-2023.
+
+    I don't know when I initially created this file,
+    but I made my bot in 2018, and this was an early addition.
+
+    This is basically a wrapper around colorama.
+    It makes it easier for me to program with it.
+
+"""
+
 from colorama import Fore, Back, Style
 import colorama
 colorama.init()
 
-"""
-    B stands for background
-    S stands for strong
+def __color_container(normal, normal_strong, background, background_strong):
+    class __color_class:
+        class B:
+            s = background_strong
 
-"""
+            def __str__(self):
+                return background
+        b = B()
+        s = normal_strong
+        def __str__(self):
+            return normal
+    return __color_class()
 
 
 class Trace:
+    """
+    B stands for background
+    S stands for strong
+
+    """
     reset = Style.RESET_ALL
     normal = Style.NORMAL
     generic = Fore.CYAN
@@ -30,109 +54,15 @@ class Trace:
 
     styles = Styles
 
-    class Black:
-        class B:
-            s = Back.LIGHTBLACK_EX
-
-            def __str__(self):
-                return Back.BLACK
-        b = B()
-        s = Fore.LIGHTBLACK_EX  # technically gray
-
-        def __str__(self):
-            return Fore.BLACK
-    black = Black()
-
-    class Red:
-        class B:
-            s = Back.LIGHTRED_EX
-
-            def __str__(self):
-                return Back.RED
-        b = B()
-        s = Fore.LIGHTRED_EX
-
-        def __str__(self):
-            return Fore.RED
-    red = Red()
-
-    class Green:
-        class B:
-            s = Back.LIGHTGREEN_EX
-
-            def __str__(self):
-                return Back.GREEN
-        b = B()
-        s = Fore.LIGHTGREEN_EX
-
-        def __str__(self):
-            return Fore.GREEN
-    green = Green()
-
-    class Yellow:
-        class B:
-            s = Back.LIGHTYELLOW_EX
-
-            def __str__(self):
-                return Back.YELLOW
-        b = B()
-        s = Fore.LIGHTYELLOW_EX
-
-        def __str__(self):
-            return Fore.YELLOW
-    yellow = Yellow()
-
-    class Blue:
-        class B:
-            s = Back.LIGHTBLUE_EX
-
-            def __str__(self):
-                return Back.BLUE
-        b = B()
-        s = Fore.LIGHTBLUE_EX
-
-        def __str__(self):
-            return Fore.BLUE
-    blue = Blue()
-
-    class Magenta:
-        class B:
-            s = Back.LIGHTMAGENTA_EX
-
-            def __str__(self):
-                return Back.MAGENTA
-        b = B()
-        s = Fore.LIGHTMAGENTA_EX
-
-        def __str__(self):
-            return Fore.MAGENTA
-    magenta = Magenta()
-
-    class Cyan:
-        class B:
-            s = Back.LIGHTCYAN_EX
-
-            def __str__(self):
-                return Back.CYAN
-        b = B()
-        s = Fore.LIGHTCYAN_EX
-
-        def __str__(self):
-            return Fore.CYAN
-    cyan = Cyan()
-
-    class White:
-        class B:
-            s = Back.LIGHTWHITE_EX
-
-            def __str__(self):
-                return Back.WHITE
-        b = B()
-        s = Fore.LIGHTWHITE_EX
-
-        def __str__(self):
-            return Fore.WHITE
-    white = White()
+    # 2023: Trying to make this nicer to look at instead of just duplicates of itself over and over for each color
+    black = __color_container(Fore.BLACK, Fore.LIGHTBLACK_EX, Back.BLACK, Back.LIGHTBLACK_EX)
+    red = __color_container(Fore.RED, Fore.LIGHTRED_EX, Back.RED, Back.LIGHTRED_EX)
+    green = __color_container(Fore.GREEN, Fore.LIGHTGREEN_EX, Back.GREEN, Back.LIGHTGREEN_EX)
+    yellow = __color_container(Fore.YELLOW, Fore.LIGHTYELLOW_EX, Back.YELLOW, Back.LIGHTYELLOW_EX)
+    blue = __color_container(Fore.BLUE, Fore.LIGHTBLUE_EX, Back.BLUE, Back.LIGHTBLUE_EX)
+    magenta = __color_container(Fore.MAGENTA, Fore.LIGHTMAGENTA_EX, Back.MAGENTA, Back.LIGHTMAGENTA_EX)
+    cyan = __color_container(Fore.CYAN, Fore.LIGHTCYAN_EX, Back.CYAN, Back.LIGHTCYAN_EX)
+    white = __color_container(Fore.WHITE, Fore.LIGHTWHITE_EX, Back.WHITE, Back.LIGHTWHITE_EX)
 
     # Tuple of all color objects implemented in this class. 36 objects in total.
     tracers = (styles.reset, styles.normal, styles.bold, styles.dim,
