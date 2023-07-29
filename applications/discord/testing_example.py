@@ -113,4 +113,4 @@ async def report_message(interaction: discord.Interaction, message: discord.Mess
     await log_channel.send(embed=embed, view=url_view)
 
 
-client.run('Mzk5Nzc3NDc5NDIzNjg4NzA1.Gg1sV5.PFEiGiwYtAX2eSKeojgwU9XG72etLPj-0JXyGQ') # 
+client.run('woops') # 
