@@ -1,3 +1,8 @@
+"""
+    THIS FILE IS MARKED FOR DELETION AND/OR A COMPLETE REWRITE
+
+"""
+
 from core.common.color import trace
 from core import util
 # import core.time

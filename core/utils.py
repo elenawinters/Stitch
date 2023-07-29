@@ -6,7 +6,7 @@
 """
 
 from typing import Any
-from core.color import trace
+from core.common.color import trace
 import traceback
 import inspect
 import logging

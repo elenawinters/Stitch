@@ -1,4 +1,4 @@
-
+# Handled in color.py?
 
 class Format:
     def clean(self, text: str):  # Shorthand for self.convert and self.remove
